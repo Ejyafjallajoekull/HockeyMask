@@ -6,4 +6,8 @@ public class JsonObject {
 		// TODO Auto-generated constructor stub
 	}
 
+	public String toJson() {
+		return null;
+	}
+	
 }

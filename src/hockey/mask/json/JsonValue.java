@@ -16,10 +16,100 @@ public class JsonValue {
 	 */
 	public static final String JSON_STRING_IDENTIFIER = "\"";
 	
+	/**
+	 * The JSON representation of a null value.
+	 */
+	public static final String JSON_NULL_VALUE = "null";
+	
 	Object value = null;
+	JsonValueTypes type = JsonValueTypes.NULL;
 
+	/**
+	 * Create a null JSON value.
+	 */
 	public JsonValue() {
-		// TODO Auto-generated constructor stub
+		this.setValueToNull();
+	}
+	
+	/**
+	 * Create a string JSON value.
+	 * 
+	 * @param string - the value
+	 */
+	public JsonValue(String string) {
+		this.setValue(string);
+	}
+	
+	/**
+	 * Create a boolean JSON value.
+	 * 
+	 * @param bool - the value
+	 */
+	public JsonValue(boolean bool) {
+		this.setValue(bool);
+	}
+	
+	/**
+	 * Create a number JSON value.
+	 * 
+	 * @param number - the value
+	 */
+	public JsonValue(int number) {
+		this.setValue(number);
+	}
+	
+	/**
+	 * Create a number JSON value.
+	 * 
+	 * @param number - the value
+	 */
+	public JsonValue(long number) {
+		this.setValue(number);
+	}
+	
+	/**
+	 * Create a number JSON value.
+	 * 
+	 * @param number - the value
+	 */
+	public JsonValue(float number) {
+		this.setValue(number);
+	}
+	
+	/**
+	 * Create a number JSON value.
+	 * 
+	 * @param number - the value
+	 */
+	public JsonValue(double number) {
+		this.setValue(number);
+	}
+	
+	/**
+	 * Create a number JSON value.
+	 * 
+	 * @param number - the value
+	 */
+	public JsonValue(BigDecimal number) {
+		this.setValue(number);
+	}
+	
+	/**
+	 * Create a JSON object JSON value.
+	 * 
+	 * @param jsonObject - the value
+	 */
+	public JsonValue(JsonObject jsonObject) {
+		this.setValue(jsonObject);
+	}
+	
+	/**
+	 * Create a JSON array JSON value.
+	 * 
+	 * @param jsonArray - the value
+	 */
+	public JsonValue(JsonArray jsonArray) {
+		this.setValue(jsonArray);
 	}
 	
 	/**
@@ -27,6 +117,7 @@ public class JsonValue {
 	 */
 	public void setValueToNull() {
 		this.value = null;
+		this.type = JsonValueTypes.NULL;
 	}
 	
 	/**
@@ -35,6 +126,11 @@ public class JsonValue {
 	 * @param string - the value to set
 	 */
 	public void setValue(String string) {
+		if (string != null) {
+			this.type = JsonValueTypes.STRING;
+		} else {
+			this.type = JsonValueTypes.NULL;
+		}
 		this.value = string;
 	}
 	
@@ -44,6 +140,7 @@ public class JsonValue {
 	 * @param bool - the value to set
 	 */
 	public void setValue(boolean bool) {
+		this.type = JsonValueTypes.BOOLEAN;
 		this.value = bool;
 	}
 	
@@ -55,6 +152,7 @@ public class JsonValue {
 	 * @param number - the value to set
 	 */
 	public void setValue(int number) {
+		this.type = JsonValueTypes.NUMBER;
 		this.value = new BigDecimal(number);
 	}
 	
@@ -66,6 +164,7 @@ public class JsonValue {
 	 * @param number - the value to set
 	 */
 	public void setValue(long number) {
+		this.type = JsonValueTypes.NUMBER;
 		this.value = new BigDecimal(number);
 	}
 	
@@ -77,6 +176,7 @@ public class JsonValue {
 	 * @param number - the value to set
 	 */
 	public void setValue(float number) {
+		this.type = JsonValueTypes.NUMBER;
 		this.value = new BigDecimal(number);
 	}
 	
@@ -88,6 +188,7 @@ public class JsonValue {
 	 * @param number - the value to set
 	 */
 	public void setValue(double number) {
+		this.type = JsonValueTypes.NUMBER;
 		this.value = new BigDecimal(number);
 	}
 	
@@ -100,6 +201,11 @@ public class JsonValue {
 	 * @param number - the value to set
 	 */
 	public void setValue(BigDecimal number) {
+		if (number != null) {
+			this.type = JsonValueTypes.NUMBER;
+		} else {
+			this.type = JsonValueTypes.NULL;
+		}
 		this.value = number;
 	}
 	
@@ -109,6 +215,11 @@ public class JsonValue {
 	 * @param jsonObject - the value to set
 	 */
 	public void setValue(JsonObject jsonObject) {
+		if (jsonObject != null) {
+			this.type = JsonValueTypes.OBJECT;
+		} else {
+			this.type = JsonValueTypes.NULL;
+		}
 		this.value = jsonObject;
 	}
 	
@@ -118,6 +229,11 @@ public class JsonValue {
 	 * @param jsonArray - the value to set
 	 */
 	public void setValue(JsonArray jsonArray) {
+		if (jsonArray != null) {
+			this.type = JsonValueTypes.ARRAY;
+		} else {
+			this.type = JsonValueTypes.NULL;
+		}
 		this.value = jsonArray;
 	}
 	
@@ -128,6 +244,15 @@ public class JsonValue {
 	 */
 	public Object getValue() {
 		return this.value;
+	}
+	
+	/**
+	 * Get the type of this JSON value.
+	 * 
+	 * @return the type of the value
+	 */
+	public JsonValueTypes getType() {
+		return this.type;
 	}
 	
 	public static JsonValue parse(String jsonValue) {
@@ -157,10 +282,57 @@ public class JsonValue {
 		}
 	}
 	
+	/**
+	 * Transforms the specified string to a JSON formatted string.
+	 * 
+	 * @param string . the string to transform
+	 * @return the JSON string representation of the specified string
+	 */
+	public static String stringToJson(String string) {
+		return JsonValue.JSON_STRING_IDENTIFIER + string + JsonValue.JSON_STRING_IDENTIFIER;
+	}
+	
+	/**
+	 * Get a string representing the value following the JSON standard.
+	 * 
+	 * @return this value in JSON format
+	 */
+	public String toJson() {
+		switch (this.type) {
+		
+		case NULL:
+			return JsonValue.JSON_NULL_VALUE;
+			
+		case STRING:
+			return JsonValue.stringToJson((String) this.getValue());
+			
+		case NUMBER:
+			return ((BigDecimal) this.getValue()).toString();
+			
+		case OBJECT:
+			return ((JsonObject) this.getValue()).toJson();
+			
+		case ARRAY:
+			return ((JsonArray) this.getValue()).toJson();
+		
+		default:
+			return this.getValue().toString();
+			
+		}
+	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (obj != null && obj instanceof JsonValue) {
-			
+			JsonValue val = (JsonValue) obj;
+			if (this.getType() == val.getType()) {
+				// simplify the null check for values by using the type
+				if (this.getType() == JsonValueTypes.NULL) {
+					return true;
+				} else {
+					return this.getValue().equals(val.getValue());				
+				}
+			}
 		}
 		return false;
 	}
