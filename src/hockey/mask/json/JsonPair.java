@@ -96,8 +96,31 @@ public class JsonPair {
 		}
 	}
 	
-	//TODO: implement equals and hash code
+	@Override
+	public boolean equals(Object obj) {
+		if (obj != null && obj instanceof JsonPair) {
+			JsonPair pair = (JsonPair) obj;
+			// the name cannot be null
+			if (this.getName().equals(pair.getName())) {
+				if (this.getValue() != null) {
+					return this.getValue().equals(pair.getValue());
+				} else {
+					return pair.getValue() == null;
+				}
+			}
+		}
+		return false;
+	}
 	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.getName() == null) ? 0 : this.getName().hashCode());
+		result = prime * result + ((this.getValue() == null) ? 0 : this.getValue().hashCode());
+		return result;
+	}
+		
 	@Override
 	public String toString() {
 		return String.format("\"%s\":%s", this.getName(), this.getValue());

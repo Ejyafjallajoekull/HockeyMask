@@ -22,6 +22,7 @@ public class JsonValueTesting implements TestSubject {
 	@Override
 	public void runAllTests() throws TestFailureException {
 		JsonValueTesting.testParseString();
+		JsonValueTesting.testToJsonString();
 		JsonValueTesting.testConstructors();
 		JsonValueTesting.testSetterGetter();
 	}
@@ -72,6 +73,30 @@ public class JsonValueTesting implements TestSubject {
 			/*
 			 * Do nothing as malformed strings should cause an exception to be thrown.
 			 */
+		}
+	}
+	
+	/**
+	 * Test the conversion of strings to JSON formatted strings.
+	 * 
+	 * @throws TestFailureException the test did fail
+	 */
+	public static void testToJsonString() throws TestFailureException {
+		String testString = null;
+		String resultString = null;
+		byte[] randomString = null;
+		for (int i = 0; i < 10000; i++) {
+			// create random strings
+			randomString = new byte[JsonValueTesting.RANDOM.nextInt(200)];
+			JsonValueTesting.RANDOM.nextBytes(randomString);
+			testString = new String(randomString);
+			// the resulting string should look like this
+			resultString = JsonValue.JSON_STRING_IDENTIFIER + testString
+					+ JsonValue.JSON_STRING_IDENTIFIER;
+			TestSubject.assertTestCondition(resultString.equals(JsonValue.stringToJson(
+					testString)), String.format("The string \"%s\" should be transfromed "
+							+ "to \"%s\", but is transformed to \"%s\".", testString, 
+							resultString, JsonValue.stringToJson(testString)));
 		}
 	}
 	
@@ -134,6 +159,15 @@ public class JsonValueTesting implements TestSubject {
 		long testLong = 0;
 		float testFloat = 0;
 		double testDouble = 0;
+		BigDecimal testDecimal = null;
+		// test null number
+		testValue.setValue(testDecimal);
+		TestSubject.assertTestCondition(testValue.getType() == JsonValueTypes.NULL, 
+				String.format("A JSON null number should be of type %s, but is %s.", 
+						JsonValueTypes.NULL, testValue.getType()));
+		TestSubject.assertTestCondition(testValue.getValue() == null, 
+				String.format("A JSON null number should have the value null, but has %s.", 
+						testValue.getValue()));
 		for (int i = 0; i < 10000; i++) {
 			// test ints
 			testInt = JsonValueTesting.RANDOM.nextInt();
@@ -171,8 +205,17 @@ public class JsonValueTesting implements TestSubject {
 			TestSubject.assertTestCondition(((BigDecimal) testValue.getValue()).doubleValue() == testDouble, 
 					String.format("The JSON number should hold the value %s, but holds %s.", 
 							testDouble, testValue.getValue()));
+			// test BigDecimal
+			testDecimal = new BigDecimal(testDouble);
+			testValue.setValue(testDecimal);
+			TestSubject.assertTestCondition(testValue.getType() == JsonValueTypes.NUMBER, 
+					String.format("A JSON number should be of type %s, but is %s.", 
+							JsonValueTypes.NUMBER, testValue.getType()));
+			TestSubject.assertTestCondition(((BigDecimal) testValue.getValue()).equals(testDecimal), 
+					String.format("The JSON number should hold the value %s, but holds %s.", 
+							testDecimal, testValue.getValue()));
 		}
-		
+		// TODO: add JsonArray and JsonObject once implemented
 	}
 
 }

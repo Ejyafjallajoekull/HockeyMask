@@ -1,6 +1,7 @@
 package hockey.mask.json;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * The JsonArray class represents an array formatted in the JSON standard. 
@@ -15,49 +16,54 @@ public class JsonArray extends ArrayList<JsonValue> {
 	 * Default serialisation ID.
 	 */
 	private static final long serialVersionUID = 1L;
-
+	
+	/**
+	 *  The identifier used to identify the start of a JSON formatted array.
+	 */
 	public static final String JSON_ARRAY_START_IDENTIFIER = "[";
 	
+	/**
+	 *  The identifier used to identify the end of a JSON formatted array.
+	 */
 	public static final String JSON_ARRAY_END_IDENTIFIER = "]";
 
+	/**
+	 *  The separator used to separate JSON formatted values contained in 
+	 *  a JSON formatted array.
+	 */
 	public static final String JSON_ARRAY_VALUE_SEPARATOR = ",";
-	
-	public ArrayList<JsonValue> content = new ArrayList<JsonValue>();
-	
+		
 	/**
 	 * Create a new, empty JSON array.
 	 */
 	public JsonArray() {
-		
+		super();
 	}
 	
-//	/**
-//	 * Set the content of the JSON array to the specified JSON values.
-//	 * 
-//	 * @param content - the new content of the array
-//	 */
-//	public void setContent(List<JsonValue> content) {
-//		if (content != null) {
-//			this.content = new ArrayList<JsonValue>(content);
-//		}
-//	}
-//	
-//	/**
-//	 * Set the content of the JSON array to the specified JSON values.
-//	 * 
-//	 * @param content - the new content of the array
-//	 */
-//	public void setContent(JsonValue[] content) {
-//		if (content != null) {
-//			this.content = new ArrayList<JsonValue>(Arrays.asList(content));
-//			this.
-//		}
-//	}
+	/**
+	 * Create a new JSON array containing the specified content.
+	 * 
+	 * @param content - the content to be contained
+	 */
+	public JsonArray(Collection<? extends JsonValue> content) {
+		super(content);
+	}
 	
-//	public int size() {
-//		return this.content.size();
-//	}
+	/**
+	 * Create a new, empty JSON array with the specified capacity.
+	 * 
+	 * @param capacity - the underlying lists capacity
+	 */
+	public JsonArray(int capacity) {
+		super(capacity);
+	}
 	
+	/**
+	 * Convert this JsonArray to a JSON formatted array string. 
+	 * Null values will be interpreted as JSON value of type null.
+	 * 
+	 * @return the JSON representation of this array
+	 */
 	public String toJson() {
 		StringBuilder jsonString = new StringBuilder(JsonArray.JSON_ARRAY_START_IDENTIFIER);
 		JsonValue val = null;
@@ -75,10 +81,38 @@ public class JsonArray extends ArrayList<JsonValue> {
 		jsonString.append(JsonArray.JSON_ARRAY_END_IDENTIFIER);
 		return jsonString.toString();
 	}
-
-//	@Override
-//	public Iterator<JsonValue> iterator() {
-//		return content.iterator();
-//	}
-
+	
+	/**
+	 * Parse the specified string as a JSON formatted array and create a JSON array 
+	 * object from it.
+	 * 
+	 * @param jsonArray - the JSON formatted array string
+	 * @return - the object created from the string
+	 * @throws JsonStandardException thrown if the string is not a JSON formatted array
+	 */
+	public static JsonArray parse(String jsonArray) throws JsonStandardException {
+		if (jsonArray != null) {
+			String trimmed = jsonArray.trim();
+			if (trimmed.startsWith(JsonArray.JSON_ARRAY_START_IDENTIFIER) 
+					&& trimmed.endsWith(JsonArray.JSON_ARRAY_END_IDENTIFIER)) {
+				trimmed = trimmed.substring(1,trimmed.length()-1);
+				String[] values = trimmed.split(JsonArray.JSON_ARRAY_VALUE_SEPARATOR);
+				JsonArray parsedArray = new JsonArray(values.length);
+				for (String val : values) {
+					parsedArray.add(new JsonValue(val));
+				}
+				return parsedArray;
+			} else {
+				throw new JsonStandardException(String.format("A JSON array has to start "
+						+ "with \"%s\" and end with \"%s\", but the supplied string \"%s\" "
+						+ "does not.", JsonArray.JSON_ARRAY_START_IDENTIFIER, 
+						JsonArray.JSON_ARRAY_END_IDENTIFIER, trimmed));
+			}
+		} else {
+			return null;
+		}
+	}
+	
+	// TODO: implement equals() and hashCode()
+	
 }

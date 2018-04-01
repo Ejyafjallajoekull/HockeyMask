@@ -21,6 +21,16 @@ public class JsonValue {
 	 */
 	public static final String JSON_NULL_VALUE = "null";
 	
+	/**
+	 * The JSON representation of a true boolean.
+	 */
+	public static final String JSON_TRUE_VALUE = "true";
+	
+	/**
+	 * The JSON representation of a false boolean.
+	 */
+	public static final String JSON_FALSE_VALUE = "false";
+	
 	Object value = null;
 	JsonValueTypes type = JsonValueTypes.NULL;
 
@@ -255,8 +265,61 @@ public class JsonValue {
 		return this.type;
 	}
 	
-	public static JsonValue parse(String jsonValue) {
-		return null;
+	public static JsonValue parse(String jsonValue) throws JsonStandardException {
+		if (jsonValue != null) {
+			try {
+				/*
+				 * Try parsing it as JSON string, which will fail if its not a JSON 
+				 * formatted string.
+				 */
+				return new JsonValue(JsonValue.parseString(jsonValue));
+			} catch (JsonStandardException e) {
+				try {
+					/*
+					 * Next, try parsing it as a JSON array, which may also fail if 
+					 * its not a JSON formatted array.
+					 */
+					return new JsonValue(JsonArray.parse(jsonValue));
+				} catch (JsonStandardException e1) {
+					try {
+						/*
+						 * Next, try parsing it as a JSON object, which may also fail if 
+						 * its not a JSON formatted object.
+						 */
+						return new JsonValue(JsonObject.parse(jsonValue));
+					} catch (JsonStandardException e2) {
+						/*
+						 * Last, check if it is a JSON null or boolean. 
+						 * If not parse it as a number.
+						 */
+						if (jsonValue.equals(JsonValue.JSON_NULL_VALUE)) {
+							return new JsonValue((String) null);
+						} else if (jsonValue.equals(JsonValue.JSON_TRUE_VALUE)) {
+							return new JsonValue(true);
+						} else if (jsonValue.equals(JsonValue.JSON_FALSE_VALUE)) {
+							return new JsonValue(false);
+						} else {
+							try {
+								return new JsonValue(new BigDecimal(jsonValue));
+							} catch (Exception lastException) {
+								/*
+								 * Catch every other exception, which might be thrown 
+								 * by trying to read in the string as number and throw 
+								 * a exception flagging it as JSON formatted.
+								 */
+								throw new JsonStandardException(String.format(
+										"The string \"%s\" is not a JSON formatted value.", 
+										jsonValue), lastException);
+							}
+						}
+					}
+
+				}
+			}
+		} else {
+			return null;
+		}
+		// TODO: implement
 	}
 	
 	/**
@@ -335,6 +398,15 @@ public class JsonValue {
 			}
 		}
 		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.getType() == null) ? 0 : this.getType().hashCode());
+		result = prime * result + ((this.getValue() == null) ? 0 : this.getValue().hashCode());
+		return result;
 	}
 	
 	@Override

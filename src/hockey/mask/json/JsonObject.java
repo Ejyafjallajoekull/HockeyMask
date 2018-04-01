@@ -10,4 +10,8 @@ public class JsonObject {
 		return null;
 	}
 	
+	public static JsonObject parse(String jsonObject) throws JsonStandardException {
+		throw new JsonStandardException();
+	}
+	
 }
