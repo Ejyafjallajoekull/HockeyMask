@@ -96,10 +96,16 @@ public class JsonArray extends ArrayList<JsonValue> {
 			if (trimmed.startsWith(JsonArray.JSON_ARRAY_START_IDENTIFIER) 
 					&& trimmed.endsWith(JsonArray.JSON_ARRAY_END_IDENTIFIER)) {
 				trimmed = trimmed.substring(1,trimmed.length()-1);
-				String[] values = trimmed.split(JsonArray.JSON_ARRAY_VALUE_SEPARATOR);
+				String[] values = null;
+				// this is needed as empty strings will cause an error
+				if (trimmed.length() > 0) {
+					values = trimmed.split(JsonArray.JSON_ARRAY_VALUE_SEPARATOR, -1);
+				} else {
+					values = new String[0];
+				}
 				JsonArray parsedArray = new JsonArray(values.length);
 				for (String val : values) {
-					parsedArray.add(new JsonValue(val));
+					parsedArray.add(JsonValue.parse(val));
 				}
 				return parsedArray;
 			} else {
@@ -113,6 +119,8 @@ public class JsonArray extends ArrayList<JsonValue> {
 		}
 	}
 	
-	// TODO: implement equals() and hashCode()
+	/*
+	 * equals() and hashCode() functions of the super class should be sufficient.
+	 */
 	
 }

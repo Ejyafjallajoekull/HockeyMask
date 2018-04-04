@@ -41,6 +41,15 @@ public class JsonPair {
 	}
 	
 	/**
+	 * Transforms the name of this pair to a JSON formatted string.
+	 * 
+	 * @return the JSON string representation of the pair name
+	 */
+	public String getNameAsJson() {
+		return JsonValue.stringToJson(this.getName());
+	}
+	
+	/**
 	 * Set the name of the pair.
 	 * 
 	 * @param name - the name of the pair
@@ -71,6 +80,20 @@ public class JsonPair {
 	 */
 	public void setValue(JsonValue value) {
 		this.value = value;
+	}
+	
+	/**
+	 * Convert this JsonPair to a JSON formatted pair string. 
+	 * Null values will be interpreted as JSON value of type null.
+	 * 
+	 * @return the JSON representation of this pair
+	 */
+	public String toJson() {
+		if (this.getValue() != null) {
+			return String.format("%s%s%s", this.getNameAsJson(), JsonPair.JSON_PAIR_SEPARATOR, this.getValue().toJson());
+		} else {
+			return String.format("%s%s%s", this.getNameAsJson(), JsonPair.JSON_PAIR_SEPARATOR, JsonValue.JSON_NULL_VALUE);
+		}
 	}
 	
 	/**
@@ -123,7 +146,7 @@ public class JsonPair {
 		
 	@Override
 	public String toString() {
-		return String.format("\"%s\":%s", this.getName(), this.getValue());
+		return String.format("\"%s\"%s%s", this.getName(), JsonPair.JSON_PAIR_SEPARATOR, this.getValue());
 	}
 
 }
