@@ -1,4 +1,4 @@
-package hockey.mask.json;
+package hockey.mask.json.hockey.mask.json;
 
 import java.util.ArrayList;
 import java.util.Collection;

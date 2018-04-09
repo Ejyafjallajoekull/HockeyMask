@@ -1,10 +1,10 @@
-package hockey.mask.test;
+package hockey.mask.test.hockey.mask.test;
 
 import java.util.Random;
 
-import hockey.mask.json.JsonPair;
-import hockey.mask.json.JsonStandardException;
-import hockey.mask.json.JsonValue;
+import hockey.mask.json.hockey.mask.json.JsonPair;
+import hockey.mask.json.hockey.mask.json.JsonStandardException;
+import hockey.mask.json.hockey.mask.json.JsonValue;
 import koro.sensei.tester.TestFailureException;
 import koro.sensei.tester.TestSubject;
 
