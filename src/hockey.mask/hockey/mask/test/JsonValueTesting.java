@@ -1,13 +1,13 @@
-package hockey.mask.test.hockey.mask.test;
+package hockey.mask.test;
 
 import java.math.BigDecimal;
 import java.util.Random;
 
-import hockey.mask.json.hockey.mask.json.JsonArray;
-import hockey.mask.json.hockey.mask.json.JsonObject;
-import hockey.mask.json.hockey.mask.json.JsonStandardException;
-import hockey.mask.json.hockey.mask.json.JsonValue;
-import hockey.mask.json.hockey.mask.json.JsonValueTypes;
+import hockey.mask.json.JsonArray;
+import hockey.mask.json.JsonObject;
+import hockey.mask.json.JsonStandardException;
+import hockey.mask.json.JsonValue;
+import hockey.mask.json.JsonValueTypes;
 import koro.sensei.tester.TestFailureException;
 import koro.sensei.tester.TestSubject;
 

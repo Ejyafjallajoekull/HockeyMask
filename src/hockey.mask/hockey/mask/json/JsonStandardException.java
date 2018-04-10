@@ -1,4 +1,4 @@
-package hockey.mask.json.hockey.mask.json;
+package hockey.mask.json;
 
 /**
  * The JsonStandardException class will be thrown if the JSON standard is violated.
