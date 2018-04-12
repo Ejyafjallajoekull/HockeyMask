@@ -12,6 +12,8 @@ module hockey.mask {
 	 */
 	
 	exports hockey.mask.json;
+	exports hockey.mask.json.io;
+	exports hockey.mask.test;
 	
 	requires transitive java.base;
 	requires koro.sensei.tester;

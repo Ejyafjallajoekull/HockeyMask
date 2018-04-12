@@ -21,6 +21,7 @@ public class JsonPairTesting implements TestSubject {
 	@Override
 	public void runAllTests() throws TestFailureException {
 		JsonPairTesting.testConstructors();
+		JsonPairTesting.testSettingGetting();
 	}
 	
 	/**
@@ -28,7 +29,7 @@ public class JsonPairTesting implements TestSubject {
 	 * 
 	 * @throws TestFailureException the test did fail
 	 */
-	public static void testConstructors() throws TestFailureException {
+	private static void testConstructors() throws TestFailureException {
 		JsonValue testValue = null;
 		String testName = null;
 		byte[] randomString = null;
@@ -72,6 +73,15 @@ public class JsonPairTesting implements TestSubject {
 				 */
 			}
 		}
+	}
+	
+	/**
+	 * Test the getters and setters.
+	 * 
+	 * @throws TestFailureException the test did fail
+	 */
+	private static void testSettingGetting() throws TestFailureException {
+		
 	}
 
 }
