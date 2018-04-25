@@ -62,16 +62,24 @@ public class JsonString {
 	 */
 	public String toJson() {
 		if (this.toString() != null) {
-			/*
-			 * TODO: Make this method more efficient and independent of the position 
-			 * of the backslash in the escaped characters array by use of a StringBuilder.
-			 */
-			String jsonS = this.toString();
-			// replace all special characters with their JSON representation
-			for (String[] specialCharacter : JsonString.JSON_STRING_ESCAPED_CHARACTERS) {
-				jsonS = jsonS.replace(specialCharacter[0], JSON_STRING_ESCAPE_CHARACTER + specialCharacter[1]);
+//			String jsonS = this.toString();
+			StringBuilder sb = new StringBuilder(this.toString());
+			int endIndex = 0;
+			for (int i = 0; i < sb.length(); i++) {
+				for (String[] escape : JsonString.JSON_STRING_ESCAPED_CHARACTERS) {
+					endIndex = i + escape[0].length();
+					if (endIndex <= sb.length() && sb.subSequence(i, endIndex).equals(escape[0])) {
+						sb.replace(i, endIndex, JsonString.JSON_STRING_ESCAPE_CHARACTER + escape[1]);
+						i += JsonString.JSON_STRING_ESCAPE_CHARACTER.length() + escape[1].length() - 1;
+					}
+				}
 			}
-			return JsonString.JSON_STRING_IDENTIFIER + jsonS + JsonString.JSON_STRING_IDENTIFIER;
+			return sb.insert(0, JsonString.JSON_STRING_IDENTIFIER).append(JsonString.JSON_STRING_IDENTIFIER).toString();
+//			// replace all special characters with their JSON representation
+//			for (String[] specialCharacter : JsonString.JSON_STRING_ESCAPED_CHARACTERS) {
+//				jsonS = jsonS.replace(specialCharacter[0], JSON_STRING_ESCAPE_CHARACTER + specialCharacter[1]);
+//			}
+//			return JsonString.JSON_STRING_IDENTIFIER + jsonS + JsonString.JSON_STRING_IDENTIFIER;
 		} else {
 			return JsonValue.JSON_NULL_VALUE;
 		}
@@ -86,11 +94,17 @@ public class JsonString {
 	 * @throws JsonStandardException thrown if the string was not JSON formatted
 	 */
 	public static String parse(String jsonString) throws JsonStandardException {
-		//TODO: adpate function
+		//TODO: update function
 		if (jsonString != null) {
 			String trimmed = jsonString.trim();
 			if (trimmed.startsWith(JsonString.JSON_STRING_IDENTIFIER) 
 					&& trimmed.endsWith(JsonString.JSON_STRING_IDENTIFIER)) {
+				// replace all escaped characters with their Java representation
+				for (String[] specialCharacter : JsonString.JSON_STRING_ESCAPED_CHARACTERS) {
+					trimmed = trimmed.replace(JSON_STRING_ESCAPE_CHARACTER + specialCharacter[1], specialCharacter[0]);
+					System.out.println(String.format("Replacing [%s] with [%s], yielding [%s]",
+							JSON_STRING_ESCAPE_CHARACTER + specialCharacter[1], specialCharacter[0], trimmed));
+				}
 				return trimmed.substring(1, trimmed.length()-1);
 			} else {
 				throw new JsonStandardException(String.format("The string \"%s\" is not a JSON string.", 
