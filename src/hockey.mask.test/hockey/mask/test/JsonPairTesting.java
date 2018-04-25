@@ -22,6 +22,7 @@ public class JsonPairTesting implements TestSubject {
 	public void runAllTests() throws TestFailureException {
 		JsonPairTesting.testConstructors();
 		JsonPairTesting.testSettingGetting();
+		JsonPairTesting.testParsing();
 	}
 	
 	/**
@@ -81,7 +82,88 @@ public class JsonPairTesting implements TestSubject {
 	 * @throws TestFailureException the test did fail
 	 */
 	private static void testSettingGetting() throws TestFailureException {
-		
+		JsonValue testValue = null;
+		String testName = "";
+		byte[] randomString = null;
+		JsonPair jp = null;
+		try {
+			jp = new JsonPair(testName, testValue);
+		} catch (JsonStandardException e1) {
+			throw new TestFailureException(String.format("The JSON standard has been violated "
+					+ "by trying to create a JSON pair with name \"%s\" and value \"%s\"", testName, 
+					testValue), e1);
+		}
+		for (int i = 0; i < 10000; i++) {
+			// create random strings
+			randomString = new byte[JsonPairTesting.RANDOM.nextInt(200)];
+			JsonPairTesting.RANDOM.nextBytes(randomString);
+			testName = new String(randomString);
+			JsonPairTesting.RANDOM.nextBytes(randomString);
+			testValue = new JsonValue(new String(randomString));
+			try {
+				jp.setName(testName);
+				jp.setValue(testValue);
+				TestSubject.assertTestCondition(jp.getName().equals(testName), 
+						String.format("The JSON pair %s should have the name \"%s\", "
+								+ "but has the name \"%s\".", jp, testName, jp.getName()));
+				TestSubject.assertTestCondition(jp.getNameAsJson().equals(JsonValue.stringToJson(testName)), 
+						String.format("The JSON pair %s should have the json name string \"%s\", "
+								+ "but has the name string \"%s\".", jp, 
+								JsonValue.stringToJson(testName), jp.getNameAsJson()));
+				TestSubject.assertTestCondition(jp.getValue().equals(testValue), 
+						String.format("The JSON pair %s should have the value \"%s\", "
+								+ "but has the value \"%s\".", jp, testValue, jp.getValue()));
+			} catch (JsonStandardException e) {
+				throw new TestFailureException("The JSON standard was violated.", e);
+			}
+			try {
+				jp.setName(null);
+				throw new TestFailureException("An exception should have been thrown as "
+						+ "the JSON standard has been violated.");
+			} catch (JsonStandardException e) {
+				/*
+				 * Do nothing as this is the expected behaviour.
+				 */
+			}
+		}
 	}
-
+	
+	/**
+	 * Test the parsing of JSON formatted strings to JSON pairs.
+	 * 
+	 * @throws TestFailureException the test did fail
+	 */
+	private static void testParsing() throws TestFailureException {
+		JsonValue testValue = null;
+		String testName = "";
+		byte[] randomString = null;
+		JsonPair jp = null;
+		JsonPair jjp = null;
+		try {
+			jp = new JsonPair(testName, testValue);
+		} catch (JsonStandardException e1) {
+			throw new TestFailureException(String.format("The JSON standard has been violated "
+					+ "by trying to create a JSON pair with name \"%s\" and value \"%s\"", testName, 
+					testValue), e1);
+		}
+		for (int i = 0; i < 10000; i++) {
+			// create random strings
+			randomString = new byte[JsonPairTesting.RANDOM.nextInt(200)];
+			JsonPairTesting.RANDOM.nextBytes(randomString);
+			testName = new String(randomString);
+			JsonPairTesting.RANDOM.nextBytes(randomString);
+			testValue = new JsonValue(new String(randomString));
+			try {
+				jp.setName(testName);
+				jp.setValue(testValue);
+				jjp = JsonPair.parse(jp.toJson());
+				TestSubject.assertTestCondition(jp.equals(jjp), 
+						String.format("The JSON pair %s should equal the pair %s parsed from "
+								+ "the JSON formatted string \"%s\".",	jp, jjp, jp.toJson()));
+			} catch (JsonStandardException e) {
+				throw new TestFailureException("The JSON standard was violated.", e);
+			}
+		}
+	}
+	
 }

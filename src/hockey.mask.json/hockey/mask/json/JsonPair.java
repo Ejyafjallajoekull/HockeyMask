@@ -111,7 +111,7 @@ public class JsonPair {
 						JsonValue.parse(pair[1]));
 			} else {
 				throw new JsonStandardException(String.format("A name-value-pair was expected, "
-						+ "but \"%s\" was supplied.", Arrays.toString(pair)));
+						+ "but %s was supplied.", Arrays.toString(pair)));
 			}
 		} else {
 			throw new JsonStandardException(String.format("The string \"%s\" is not a JSONPair.", 

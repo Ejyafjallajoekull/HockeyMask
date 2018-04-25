@@ -12,11 +12,6 @@ import java.math.BigDecimal;
 public class JsonValue {
 	
 	/**
-	 *  The identifier used to identify JSON formatted strings.
-	 */
-	public static final String JSON_STRING_IDENTIFIER = "\"";
-	
-	/**
 	 * The JSON representation of a null value.
 	 */
 	public static final String JSON_NULL_VALUE = "null";
@@ -320,39 +315,6 @@ public class JsonValue {
 			return null;
 		}
 		// TODO: implement
-	}
-	
-	/**
-	 * Parse the specified JSON formatted string and return its internal representation.
-	 * This basically strips the string from the JSON string identifier characters.
-	 * 
-	 * @param jsonString - the JSON formatted string
-	 * @return the string without the JSON string identifier
-	 * @throws JsonStandardException thrown if the string was not JSON formatted
-	 */
-	public static String parseString(String jsonString) throws JsonStandardException {
-		if (jsonString != null) {
-			String trimmed = jsonString.trim();
-			if (trimmed.startsWith(JsonValue.JSON_STRING_IDENTIFIER) 
-					&& trimmed.endsWith(JsonValue.JSON_STRING_IDENTIFIER)) {
-				return trimmed.substring(1, trimmed.length()-1);
-			} else {
-				throw new JsonStandardException(String.format("The string \"%s\" is not a JSON string.", 
-						jsonString));
-			}
-		} else {
-			throw new JsonStandardException("A JSON formatted string may not be null.");
-		}
-	}
-	
-	/**
-	 * Transforms the specified string to a JSON formatted string.
-	 * 
-	 * @param string . the string to transform
-	 * @return the JSON string representation of the specified string
-	 */
-	public static String stringToJson(String string) {
-		return JsonValue.JSON_STRING_IDENTIFIER + string + JsonValue.JSON_STRING_IDENTIFIER;
 	}
 	
 	/**
