@@ -9,6 +9,6 @@ module hockey.mask.json {
 	exports hockey.mask.json;
 	exports hockey.mask.json.io;
 	
-	requires transitive java.base;
+	requires java.base;
 	
 }

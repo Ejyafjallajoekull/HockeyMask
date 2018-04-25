@@ -9,7 +9,7 @@ module hockey.mask.test {
 	exports hockey.mask.test;
 	
 	requires hockey.mask.json;
-	requires transitive java.base;
+	requires java.base;
 	requires koro.sensei.tester;
 	
 }
