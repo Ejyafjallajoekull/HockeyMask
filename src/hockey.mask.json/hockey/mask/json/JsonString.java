@@ -93,19 +93,40 @@ public class JsonString {
 	 * @return the string without the JSON string identifier
 	 * @throws JsonStandardException thrown if the string was not JSON formatted
 	 */
-	public static String parse(String jsonString) throws JsonStandardException {
+	public static JsonString parse(String jsonString) throws JsonStandardException {
 		//TODO: update function
 		if (jsonString != null) {
 			String trimmed = jsonString.trim();
 			if (trimmed.startsWith(JsonString.JSON_STRING_IDENTIFIER) 
 					&& trimmed.endsWith(JsonString.JSON_STRING_IDENTIFIER)) {
+				// strip identifiers and create StringBuilder 
+				StringBuilder sb = new StringBuilder(trimmed.substring(JsonString.JSON_STRING_IDENTIFIER.length(), trimmed.length()-JsonString.JSON_STRING_IDENTIFIER.length()));
 				// replace all escaped characters with their Java representation
-				for (String[] specialCharacter : JsonString.JSON_STRING_ESCAPED_CHARACTERS) {
-					trimmed = trimmed.replace(JSON_STRING_ESCAPE_CHARACTER + specialCharacter[1], specialCharacter[0]);
-					System.out.println(String.format("Replacing [%s] with [%s], yielding [%s]",
-							JSON_STRING_ESCAPE_CHARACTER + specialCharacter[1], specialCharacter[0], trimmed));
+//				for (String[] specialCharacter : JsonString.JSON_STRING_ESCAPED_CHARACTERS) {
+//					trimmed = trimmed.replace(JSON_STRING_ESCAPE_CHARACTER + specialCharacter[1], specialCharacter[0]);
+//					System.out.println(String.format("Replacing [%s] with [%s], yielding [%s]",
+//							JSON_STRING_ESCAPE_CHARACTER + specialCharacter[1], specialCharacter[0], trimmed));
+//				}
+				int endIndex = 0;
+				for (int i = 0; i < sb.length(); i++) {
+					endIndex = i + JsonString.JSON_STRING_ESCAPE_CHARACTER.length();
+					// find escape characters
+					if (endIndex <= sb.length() && sb.subSequence(i, endIndex).equals(JsonString.JSON_STRING_ESCAPE_CHARACTER)) {
+						for (String[] escape : JsonString.JSON_STRING_ESCAPED_CHARACTERS) {
+							if (endIndex + escape[1].length() <= sb.length() && sb.subSequence(endIndex, endIndex + escape[1].length()).equals(escape[1])) {
+								sb.replace(i, endIndex + escape[1].length(), escape[0]);
+								i += escape[0].length() - 1;
+								/*
+								 * Exit the loop if the according character is found, so 
+								 * subsequent meaningful characters are not processed afterwards.
+								 */
+								break;
+							}
+						}
+					}
+					
 				}
-				return trimmed.substring(1, trimmed.length()-1);
+				return new JsonString(sb.toString());
 			} else {
 				throw new JsonStandardException(String.format("The string \"%s\" is not a JSON string.", 
 						jsonString));
