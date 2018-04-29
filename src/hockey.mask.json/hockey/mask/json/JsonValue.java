@@ -41,7 +41,7 @@ public class JsonValue {
 	 * 
 	 * @param string - the value
 	 */
-	public JsonValue(String string) {
+	public JsonValue(JsonString string) {
 		this.setValue(string);
 	}
 	
@@ -130,7 +130,7 @@ public class JsonValue {
 	 * 
 	 * @param string - the value to set
 	 */
-	public void setValue(String string) {
+	public void setValue(JsonString string) {
 		if (string != null) {
 			this.type = JsonValueTypes.STRING;
 		} else {
@@ -267,7 +267,7 @@ public class JsonValue {
 				 * Try parsing it as JSON string, which will fail if its not a JSON 
 				 * formatted string.
 				 */
-				return new JsonValue(JsonValue.parseString(jsonValue));
+				return new JsonValue(JsonString.parse(jsonValue));
 			} catch (JsonStandardException e) {
 				try {
 					/*
@@ -288,7 +288,7 @@ public class JsonValue {
 						 * If not parse it as a number.
 						 */
 						if (jsonValue.equals(JsonValue.JSON_NULL_VALUE)) {
-							return new JsonValue((String) null);
+							return new JsonValue();
 						} else if (jsonValue.equals(JsonValue.JSON_TRUE_VALUE)) {
 							return new JsonValue(true);
 						} else if (jsonValue.equals(JsonValue.JSON_FALSE_VALUE)) {
@@ -300,7 +300,7 @@ public class JsonValue {
 								/*
 								 * Catch every other exception, which might be thrown 
 								 * by trying to read in the string as number and throw 
-								 * a exception flagging it as JSON formatted.
+								 * a exception flagging it as not JSON formatted.
 								 */
 								throw new JsonStandardException(String.format(
 										"The string \"%s\" is not a JSON formatted value.", 
@@ -314,7 +314,6 @@ public class JsonValue {
 		} else {
 			return null;
 		}
-		// TODO: implement
 	}
 	
 	/**
@@ -329,7 +328,7 @@ public class JsonValue {
 			return JsonValue.JSON_NULL_VALUE;
 			
 		case STRING:
-			return JsonValue.stringToJson((String) this.getValue());
+			return ((JsonString) this.getValue()).toJson();
 			
 		case NUMBER:
 			return ((BigDecimal) this.getValue()).toString();

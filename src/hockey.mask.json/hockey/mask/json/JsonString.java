@@ -48,9 +48,15 @@ public class JsonString {
 	 * Create a new JSON formatted string from a Java string.
 	 * 
 	 * @param value - the java string content
+	 * 
+	 * @throws NullPointerException if null is passed string value
 	 */
 	public JsonString(String value) {
-		this.value = value;
+		if (value != null) {
+			this.value = value;
+		} else {
+			throw new NullPointerException("A JSON formatted string cannot be null");
+		}
 	}
 	
 	/**
@@ -94,7 +100,6 @@ public class JsonString {
 	 * @throws JsonStandardException thrown if the string was not JSON formatted
 	 */
 	public static JsonString parse(String jsonString) throws JsonStandardException {
-		//TODO: update function
 		if (jsonString != null) {
 			String trimmed = jsonString.trim();
 			if (trimmed.startsWith(JsonString.JSON_STRING_IDENTIFIER) 

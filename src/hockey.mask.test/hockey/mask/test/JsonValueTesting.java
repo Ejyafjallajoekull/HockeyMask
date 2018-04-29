@@ -6,6 +6,7 @@ import java.util.Random;
 import hockey.mask.json.JsonArray;
 import hockey.mask.json.JsonObject;
 import hockey.mask.json.JsonStandardException;
+import hockey.mask.json.JsonString;
 import hockey.mask.json.JsonValue;
 import hockey.mask.json.JsonValueTypes;
 import koro.sensei.tester.TestFailureException;
@@ -23,85 +24,10 @@ public class JsonValueTesting implements TestSubject {
 	
 	@Override
 	public void runAllTests() throws TestFailureException {
-		JsonValueTesting.testParseString();
-		JsonValueTesting.testToJsonString();
 		JsonValueTesting.testConstructors();
 		JsonValueTesting.testSetterGetter();
 		JsonValueTesting.testParsing();
 		JsonValueTesting.testToJson();
-	}
-	
-	/**
-	 * Test whether the parsing of JSON formatted strings works correctly.
-	 * 
-	 * @throws TestFailureException the test did fail
-	 */
-	private static void testParseString() throws TestFailureException {
-		String testString = null;
-		String resultString = null;
-		byte[] randomString = null;
-		for (int i = 0; i < 10000; i++) {
-			// create random strings
-			randomString = new byte[JsonValueTesting.RANDOM.nextInt(200)];
-			JsonValueTesting.RANDOM.nextBytes(randomString);
-			resultString = new String(randomString);
-			// test well formed strings
-			testString = JsonValue.JSON_STRING_IDENTIFIER + resultString
-					+ JsonValue.JSON_STRING_IDENTIFIER;
-			try {
-				TestSubject.assertTestCondition(resultString.equals(JsonValue.parseString(
-						testString)), String.format("The JSON string \"%s\" should be parsed "
-								+ "as \"%s\", but is parsed as \"%s\".", testString, 
-								resultString, JsonValue.parseString(testString)));
-			} catch (JsonStandardException e) {
-				throw new TestFailureException(e);
-			}
-			// test malformed strings
-			testString = testString.replaceAll(JsonValue.JSON_STRING_IDENTIFIER, "");
-			try {
-				JsonValue.parseString(testString);
-				throw new TestFailureException(String.format("The string \"%s\" should "
-						+ "not be JSON formatted and thereby cause an error.", testString));
-			} catch (JsonStandardException e) {
-				/*
-				 * Do nothing as malformed strings should cause an exception to be thrown.
-				 */
-			}
-		}
-		// test null strings
-		try {
-			JsonValue.parseString(null);
-			throw new TestFailureException("A null string should "
-					+ "not be JSON formatted and thereby cause an error.");
-		} catch (JsonStandardException e) {
-			/*
-			 * Do nothing as malformed strings should cause an exception to be thrown.
-			 */
-		}
-	}
-	
-	/**
-	 * Test the conversion of strings to JSON formatted strings.
-	 * 
-	 * @throws TestFailureException the test did fail
-	 */
-	private static void testToJsonString() throws TestFailureException {
-		String testString = null;
-		String resultString = null;
-		byte[] randomString = null;
-		for (int i = 0; i < 10000; i++) {
-			// create random strings
-			randomString = new byte[JsonValueTesting.RANDOM.nextInt(200)];
-			JsonValueTesting.RANDOM.nextBytes(randomString);
-			testString = new String(randomString);
-			// the resulting string should look like this
-			resultString = JsonValue.JSON_STRING_IDENTIFIER + testString
-					+ JsonValue.JSON_STRING_IDENTIFIER;
-			TestSubject.assertTestCondition(resultString.equals(JsonValue.stringToJson(
-					testString)), String.format("The string \"%s\" should be transfromed "
-							+ "to \"%s\", but is transformed to \"%s\".", testString, 
-							resultString, JsonValue.stringToJson(testString)));
-		}
 	}
 	
 	/**
@@ -119,7 +45,8 @@ public class JsonValueTesting implements TestSubject {
 		// test JSON string
 		String testString = null;
 		byte[] randomString = null;
-		testValue = new JsonValue(testString);
+		JsonString jsonTestString = null;
+		testValue = new JsonValue(jsonTestString);
 		TestSubject.assertTestCondition(testValue.getType() == JsonValueTypes.NULL, 
 				String.format("A JSON null string should be of type %s, but is %s.", 
 						JsonValueTypes.NULL, testValue.getType()));
@@ -131,13 +58,14 @@ public class JsonValueTesting implements TestSubject {
 			randomString = new byte[JsonValueTesting.RANDOM.nextInt(200)];
 			JsonValueTesting.RANDOM.nextBytes(randomString);
 			testString = new String(randomString);
-			testValue = new JsonValue(testString);
+			jsonTestString = new JsonString(testString);
+			testValue = new JsonValue(jsonTestString);
 			TestSubject.assertTestCondition(testValue.getType() == JsonValueTypes.STRING, 
 					String.format("A JSON string should be of type %s, but is %s.", 
 							JsonValueTypes.STRING, testValue.getType()));
-			TestSubject.assertTestCondition(testString.equals(testValue.getValue()), 
+			TestSubject.assertTestCondition(jsonTestString.equals(testValue.getValue()), 
 					String.format("The JSON string should hold the value %s, but has %s.", 
-							testString, testValue.getValue()));
+							jsonTestString, testValue.getValue()));
 		}
 		// test JSON boolean
 		boolean testBool = false;
@@ -251,7 +179,8 @@ public class JsonValueTesting implements TestSubject {
 		// test JSON string
 		String testString = null;
 		byte[] randomString = null;
-		testValue.setValue(testString);
+		JsonString jsonTestString = null;
+		testValue.setValue(jsonTestString);
 		TestSubject.assertTestCondition(testValue.getType() == JsonValueTypes.NULL, 
 				String.format("A JSON null string should be of type %s, but is %s.", 
 						JsonValueTypes.NULL, testValue.getType()));
@@ -263,13 +192,14 @@ public class JsonValueTesting implements TestSubject {
 			randomString = new byte[JsonValueTesting.RANDOM.nextInt(200)];
 			JsonValueTesting.RANDOM.nextBytes(randomString);
 			testString = new String(randomString);
-			testValue.setValue(testString);
+			jsonTestString = new JsonString(testString);
+			testValue.setValue(jsonTestString);
 			TestSubject.assertTestCondition(testValue.getType() == JsonValueTypes.STRING, 
 					String.format("A JSON string should be of type %s, but is %s.", 
 							JsonValueTypes.STRING, testValue.getType()));
-			TestSubject.assertTestCondition(testString.equals(testValue.getValue()), 
+			TestSubject.assertTestCondition(jsonTestString.equals(testValue.getValue()), 
 					String.format("The JSON string should hold the value %s, but has %s.", 
-							testString, testValue.getValue()));
+							jsonTestString, testValue.getValue()));
 		}
 		// test JSON boolean
 		boolean testBool = false;
@@ -375,19 +305,22 @@ public class JsonValueTesting implements TestSubject {
 		// test strings
 		String testString = null;
 		byte[] randomString = null;
+		JsonString jsonTestString = null;
 		for (int i = 0; i < 10000; i++) {
 			// create random strings
 			randomString = new byte[JsonValueTesting.RANDOM.nextInt(200)];
 			JsonValueTesting.RANDOM.nextBytes(randomString);
 			testString = new String(randomString);
+			jsonTestString = new JsonString(testString);
 			try {
-				testValue = JsonValue.parse(JsonValue.stringToJson(testString));
+				
+				testValue = JsonValue.parse(jsonTestString.toJson());
 				TestSubject.assertTestCondition(testValue.getType() == JsonValueTypes.STRING, 
 						String.format("A JSON string should be of type %s, but is %s.", 
 								JsonValueTypes.STRING, testValue.getType()));
-				TestSubject.assertTestCondition(testString.equals(testValue.getValue()), 
+				TestSubject.assertTestCondition(jsonTestString.equals(testValue.getValue()), 
 						String.format("The JSON string should hold the value %s, but has %s.", 
-								testString, testValue.getValue()));
+								jsonTestString, testValue.getValue()));
 			} catch (JsonStandardException e) {
 				throw new TestFailureException(String.format("No JSON representation for "
 						+ "the string \"%s\" could be generated.", testString), e);
@@ -507,7 +440,8 @@ public class JsonValueTesting implements TestSubject {
 			// test JSON string
 			String testString = null;
 			byte[] randomString = null;
-			testValue.setValue(testString);
+			JsonString jsonTestString = null;
+			testValue.setValue(jsonTestString);
 			serialised = JsonValue.parse(testValue.toJson());
 			TestSubject.assertTestCondition(testValue.equals(serialised), 
 					String.format("The JSON value created by parsing the string \"%s\" "
@@ -518,7 +452,8 @@ public class JsonValueTesting implements TestSubject {
 				randomString = new byte[JsonValueTesting.RANDOM.nextInt(200)];
 				JsonValueTesting.RANDOM.nextBytes(randomString);
 				testString = new String(randomString);
-				testValue = new JsonValue(testString);
+				jsonTestString = new JsonString(testString);
+				testValue = new JsonValue(jsonTestString);
 				serialised = JsonValue.parse(testValue.toJson());
 				TestSubject.assertTestCondition(testValue.equals(serialised), 
 						String.format("The JSON value created by parsing the string \"%s\" "

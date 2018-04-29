@@ -30,22 +30,29 @@ public class JsonStringTesting implements TestSubject {
 	 * @throws TestFailureException the test did fail
 	 */
 	private static void testConstructors() throws TestFailureException {
-		JsonString jsonTestString = new JsonString(null);
-		JsonString eT = new JsonString(null);
+		JsonString jsonTestString = null;
+		JsonString eT = null;
 		// test JSON null strings
-		TestSubject.assertTestCondition(jsonTestString.toString() == null, 
-				String.format("A JSON null string should have the value null, but has %s.", 
-						jsonTestString.toString()));
-		TestSubject.assertTestCondition(jsonTestString.equals(eT), 
-				String.format("The JSON null string \"%s\" should equal the JSON null string \"%s\", "
-						+ "but does not.", jsonTestString, eT));
-		TestSubject.assertTestCondition(!jsonTestString.equals(null), 
-				String.format("The JSON null string \"%s\" should not equal the Java null value.", 
-						jsonTestString));
+//		TestSubject.assertTestCondition(jsonTestString.toString() == null, 
+//				String.format("A JSON null string should have the value null, but has %s.", 
+//						jsonTestString.toString()));
+//		TestSubject.assertTestCondition(jsonTestString.equals(eT), 
+//				String.format("The JSON null string \"%s\" should equal the JSON null string \"%s\", "
+//						+ "but does not.", jsonTestString, eT));
+//		TestSubject.assertTestCondition(!jsonTestString.equals(null), 
+//				String.format("The JSON null string \"%s\" should not equal the Java null value.", 
+//						jsonTestString));
+		try {
+			jsonTestString = new JsonString(null);
+			throw new TestFailureException("A JSON formatted string cannot contain the value null.");
+		} catch (NullPointerException e1) {
+			/*
+			 * Do nothing as this is expected behaviour.
+			 */
+		}
 		// test JSON string
 		String testString = null;
 		byte[] randomString = null;
-		jsonTestString = new JsonString(testString);
 		for (int i = 0; i < 10000; i++) {
 			// create random strings
 			randomString = new byte[JsonStringTesting.RANDOM.nextInt(200)];
@@ -68,12 +75,11 @@ public class JsonStringTesting implements TestSubject {
 	 * @throws TestFailureException - the test did fail
 	 */
 	private static void testToJson() throws TestFailureException {
-		JsonString jsonTestString = new JsonString(null);
+		JsonString jsonTestString = null;
 		String perfectString = null;
 		// test JSON string
 		String testString = null;
 		char randomString = 0;
-		jsonTestString = new JsonString(testString);
 		int escapeIndex = 0;
 		for (int i = 0; i < 10000; i++) {
 			// create random substrings
@@ -110,7 +116,7 @@ public class JsonStringTesting implements TestSubject {
 	 * @throws TestFailureException - the test did fail
 	 */
 	private static void testParsing() throws TestFailureException {
-		JsonString jsonTestString = new JsonString(null);
+		JsonString jsonTestString = null;
 		JsonString eT = null;
 		// test JSON null strings
 		try {
@@ -121,21 +127,12 @@ public class JsonStringTesting implements TestSubject {
 			 * Do nothing as this is expected behaviour.
 			 */
 		}
-		try {
-			eT = JsonString.parse(jsonTestString.toJson());
-			throw new TestFailureException("Parsing of a JSON null string for a JSON string should fail.");
-		} catch (JsonStandardException e1) {
-			/*
-			 * Do nothing as this is expected behaviour.
-			 */
-		}
 		// test JSON string
 		String testString = null;
 		byte[] randomString = null;
-		jsonTestString = new JsonString(testString);
 		for (int i = 0; i < 10000; i++) {
 			// create random strings
-			randomString = new byte[JsonStringTesting.RANDOM.nextInt(20)];
+			randomString = new byte[JsonStringTesting.RANDOM.nextInt(200)];
 			JsonStringTesting.RANDOM.nextBytes(randomString);
 			testString = new String(randomString);
 			// remove all escape characters to not cause problems for the test
