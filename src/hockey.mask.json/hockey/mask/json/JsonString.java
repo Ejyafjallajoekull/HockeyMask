@@ -141,6 +141,63 @@ public class JsonString {
 		}
 	}
 	
+	/**
+	 * Split the specified JSON formatted data by the occurrence of the first JSON formatted string.
+	 * A string array will be returned containing three elements.<br>
+	 * <b>First:</b> the characters present before the first JSON string<br>
+	 * <b>Second:</b> the first JSON string<br>
+	 * <b>Third:</b> the characters present after the end of the first JSON string
+	 * 
+	 * @param jsonData
+	 * @return
+	 */
+	public static String[] splitByFirstJsonString(String jsonData) {
+		if (jsonData != null) {
+			String[] split = new String[3];
+			int querry = 0; // the index of the current apostrophe
+			int first = -1; // the index of the string opening apostrophe
+			int second = -1; // the index of the string closing apostrophe
+			int escapeCount = 0; // the number of escape characters preceding the apostrophe
+			// TODO: maybe replace the outer while with a for loop
+			while (querry < jsonData.length()) {
+				escapeCount = 0; // reset number of counted escape characters
+				querry = jsonData.indexOf(JsonString.JSON_STRING_IDENTIFIER, querry);
+				if (querry < 0) { // pattern not found
+					break;
+				} else {
+					while (querry-1-escapeCount >= 0 && jsonData.substring(querry-1-escapeCount, querry-escapeCount).equals(JsonString.JSON_STRING_ESCAPE_CHARACTER)) {
+						escapeCount++;
+					}
+					// only accept the apostrophe if the number of preceding escape characters is even
+					if (escapeCount%2 == 0) {
+						if (first < 0) {
+							first = querry;
+						} else {
+							second = querry;
+						}
+					}
+					querry++;
+				}
+			}
+			if (first >= 0 && second > 0) {
+				split[0] = jsonData.substring(0, first);
+				split[1] = jsonData.substring(first, second + 1);
+				split[2] = jsonData.substring(second + 1);
+			} else {
+				split[0] = jsonData;
+			}
+			// replace nulls with empty strings for consistency
+			for (int i = 0; i < split.length; i++) {
+				if (split[i] == null) {
+					split[i] = "";
+				}
+			}
+			return split;
+		} else {
+			return null;
+		}
+	}
+	
 	@Override
 	public String toString() {
 		return this.value;

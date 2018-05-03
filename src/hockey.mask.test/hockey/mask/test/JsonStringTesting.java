@@ -1,5 +1,6 @@
 package hockey.mask.test;
 
+import java.util.Arrays;
 import java.util.Random;
 
 import hockey.mask.json.JsonStandardException;
@@ -22,6 +23,7 @@ public class JsonStringTesting implements TestSubject {
 		JsonStringTesting.testConstructors();
 		JsonStringTesting.testToJson();
 		JsonStringTesting.testParsing();
+		JsonStringTesting.testSplitting();
 	}
 	
 	/**
@@ -149,8 +151,85 @@ public class JsonStringTesting implements TestSubject {
 						), e);
 			}
 		}
+	}
+	
+	/**
+	 * Test whether the splitting of strings works as intended.
+	 * 
+	 * @throws TestFailureException - the test did fail
+	 */
+	private static void testSplitting() throws TestFailureException {
+		String testString = null;
+		String first = null;
+		String second = null;
+		String third = null;
+		byte[] randomString = null;
+		String[] split = null;
+		// test null
+		split = JsonString.splitByFirstJsonString(testString);
+		TestSubject.assertTestCondition(split == null, String.format("Splitting a null should "
+				+ "return null, but returned \"%s\" instead.", Arrays.toString(split)));
+		// test no JSON string
+		for (int i = 0; i < 10000; i++) {
+			// create random strings
+			randomString = new byte[JsonStringTesting.RANDOM.nextInt(200)];
+			JsonStringTesting.RANDOM.nextBytes(randomString);
+			// remove all possible JSON string identifiers
+			first = (new String(randomString)).replace(JsonString.JSON_STRING_IDENTIFIER, "");
+			second = "";
+			third = "";
+			split = JsonString.splitByFirstJsonString(first);
+			TestSubject.assertTestCondition(split[0].equals(first), String.format("The string "
+					+ "before occurrence of the first JSON formatted string should be \"%s\", but is "
+					+ "\"%s\".", first, split[0]));
+			TestSubject.assertTestCondition(split[1].equals(second), String.format("The string "
+					+ "describing the occurrence of the first JSON formatted string should be \"%s\", but is "
+					+ "\"%s\".", second, split[1]));
+			TestSubject.assertTestCondition(split[2].equals(third), String.format("The string "
+					+ "after occurrence of the first JSON formatted string should be \"%s\", but is "
+					+ "\"%s\".", third, split[2]));
+		}
+		// only JSON string
+		for (int i = 0; i < 10000; i++) {
+			// create random strings
+			randomString = new byte[JsonStringTesting.RANDOM.nextInt(200)];
+			JsonStringTesting.RANDOM.nextBytes(randomString);
+			// remove all possible JSON string identifiers
+			first = "";
+			second = (new JsonString(new String(randomString))).toJson();
+			split = JsonString.splitByFirstJsonString(second);
+			third = "";
+			System.out.println(second);
+			TestSubject.assertTestCondition(split[0].equals(first), String.format("The string "
+					+ "before occurrence of the first JSON formatted string should be \"%s\", but is "
+					+ "\"%s\".", first, split[0]));
+			TestSubject.assertTestCondition(split[1].equals(second), String.format("The string "
+					+ "describing the occurrence of the first JSON formatted string should be \"%s\", but is "
+					+ "\"%s\".", second, split[1]));
+			TestSubject.assertTestCondition(split[2].equals(third), String.format("The string "
+					+ "after occurrence of the first JSON formatted string should be \"%s\", but is "
+					+ "\"%s\".", third, split[2]));
+		}
+		/*
+		for (int i = 0; i < 10000; i++) {
+			// create random substrings
+			testString = "";
+			for (int index = 0; index < 3; index++) {
+				for (int j = 0; j < 100; j++) {
 
-		
+
+					randomString = (char) (JsonStringTesting.RANDOM.nextInt(26) + 97);
+					testString = testString + randomString;
+				}
+			}
+			perfectString = JsonString.JSON_STRING_IDENTIFIER + perfectString + JsonString.JSON_STRING_IDENTIFIER;
+			jsonTestString = new JsonString(testString);
+			TestSubject.assertTestCondition(perfectString.equals(jsonTestString.toJson()), 
+					String.format("The JSON representation of the Java string \"%s\" "
+							+ "should equal the value \"%s\", but is \"%s\".", 
+							testString, perfectString, jsonTestString.toJson()));
+			
+		}*/
 	}
 
 }
