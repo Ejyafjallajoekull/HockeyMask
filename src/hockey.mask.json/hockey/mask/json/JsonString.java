@@ -174,6 +174,8 @@ public class JsonString {
 							first = querry;
 						} else {
 							second = querry;
+							// stop after finding the closing apostrophe
+							break;
 						}
 					}
 					querry++;

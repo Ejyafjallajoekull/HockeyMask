@@ -219,8 +219,7 @@ public class JsonStringTesting implements TestSubject {
 			JsonStringTesting.RANDOM.nextBytes(randomString);
 			second = (new JsonString(new String(randomString))).toJson();
 			JsonStringTesting.RANDOM.nextBytes(randomString);
-			// remove all possible JSON string identifiers
-			third = (new String(randomString)).replace(JsonString.JSON_STRING_IDENTIFIER, "").replace(JsonString.JSON_STRING_ESCAPE_CHARACTER, "");
+			third = new String(randomString);
 			testString = first + second + third;
 			split = JsonString.splitByFirstJsonString(testString);
 			TestSubject.assertTestCondition(split[0].equals(first), String.format("The string "
