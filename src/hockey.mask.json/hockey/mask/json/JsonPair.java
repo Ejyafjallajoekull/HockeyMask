@@ -1,7 +1,5 @@
 package hockey.mask.json;
 
-import java.util.Arrays;
-
 /**
  * The JsonPair class represents a single name-value-pair formated in JSON.
  * 
@@ -10,7 +8,7 @@ import java.util.Arrays;
  */
 public class JsonPair {
 
-	private String name = "";
+	private JsonString name = null;
 	private JsonValue value = null;
 	
 	/**
@@ -19,14 +17,14 @@ public class JsonPair {
 	public static final String JSON_PAIR_SEPARATOR = ":";
 	
 	/**
-	 * Create a new JSON name-value-pair.
+	 * Create a new JSON name-value-pair. The name will be immutable.
 	 * 
 	 * @param name - the name of the pair
 	 * @param value - the value of the pair
-	 * @throws JsonStandardException thrown if null is supplied for name as a JSON string 
-	 * cannot be null
+	 * @throws NullpointerException if null is supplied for name as it must be a JSON 
+	 * formatted string
 	 */
-	public JsonPair(String name, JsonValue value) throws JsonStandardException {
+	public JsonPair(JsonString name, JsonValue value) {
 		this.setName(name);
 		this.setValue(value);
 	}
@@ -36,31 +34,23 @@ public class JsonPair {
 	 * 
 	 * @return the name of the pair
 	 */
-	public String getName() {
+	public JsonString getName() {
 		return this.name;
 	}
 	
 	/**
-	 * Transforms the name of this pair to a JSON formatted string.
-	 * 
-	 * @return the JSON string representation of the pair name
-	 */
-	public String getNameAsJson() {
-		return JsonValue.stringToJson(this.getName());
-	}
-	
-	/**
-	 * Set the name of the pair.
+	 * Set the name of the pair. This method is private since the name/key should be immutable. 
+	 * Only the value is allowed to change.
 	 * 
 	 * @param name - the name of the pair
-	 * @throws JsonStandardException thrown if null is supplied for name as a JSON string 
-	 * cannot be null
+	 * @throws NullPointerException if null is supplied for name as it must be a JSON 
+	 * formatted string
 	 */
-	public void setName(String name) throws JsonStandardException {
+	private void setName(JsonString name) {
 		if (name != null) {
 			this.name = name;
 		} else {
-			throw new JsonStandardException("JSON strings may not be null.");
+			throw new NullPointerException("JSON strings may not be null.");
 		}
 	}
 	
@@ -90,9 +80,9 @@ public class JsonPair {
 	 */
 	public String toJson() {
 		if (this.getValue() != null) {
-			return String.format("%s%s%s", this.getNameAsJson(), JsonPair.JSON_PAIR_SEPARATOR, this.getValue().toJson());
+			return String.format("%s%s%s", this.getName().toJson(), JsonPair.JSON_PAIR_SEPARATOR, this.getValue().toJson());
 		} else {
-			return String.format("%s%s%s", this.getNameAsJson(), JsonPair.JSON_PAIR_SEPARATOR, JsonValue.JSON_NULL_VALUE);
+			return String.format("%s%s%s", this.getName().toJson(), JsonPair.JSON_PAIR_SEPARATOR, JsonValue.JSON_NULL_VALUE);
 		}
 	}
 	
@@ -105,13 +95,30 @@ public class JsonPair {
 	 */
 	public static JsonPair parse(String jsonPair) throws JsonStandardException {
 		if (jsonPair != null) {
-			String[] pair = jsonPair.split(JsonPair.JSON_PAIR_SEPARATOR, 2);
-			if (pair.length != 2) {
-				return new JsonPair(JsonValue.parseString(pair[0]), 
-						JsonValue.parse(pair[1]));
+			String[] firstJsonString = JsonString.splitByFirstJsonString(jsonPair);
+			// trim all the splitted strings for convenience
+			for (int i = 0; i < firstJsonString.length; i++) {
+				firstJsonString[i] = firstJsonString[i].trim();
+			}
+			/*
+			 * Ensure no invalid data comes before the first appearance of a JSON formatted 
+			 * string. Furthermore, there must be a JSON formatted string defining the name of 
+			 * the pair and also trailing data defining the value.
+			 */
+			if (firstJsonString[0].length() == 0 && firstJsonString[1].length() > 0 &&
+					firstJsonString[2].length() > JsonPair.JSON_PAIR_SEPARATOR.length()) {
+				// check if the next character of the trailing data is a pair separator
+				if (firstJsonString[2].substring(0, JsonPair.JSON_PAIR_SEPARATOR.length()).equals(
+						JsonPair.JSON_PAIR_SEPARATOR)) {
+					firstJsonString[2] = firstJsonString[2].substring(JsonPair.JSON_PAIR_SEPARATOR.length());
+					return new JsonPair(JsonString.parse(firstJsonString[1]), JsonValue.parse(firstJsonString[2]));
+				} else {
+					throw new JsonStandardException(String.format("The string \"%s\" is not a JSONPair.", 
+							jsonPair));	
+				}
 			} else {
-				throw new JsonStandardException(String.format("A name-value-pair was expected, "
-						+ "but %s was supplied.", Arrays.toString(pair)));
+				throw new JsonStandardException(String.format("The string \"%s\" is not a JSONPair.", 
+						jsonPair));
 			}
 		} else {
 			throw new JsonStandardException(String.format("The string \"%s\" is not a JSONPair.", 
