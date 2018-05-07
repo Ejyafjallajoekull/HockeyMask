@@ -1,5 +1,7 @@
 package hockey.mask.json;
 
+import java.util.ArrayList;
+
 /**
  * The JsonString class represents a string formatted in the JSON format.
  * 
@@ -148,8 +150,9 @@ public class JsonString {
 	 * <b>Second:</b> the first JSON string<br>
 	 * <b>Third:</b> the characters present after the end of the first JSON string
 	 * 
-	 * @param jsonData
-	 * @return
+	 * @param jsonData - the JSON formatted data to split
+	 * @return an array of substrings containing the sequence preceding the first JSON formatted #
+	 * string, the string itself and the sequence following the string
 	 */
 	public static String[] splitByFirstJsonString(String jsonData) {
 		if (jsonData != null) {
@@ -195,6 +198,52 @@ public class JsonString {
 				}
 			}
 			return split;
+		} else {
+			return null;
+		}
+	}
+	
+	/**
+	 * Split the specified JSON formatted data by the occurrence of JSON formatted strings.
+	 * A string array will be returned containing all JSON strings with preceding and 
+	 * trailing data. Preceding and trailing data may be empty strings.<br><br>
+	 * The pattern is defined as following:<br><br>
+	 * <b>[preceding data, JSON string, intermediate data, JSON string, intermediate data, ... , 
+	 * JSON string, trailing data]</b>
+	 * 
+	 * @param jsonData - the JSON formatted data to split
+	 * @return an array of substrings containing the sequence preceding the first JSON formatted #
+	 * string, the string itself and the sequence following the string
+	 */
+	public static String[] splitByAllJsonStrings(String jsonData) {
+		if (jsonData != null) {
+			ArrayList<String> values = new ArrayList<String>();
+			// while a string is present fetch the next one
+			String[] firstJsonString = null;
+			// track the trailing data
+			String lastString = jsonData;
+			while (lastString.length() > 0) {
+				firstJsonString = JsonString.splitByFirstJsonString(lastString);
+				// add the preceding data and the JSON string itself
+				values.add(firstJsonString[0]);
+				values.add(firstJsonString[1]);
+				// track the trailing data
+				lastString = firstJsonString[2];
+			}
+			if (firstJsonString[1].length() > 0) {
+				/*
+				 * If there is a valid JSON formatted string present also append the empty 
+				 * trailing data.
+				 */
+				values.add(lastString);
+			} else {
+				/*
+				 * Remove the last element since there is no JSON formatted string and 
+				 * the last substring processed is actually the last piece of data.
+				 */
+				values.remove(values.size() - 1);
+			}
+			return values.toArray(new String[values.size()]);
 		} else {
 			return null;
 		}

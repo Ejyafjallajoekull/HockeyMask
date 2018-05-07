@@ -1,5 +1,6 @@
 package hockey.mask.test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -231,6 +232,37 @@ public class JsonStringTesting implements TestSubject {
 			TestSubject.assertTestCondition(split[2].equals(third), String.format("The string "
 					+ "after occurrence of the first JSON formatted string should be \"%s\", but is "
 					+ "\"%s\".", third, split[2]));
+		}
+		// test splitting by all JSON strings
+		ArrayList<String> values = new ArrayList<String>();
+		int numberOfElements = 0;
+		for (int i = 0; i < 10000; i++) {
+			// reset the list
+			values.clear();
+			testString = "";
+			// add a random number of elements
+			numberOfElements = JsonStringTesting.RANDOM.nextInt(3) + 3;
+			for (int j = 0; j < numberOfElements; j++) {
+				// create random strings
+				randomString = new byte[JsonStringTesting.RANDOM.nextInt(20)];
+				JsonStringTesting.RANDOM.nextBytes(randomString);
+				// must start with garbage data or an "" appended since preceding data is part of the returned array
+				if (j%2 == 0) { // even: add some garbage data without special string characters
+					values.add((new String(randomString)).replace(
+							JsonString.JSON_STRING_IDENTIFIER, "").replace(JsonString.JSON_STRING_ESCAPE_CHARACTER, ""));
+				} else { // odd: add JSON string
+					values.add((new JsonString(new String(randomString))).toJson());
+				}
+				testString += values.get(j);
+			}
+			// if the last value is a JSON string append some garbage to make sure it matches the output
+			if (values.size()%2 == 0) {
+				values.add("");
+			}
+			split = JsonString.splitByAllJsonStrings(testString);
+			TestSubject.assertTestCondition(Arrays.equals(split, values.toArray()), String.format("The string "
+					+ "\"%s\" should be splitted into \"%s\", but is "
+					+ "\"%s\".",testString, values, Arrays.toString(split)));
 		}
 	}
 
