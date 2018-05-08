@@ -1,6 +1,8 @@
 package hockey.mask.json;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 
 /**
  * The JsonString class represents a string formatted in the JSON format.
@@ -143,6 +145,20 @@ public class JsonString {
 		}
 	}
 	
+	public static boolean isJsonString(String jsonString) {
+		if (jsonString != null) {
+			String trimmed = jsonString.trim();
+			if (trimmed.startsWith(JsonString.JSON_STRING_IDENTIFIER) 
+					&& trimmed.endsWith(JsonString.JSON_STRING_IDENTIFIER)) {
+				
+			} else {
+				throw new JsonStandardException(String.format("The string \"%s\" is not a JSON string.", 
+						jsonString));
+			}
+		}
+		return false;
+	}
+	
 	/**
 	 * Split the specified JSON formatted data by the occurrence of the first JSON formatted string.
 	 * A string array will be returned containing three elements.<br>
@@ -155,6 +171,7 @@ public class JsonString {
 	 * string, the string itself and the sequence following the string
 	 */
 	public static String[] splitByFirstJsonString(String jsonData) {
+		// TODO: replace the array with a private linked list class
 		if (jsonData != null) {
 			String[] split = new String[3];
 			int querry = 0; // the index of the current apostrophe
@@ -216,6 +233,7 @@ public class JsonString {
 	 * string, the string itself and the sequence following the string
 	 */
 	public static String[] splitByAllJsonStrings(String jsonData) {
+		// TODO: replace the array with a private linked list class
 		if (jsonData != null) {
 			ArrayList<String> values = new ArrayList<String>();
 			// while a string is present fetch the next one
@@ -277,6 +295,32 @@ public class JsonString {
 		} else if (!value.equals(other.value))
 			return false;
 		return true;
+	}
+	
+	/**
+	 * The JsonStringSplitLinkedList class is a helper class for handling splitting of JSON 
+	 * formatted data.
+	 * 
+	 * @author Planters
+	 *
+	 */
+	public class JsonStringSplitLinkedListElement {
+
+		boolean jsonString = false;	// is this element a JSON formatted string?
+		String value = null;
+		
+		/**
+		 * Create a new element containing some data, either a JSON string or some other 
+		 * JSON formatted data.
+		 */
+		public void setValue(String jsonData) {
+			if () {
+				
+			} else {
+				
+			}
+		}
+		
 	}
 
 }

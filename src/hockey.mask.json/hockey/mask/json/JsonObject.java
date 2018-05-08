@@ -65,14 +65,14 @@ public class JsonObject extends ArrayList<JsonPair> {
 	 * 
 	 * @return the names of all member pairs
 	 */
-	public String[] getMemberNames() {
-		ArrayList<String> names = new ArrayList<String>();
+	public JsonString[] getMemberNames() {
+		ArrayList<JsonString> names = new ArrayList<JsonString>();
 		for (JsonPair pair : this) {
 			if (pair != null) {
 				names.add(pair.getName());
 			}
 		}
-		return names.toArray(new String[names.size()]);
+		return names.toArray(new JsonString[names.size()]);
 	}
 	
 	/**
@@ -84,7 +84,7 @@ public class JsonObject extends ArrayList<JsonPair> {
 	 * @param name - the member name to get the values from
 	 * @return the values assigned to the specified member name
 	 */
-	public JsonValue[] getValuesByName(String name) {
+	public JsonValue[] getValuesByName(JsonString name) {
 		ArrayList<JsonValue> values = new ArrayList<JsonValue>();
 		for (JsonPair pair : this) {
 			if (pair != null && pair.getName().equals(name)) {
@@ -104,7 +104,7 @@ public class JsonObject extends ArrayList<JsonPair> {
 	 * @param name - the name assigned to the member
 	 * @return the value of the first member with the specified name
 	 */
-	public JsonValue getFirstValueByName(String name) {
+	public JsonValue getFirstValueByName(JsonString name) {
 		for (JsonPair pair : this) {
 			if (pair != null && pair.getName().equals(name)) {
 				return pair.getValue();
@@ -120,7 +120,7 @@ public class JsonObject extends ArrayList<JsonPair> {
 	 * @param name - the name of the member
 	 * @return true if a member with the specified name is present, false if not
 	 */
-	public boolean hasMember(String name) {
+	public boolean hasMember(JsonString name) {
 		for (JsonPair pair : this) {
 			if (pair != null && pair.getName().equals(name)) {
 				return true;
@@ -161,6 +161,7 @@ public class JsonObject extends ArrayList<JsonPair> {
 	 * @throws JsonStandardException thrown if the string is not a JSON formatted object
 	 */
 	public static JsonObject parse(String jsonObject) throws JsonStandardException {
+		// TODO: fix this, it does not work
 		if (jsonObject != null) {
 			String trimmed = jsonObject.trim();
 			if (trimmed.startsWith(JsonObject.JSON_OBJECT_START_IDENTIFIER) 

@@ -91,21 +91,51 @@ public class JsonArray extends ArrayList<JsonValue> {
 	 * @throws JsonStandardException thrown if the string is not a JSON formatted array
 	 */
 	public static JsonArray parse(String jsonArray) throws JsonStandardException {
+		// TODO: fix this, it does not work
 		if (jsonArray != null) {
 			String trimmed = jsonArray.trim();
+			JsonArray parsedArray = new JsonArray();
 			if (trimmed.startsWith(JsonArray.JSON_ARRAY_START_IDENTIFIER) 
 					&& trimmed.endsWith(JsonArray.JSON_ARRAY_END_IDENTIFIER)) {
+				// remove brackets
 				trimmed = trimmed.substring(1,trimmed.length()-1);
-				String[] values = null;
-				// this is needed as empty strings will cause an error
-				if (trimmed.length() > 0) {
-					values = trimmed.split(JsonArray.JSON_ARRAY_VALUE_SEPARATOR, -1);
-				} else {
-					values = new String[0];
-				}
-				JsonArray parsedArray = new JsonArray(values.length);
-				for (String val : values) {
-					parsedArray.add(JsonValue.parse(val));
+				ArrayList<String> values = new ArrayList<String>();
+				/*
+				 * Split the data by occurrence of JSON formatted strings to specifically 
+				 * scan for array separation marks.
+				 */
+				String[] splitValues = JsonString.splitByAllJsonStrings(jsonArray);
+				String[] splitData = null; // the intermediate data will be split here
+				for (int i = 0; i < splitValues.length; i++) {
+					if (i%2 == 0) { // even: no JSON string -> data to split
+						// check for valid separators
+						if (i == 0 && splitData[i].length() == 0) { // first element
+							
+						} else { // last element
+							
+						}
+						splitData = splitValues[i].split(JsonArray.JSON_ARRAY_VALUE_SEPARATOR, -1);
+						for (int j = 0; j < splitData.length; j++) {
+							if (splitData[i].length() == 0) {
+								if (j > 0 && j != splitData.length - 1) {
+									/*
+									 * Throw an exception if there is an empty entry indicating two 
+									 * subsequent array separators. Ignore the first and the last 
+									 * entry.
+									 */
+									throw new JsonStandardException(String.format("The JSON formatted "
+											+ "array %s contains empty values.", jsonArray));
+								}
+							} else {
+								/*
+								 * Add the data if it contains more than whitespace.
+								 */
+								parsedArray.add(JsonValue.parse(splitData[i]));
+							}
+						}
+					} else { // odd: a JSON string -> no splitting required
+						parsedArray.add(JsonValue.parse(splitValues[i]));
+					}
 				}
 				return parsedArray;
 			} else {
