@@ -10,7 +10,7 @@ import koro.sensei.tester.TestFailureException;
 import koro.sensei.tester.TestSubject;
 
 /**
- * The JsonPairTesting class test the JsonPair class for correct functionality.
+ * The JsonPairTesting class tests the JsonPair class for correct functionality.
  * 
  * @author Planters
  *

@@ -145,19 +145,18 @@ public class JsonString {
 		}
 	}
 	
-	public static boolean isJsonString(String jsonString) {
-		if (jsonString != null) {
-			String trimmed = jsonString.trim();
-			if (trimmed.startsWith(JsonString.JSON_STRING_IDENTIFIER) 
-					&& trimmed.endsWith(JsonString.JSON_STRING_IDENTIFIER)) {
-				
-			} else {
-				throw new JsonStandardException(String.format("The string \"%s\" is not a JSON string.", 
-						jsonString));
-			}
-		}
-		return false;
-	}
+	/**
+	 * @param jsonString
+	 * @return true if the passed string is a JSON
+	 */
+//	public static boolean isJsonString(String jsonString) {
+//		if (jsonString != null) {
+//			String trimmed = jsonString.trim();
+//			return trimmed.startsWith(JsonString.JSON_STRING_IDENTIFIER) 
+//					&& trimmed.endsWith(JsonString.JSON_STRING_IDENTIFIER);
+//		}
+//		return false;
+//	}
 	
 	/**
 	 * Split the specified JSON formatted data by the occurrence of the first JSON formatted string.
