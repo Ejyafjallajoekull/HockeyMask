@@ -127,6 +127,29 @@ public class JsonParser {
 	}
 	
 	/**
+	 * Checks whether the next characters are the query.
+	 * Optionally the position mark can be incremented if the query is found
+	 * 
+	 * @param query - the string to query for
+	 * @param incrementPosition - true to increment the position mark by the search if found
+	 * @return true if the next characters equal the query
+	 */
+	public boolean isNext(String query, boolean incrementPosition) {
+		if (query != null) {
+			int end = this.getPosition() + query.length();
+			if (end <= this.getData().length()) {
+				if (this.getData().substring(this.getPosition(), end).equals(query)) {
+					if (incrementPosition) {
+						this.setPosition(this.getPosition() + query.length());
+					}
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	/**
 	 * Get the remaining characters of the parsed string as substring.
 	 * 
 	 * @return a substring from the parsers position mark to the end of the parsed string
@@ -140,6 +163,17 @@ public class JsonParser {
 	 */
 	public void rewind() {
 		this.setPosition(0);
+	}
+	
+	/**
+	 * Moves the position mark to the next non-whitespace character in the parser. If the 
+	 * parser only contains whitespace characters, the position mark is moved to the end 
+	 * position, at which no character resides.
+	 */
+	public void skipWhitespace() {
+		while (this.hasNext() && Character.isWhitespace(this.getData().charAt(this.getPosition()))) {
+			this.setPosition(this.getPosition() + 1);
+		}
 	}
 	
 	@Override

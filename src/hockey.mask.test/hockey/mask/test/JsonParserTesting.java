@@ -21,6 +21,7 @@ public class JsonParserTesting implements TestSubject {
 		JsonParserTesting.testConstructors();
 		JsonParserTesting.testSettingGetting();
 		JsonParserTesting.testNext();
+		JsonParserTesting.testSkipWhitespace();
 	}
 	
 	/**
@@ -29,18 +30,14 @@ public class JsonParserTesting implements TestSubject {
 	 * @throws TestFailureException the test did fail
 	 */
 	private static void testConstructors() throws TestFailureException {
-		String testString = null;
-		byte[] randomString = null;
-		JsonParser jp = null;
-		JsonParser jjp = null;
 		for (int i = 0; i < 10000; i++) {
 			// create random strings
-			randomString = new byte[JsonParserTesting.RANDOM.nextInt(200)];
+			byte[] randomString = new byte[JsonParserTesting.RANDOM.nextInt(200)];
 			JsonParserTesting.RANDOM.nextBytes(randomString);
-			testString = new String(randomString);
+			String testString = new String(randomString);
 			if (testString.length() > 0) {
-				jp = new JsonParser(testString);
-				jjp = new JsonParser(jp.getData());
+				JsonParser jp = new JsonParser(testString);
+				JsonParser jjp = new JsonParser(jp.getData());
 				TestSubject.assertTestCondition(jp.equals(jjp), 
 						String.format("The JSON parser %s should equal the parser %s.",	jp, jjp));
 				jjp = new JsonParser(testString + "test");
@@ -49,7 +46,7 @@ public class JsonParserTesting implements TestSubject {
 
 			} else {
 				try {
-					jp = new JsonParser(testString);
+					new JsonParser(testString);
 					throw new TestFailureException("An exception should have been thrown as \""
 							+ testString + "\" is no valid input for a JSON parser.");
 				} catch (IllegalArgumentException e) {
@@ -59,7 +56,7 @@ public class JsonParserTesting implements TestSubject {
 				}
 			}
 			try {
-				jp = new JsonParser(null);
+				new JsonParser(null);
 				throw new TestFailureException("An exception should have been thrown as "
 						+ "null is no valid input for a JSON parser.");
 			} catch (NullPointerException e) {
@@ -76,16 +73,13 @@ public class JsonParserTesting implements TestSubject {
 	 * @throws TestFailureException the test did fail
 	 */
 	private static void testSettingGetting() throws TestFailureException {
-		String testString = null;
-		byte[] randomString = null;
-		JsonParser jp = null;
 		for (int i = 0; i < 10000; i++) {
 			// create random strings
-			randomString = new byte[JsonParserTesting.RANDOM.nextInt(200)];
+			byte[] randomString = new byte[JsonParserTesting.RANDOM.nextInt(200)];
 			JsonParserTesting.RANDOM.nextBytes(randomString);
-			testString = new String(randomString);
+			String testString = new String(randomString);
 			if (testString.length() > 0) {
-				jp = new JsonParser(testString);
+				JsonParser jp = new JsonParser(testString);
 				TestSubject.assertTestCondition(jp.getPosition() == 0, 
 						String.format("The newly initialised JSON parser %s should start at position "
 								+ "%s, but starts at %s.", jp, 0, jp.getPosition()));
@@ -120,7 +114,7 @@ public class JsonParserTesting implements TestSubject {
 				}
 			} else { // empty strings should throw an exception
 				try {
-					jp = new JsonParser(testString);
+					new JsonParser(testString);
 					throw new TestFailureException("An exception should have been thrown as \""
 							+ testString + "\" is no valid input for a JSON parser.");
 				} catch (IllegalArgumentException e) {
@@ -138,19 +132,15 @@ public class JsonParserTesting implements TestSubject {
 	 * @throws TestFailureException the test did fail
 	 */
 	private static void testNext() throws TestFailureException {
-		String testString = null;
-		String perfectString = null;
-		byte[] randomString = null;
-		JsonParser jp = null;
 		for (int i = 0; i < 10000; i++) {
 			// create random strings
-			randomString = new byte[JsonParserTesting.RANDOM.nextInt(200)];
+			byte[] randomString = new byte[JsonParserTesting.RANDOM.nextInt(200)];
 			JsonParserTesting.RANDOM.nextBytes(randomString);
-			testString = new String(randomString);
+			String testString = new String(randomString);
 			if (testString.length() > 0) {
-				jp = new JsonParser(testString);
+				JsonParser jp = new JsonParser(testString);
 				// test parsing character after character and retrieving remaining characters
-				perfectString = "";
+				String perfectString = "";
 				TestSubject.assertTestCondition(jp.getRemaining().equals(testString), 
 						String.format("The remaining characters of the data parsed by the "
 								+ "JSON parser %s should read \"%s\", "
@@ -217,7 +207,7 @@ public class JsonParserTesting implements TestSubject {
 				
 			} else { // empty strings should throw an exception
 				try {
-					jp = new JsonParser(testString);
+					new JsonParser(testString);
 					throw new TestFailureException("An exception should have been thrown as \""
 							+ testString + "\" is no valid input for a JSON parser.");
 				} catch (IllegalArgumentException e) {
@@ -229,4 +219,92 @@ public class JsonParserTesting implements TestSubject {
 		}
 	}
 
+	/**
+	 * Test skipping whitespaces.
+	 * 
+	 * @throws TestFailureException the test did fail
+	 */
+	private static void testSkipWhitespace() throws TestFailureException {
+		for (int i = 0; i < 10000; i++) {
+			// test strings only consisting of whitespace
+			String whitespaceString = JsonParserTesting.createRandomWhitespaceSequence();
+			if (whitespaceString.length() > 0) { // otherwise an exception will be thrown
+				JsonParser whiteSpaceParser = new JsonParser(whitespaceString);
+				whiteSpaceParser.skipWhitespace();
+				TestSubject.assertTestCondition(whiteSpaceParser.getPosition() == whitespaceString.length(), 
+						String.format("The JSON parser %s should be at position "
+								+ "%s after skiping all whitespaces, but is at %s.", 
+								whiteSpaceParser, whitespaceString.length(), whiteSpaceParser.getPosition()));
+
+			}
+			// test strings without whitespace
+			String stringWithoutWhitespace = JsonParserTesting.createRandomSequenceWithoutWhitespace();
+			if (stringWithoutWhitespace.length() > 0) { // otherwise an exception will be thrown
+				JsonParser noWhiteSpaceParser = new JsonParser(stringWithoutWhitespace);
+				noWhiteSpaceParser.skipWhitespace();
+				TestSubject.assertTestCondition(noWhiteSpaceParser.getPosition() == 0, 
+						String.format("The JSON parser %s should be at position "
+								+ "%s after skipping all whitespaces, but is at %s.", 
+								noWhiteSpaceParser, 0, noWhiteSpaceParser.getPosition()));
+
+			}
+			// test normal strings
+			String testString = JsonParserTesting.createRandomSequenceWithoutWhitespace();
+			int whiteSpaceStart = testString.length();
+			testString += JsonParserTesting.createRandomWhitespaceSequence();
+			int whiteSpaceEnd = testString.length();
+			testString += JsonParserTesting.createRandomSequenceWithoutWhitespace();
+			if (testString.length() > 0) { // otherwise an exception will be thrown
+				JsonParser jp = new JsonParser(testString);
+				jp.setPosition(whiteSpaceStart);
+				jp.skipWhitespace();
+				TestSubject.assertTestCondition(jp.getPosition() == whiteSpaceEnd, 
+						String.format("The JSON parser %s should be at position "
+								+ "%s after skipping all whitespaces, but is at %s.", 
+								jp, whiteSpaceEnd, jp.getPosition()));
+
+			}
+		}
+	}
+	
+	/**
+	 * Helper function to create a string only containing random whitespaces.
+	 */
+	private static String createRandomWhitespaceSequence() {
+		/*
+		 * This string creation method is heavily biased against empty strings, but for the sake
+		 * of testing it should be fine.
+		 */
+		byte[] randomString = new byte[JsonParserTesting.RANDOM.nextInt(1000)];
+		JsonParserTesting.RANDOM.nextBytes(randomString);
+		String testString = new String(randomString);
+		StringBuilder sb = new StringBuilder();
+		for(int i = 0; i < testString.length(); i++) {
+			if (Character.isWhitespace(testString.charAt(i))) {
+				sb.append(testString.charAt(i));
+			}
+		}
+		return sb.toString();
+	}
+	
+	/**
+	 * Helper function to create a random string without any whitespaces.
+	 */
+	private static String createRandomSequenceWithoutWhitespace() {
+		/*
+		 * This creation method is biased against empty strings, but for the sake
+		 * of testing it should be fine.
+		 */
+		byte[] randomString = new byte[JsonParserTesting.RANDOM.nextInt(300)];
+		JsonParserTesting.RANDOM.nextBytes(randomString);
+		String testString = new String(randomString);
+		StringBuilder sb = new StringBuilder();
+		for(int i = 0; i < testString.length(); i++) {
+			if (!Character.isWhitespace(testString.charAt(i))) {
+				sb.append(testString.charAt(i));
+			}
+		}
+		return sb.toString();
+	}
+	
 }
