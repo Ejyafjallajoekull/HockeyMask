@@ -1,8 +1,6 @@
 package hockey.mask.json;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
+import hockey.mask.json.parser.JsonParser;
 
 /**
  * The JsonString class represents a string formatted in the JSON format.
@@ -38,7 +36,7 @@ public class JsonString {
 				{"\r", "r"},	// carriage return
 				{"\f", "f"},	// formfeed
 				{"\n", "n"},	// new line
-				{"\t", "t"}};	// tab
+				{"\t", "t"} };	// tab
 			// TODO: is \\u unicode support necessary?
 			
 	/**
@@ -72,7 +70,6 @@ public class JsonString {
 	 */
 	public String toJson() {
 		if (this.toString() != null) {
-//			String jsonS = this.toString();
 			StringBuilder sb = new StringBuilder(this.toString());
 			int endIndex = 0;
 			for (int i = 0; i < sb.length(); i++) {
@@ -85,11 +82,6 @@ public class JsonString {
 				}
 			}
 			return sb.insert(0, JsonString.JSON_STRING_IDENTIFIER).append(JsonString.JSON_STRING_IDENTIFIER).toString();
-//			// replace all special characters with their JSON representation
-//			for (String[] specialCharacter : JsonString.JSON_STRING_ESCAPED_CHARACTERS) {
-//				jsonS = jsonS.replace(specialCharacter[0], JSON_STRING_ESCAPE_CHARACTER + specialCharacter[1]);
-//			}
-//			return JsonString.JSON_STRING_IDENTIFIER + jsonS + JsonString.JSON_STRING_IDENTIFIER;
 		} else {
 			return JsonValue.JSON_NULL_VALUE;
 		}
@@ -100,31 +92,28 @@ public class JsonString {
 	 * This basically strips the string from the JSON string identifier characters.
 	 * 
 	 * @param jsonString - the JSON formatted string
-	 * @return the string without the JSON string identifier
+	 * @return the internal representation of the JSON formatted string
 	 * @throws JsonStandardException thrown if the string was not JSON formatted
 	 */
 	public static JsonString parse(String jsonString) throws JsonStandardException {
 		if (jsonString != null) {
-			String trimmed = jsonString.trim();
-			if (trimmed.startsWith(JsonString.JSON_STRING_IDENTIFIER) 
-					&& trimmed.endsWith(JsonString.JSON_STRING_IDENTIFIER)) {
+			JsonParser jp = new JsonParser(jsonString.trim());
+			if (jp.isNext(JsonString.JSON_STRING_IDENTIFIER, true)) {
 				// strip identifiers and create StringBuilder 
-				StringBuilder sb = new StringBuilder(trimmed.substring(JsonString.JSON_STRING_IDENTIFIER.length(), trimmed.length()-JsonString.JSON_STRING_IDENTIFIER.length()));
-				// replace all escaped characters with their Java representation
-//				for (String[] specialCharacter : JsonString.JSON_STRING_ESCAPED_CHARACTERS) {
-//					trimmed = trimmed.replace(JSON_STRING_ESCAPE_CHARACTER + specialCharacter[1], specialCharacter[0]);
-//					System.out.println(String.format("Replacing [%s] with [%s], yielding [%s]",
-//							JSON_STRING_ESCAPE_CHARACTER + specialCharacter[1], specialCharacter[0], trimmed));
-//				}
-				int endIndex = 0;
-				for (int i = 0; i < sb.length(); i++) {
-					endIndex = i + JsonString.JSON_STRING_ESCAPE_CHARACTER.length();
-					// find escape characters
-					if (endIndex <= sb.length() && sb.subSequence(i, endIndex).equals(JsonString.JSON_STRING_ESCAPE_CHARACTER)) {
+				StringBuilder sb = new StringBuilder();
+				while (jp.hasNext()) {
+					// end condition
+					if (jp.isNext(JsonString.JSON_STRING_IDENTIFIER, true)) {
+						if (jp.hasNext()) { // check for remaining unparsed characters
+							throw new JsonStandardException(String.format("The parsed string \"%s\" "
+									+ "contains additional characters \"%s\"", jsonString, jp.getRemaining()));
+						} else {
+							return new JsonString(sb.toString());
+						}
+					} else if (jp.isNext(JsonString.JSON_STRING_ESCAPE_CHARACTER, true)) { // escape characters
 						for (String[] escape : JsonString.JSON_STRING_ESCAPED_CHARACTERS) {
-							if (endIndex + escape[1].length() <= sb.length() && sb.subSequence(endIndex, endIndex + escape[1].length()).equals(escape[1])) {
-								sb.replace(i, endIndex + escape[1].length(), escape[0]);
-								i += escape[0].length() - 1;
+							if (jp.isNext(escape[1], true)) {
+								sb.append(escape[0]);
 								/*
 								 * Exit the loop if the according character is found, so 
 								 * subsequent meaningful characters are not processed afterwards.
@@ -132,16 +121,67 @@ public class JsonString {
 								break;
 							}
 						}
+					} else { // standard characters
+						sb.append(jp.get());
 					}
-					
 				}
-				return new JsonString(sb.toString());
+				// if the end condition has not been triggered throw an exception
+				throw new JsonStandardException(String.format("The string \"%s\" is not a JSON string.", 
+						jsonString));
 			} else {
 				throw new JsonStandardException(String.format("The string \"%s\" is not a JSON string.", 
 						jsonString));
 			}
 		} else {
 			throw new JsonStandardException("A JSON formatted string may not be null.");
+		}
+	}
+	
+	/**
+	 * Parse the next JSON formatted string from the specified JSON parser and return its 
+	 * internal representation.
+	 * 
+	 * @param parser - the parser to retrieve the JSON formatted string from
+	 * @return the internal representation of the JSON formatted string
+	 * @throws JsonStandardException if the next element in the parser is not a JSON formatted string
+	 */
+	public static JsonString parseNext(JsonParser parser) throws JsonStandardException {
+		if (parser != null) {
+			int startingPosition = parser.getPosition();
+			parser.skipWhitespace();
+			if (parser.isNext(JsonString.JSON_STRING_IDENTIFIER, true)) {
+				// strip identifiers and create StringBuilder 
+				StringBuilder sb = new StringBuilder();
+				while (parser.hasNext()) {
+					// end condition
+					if (parser.isNext(JsonString.JSON_STRING_IDENTIFIER, true)) {
+						return new JsonString(sb.toString());
+					} else if (parser.isNext(JsonString.JSON_STRING_ESCAPE_CHARACTER, true)) { // escape characters
+						for (String[] escape : JsonString.JSON_STRING_ESCAPED_CHARACTERS) {
+							if (parser.isNext(escape[1], true)) {
+								sb.append(escape[0]);
+								/*
+								 * Exit the loop if the according character is found, so 
+								 * subsequent meaningful characters are not processed afterwards.
+								 */
+								break;
+							}
+						}
+					} else { // standard characters
+						sb.append(parser.get());
+					}
+				}
+				// if the end condition has not been triggered throw an exception
+				parser.setPosition(startingPosition); // do not modify the parser
+				throw new JsonStandardException(String.format("The next element in the JSON parser "
+						+ "%s is not a JSON string.", parser));
+			} else {
+				parser.setPosition(startingPosition); // the parser should not be modified
+				throw new JsonStandardException(String.format("The next element in the JSON parser "
+						+ "%s is not a JSON string.", parser));
+			}
+		} else {
+			throw new JsonStandardException("The JSON parser may not be null.");
 		}
 	}
 	
@@ -157,114 +197,6 @@ public class JsonString {
 //		}
 //		return false;
 //	}
-	
-	/**
-	 * Split the specified JSON formatted data by the occurrence of the first JSON formatted string.
-	 * A string array will be returned containing three elements.<br>
-	 * <b>First:</b> the characters present before the first JSON string<br>
-	 * <b>Second:</b> the first JSON string<br>
-	 * <b>Third:</b> the characters present after the end of the first JSON string
-	 * 
-	 * @param jsonData - the JSON formatted data to split
-	 * @return an array of substrings containing the sequence preceding the first JSON formatted #
-	 * string, the string itself and the sequence following the string
-	 */
-	public static String[] splitByFirstJsonString(String jsonData) {
-		// TODO: replace the array with a private linked list class
-		if (jsonData != null) {
-			String[] split = new String[3];
-			int querry = 0; // the index of the current apostrophe
-			int first = -1; // the index of the string opening apostrophe
-			int second = -1; // the index of the string closing apostrophe
-			int escapeCount = 0; // the number of escape characters preceding the apostrophe
-			// TODO: maybe replace the outer while with a for loop
-			while (querry < jsonData.length()) {
-				escapeCount = 0; // reset number of counted escape characters
-				querry = jsonData.indexOf(JsonString.JSON_STRING_IDENTIFIER, querry);
-				if (querry < 0) { // pattern not found
-					break;
-				} else {
-					while (querry-1-escapeCount >= 0 && jsonData.substring(querry-1-escapeCount, querry-escapeCount).equals(JsonString.JSON_STRING_ESCAPE_CHARACTER)) {
-						escapeCount++;
-					}
-					// only accept the apostrophe if the number of preceding escape characters is even
-					if (escapeCount%2 == 0) {
-						if (first < 0) {
-							first = querry;
-						} else {
-							second = querry;
-							// stop after finding the closing apostrophe
-							break;
-						}
-					}
-					querry++;
-				}
-			}
-			if (first >= 0 && second > 0) {
-				split[0] = jsonData.substring(0, first);
-				split[1] = jsonData.substring(first, second + 1);
-				split[2] = jsonData.substring(second + 1);
-			} else {
-				split[0] = jsonData;
-			}
-			// replace nulls with empty strings for consistency
-			for (int i = 0; i < split.length; i++) {
-				if (split[i] == null) {
-					split[i] = "";
-				}
-			}
-			return split;
-		} else {
-			return null;
-		}
-	}
-	
-	/**
-	 * Split the specified JSON formatted data by the occurrence of JSON formatted strings.
-	 * A string array will be returned containing all JSON strings with preceding and 
-	 * trailing data. Preceding and trailing data may be empty strings.<br><br>
-	 * The pattern is defined as following:<br><br>
-	 * <b>[preceding data, JSON string, intermediate data, JSON string, intermediate data, ... , 
-	 * JSON string, trailing data]</b>
-	 * 
-	 * @param jsonData - the JSON formatted data to split
-	 * @return an array of substrings containing the sequence preceding the first JSON formatted #
-	 * string, the string itself and the sequence following the string
-	 */
-	public static String[] splitByAllJsonStrings(String jsonData) {
-		// TODO: replace the array with a private linked list class
-		if (jsonData != null) {
-			ArrayList<String> values = new ArrayList<String>();
-			// while a string is present fetch the next one
-			String[] firstJsonString = null;
-			// track the trailing data
-			String lastString = jsonData;
-			while (lastString.length() > 0) {
-				firstJsonString = JsonString.splitByFirstJsonString(lastString);
-				// add the preceding data and the JSON string itself
-				values.add(firstJsonString[0]);
-				values.add(firstJsonString[1]);
-				// track the trailing data
-				lastString = firstJsonString[2];
-			}
-			if (firstJsonString[1].length() > 0) {
-				/*
-				 * If there is a valid JSON formatted string present also append the empty 
-				 * trailing data.
-				 */
-				values.add(lastString);
-			} else {
-				/*
-				 * Remove the last element since there is no JSON formatted string and 
-				 * the last substring processed is actually the last piece of data.
-				 */
-				values.remove(values.size() - 1);
-			}
-			return values.toArray(new String[values.size()]);
-		} else {
-			return null;
-		}
-	}
 	
 	@Override
 	public String toString() {
@@ -294,32 +226,6 @@ public class JsonString {
 		} else if (!value.equals(other.value))
 			return false;
 		return true;
-	}
-	
-	/**
-	 * The JsonStringSplitLinkedList class is a helper class for handling splitting of JSON 
-	 * formatted data.
-	 * 
-	 * @author Planters
-	 *
-	 */
-	public class JsonStringSplitLinkedListElement {
-
-		boolean jsonString = false;	// is this element a JSON formatted string?
-		String value = null;
-		
-		/**
-		 * Create a new element containing some data, either a JSON string or some other 
-		 * JSON formatted data.
-		 */
-		public void setValue(String jsonData) {
-			if () {
-				
-			} else {
-				
-			}
-		}
-		
 	}
 
 }
