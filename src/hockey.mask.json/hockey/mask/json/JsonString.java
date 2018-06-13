@@ -94,6 +94,7 @@ public class JsonString {
 	 * @param jsonString - the JSON formatted string
 	 * @return the internal representation of the JSON formatted string
 	 * @throws JsonStandardException thrown if the string was not JSON formatted
+	 * @throws NullPointerException - if null is passed as JSON input string
 	 */
 	public static JsonString parse(String jsonString) throws JsonStandardException {
 		if (jsonString != null) {
@@ -107,7 +108,7 @@ public class JsonString {
 						jsonString)); 
 			}
 		} else {
-			throw new JsonStandardException("A JSON formatted string may not be null.");
+			throw new NullPointerException("A JSON formatted string may not be null.");
 		}
 	}
 	
@@ -118,6 +119,7 @@ public class JsonString {
 	 * @param parser - the parser to retrieve the JSON formatted string from
 	 * @return the internal representation of the JSON formatted string
 	 * @throws JsonStandardException if the next element in the parser is not a JSON formatted string
+	 * @throws NullPointerException - if null is passed as JSON parser
 	 */
 	public static JsonString parseNext(JsonParser parser) throws JsonStandardException {
 		if (parser != null) {
@@ -155,7 +157,7 @@ public class JsonString {
 						+ "%s is not a JSON string.", parser));
 			}
 		} else {
-			throw new JsonStandardException("The JSON parser may not be null.");
+			throw new NullPointerException("The JSON parser may not be null.");
 		}
 	}
 	
