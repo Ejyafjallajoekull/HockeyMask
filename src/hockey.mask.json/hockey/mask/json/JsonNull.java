@@ -33,7 +33,6 @@ public class JsonNull {
 
 	/**
 	 * Parse the specified JSON formatted string and return its internal representation.
-	 * This basically strips the string from the JSON string identifier characters.
 	 * 
 	 * @param jsonString - the JSON formatted string
 	 * @return the internal representation of the JSON formatted string
