@@ -62,8 +62,7 @@ public class JsonString {
 	}
 	
 	/**
-	 * Transforms the specified string to a JSON formatted string.
-	 * If the string is null, the JSON representation of null is returned.
+	 * Get a JSON formatted string from the internal representation of this JSON string.
 	 * 
 	 * @return the JSON string representation of the specified string
 	 */

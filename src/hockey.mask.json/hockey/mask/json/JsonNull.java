@@ -15,13 +15,15 @@ public class JsonNull {
 	 */
 	public static final String JSON_NULL_VALUE = "null";
 
+	/**
+	 * Create a new JSON null value.
+	 */
 	public JsonNull() {
 		// empty constructor
 	}
 	
 	/**
-	 * Transforms the specified string to a JSON formatted string.
-	 * If the string is null, the JSON representation of null is returned.
+	 * Get a JSON formatted string from the internal representation of this JSON null.
 	 * 
 	 * @return the JSON string representation of null
 	 */
