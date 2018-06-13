@@ -181,6 +181,30 @@ public class JsonStringTesting implements TestSubject {
 						), e);
 			}
 		}
+		// test reseting position mark after exception
+		for (int i = 0; i < 10000; i++) {
+			// create random strings
+			byte[] randomString = new byte[JsonStringTesting.RANDOM.nextInt(4)];
+			JsonStringTesting.RANDOM.nextBytes(randomString);
+			JsonString jsonTestString = new JsonString(new String(randomString));
+			String testString = jsonTestString.toJson();
+			// remove the last apostrophe so an exception will be raised
+			testString = testString.substring(0, testString.length() - 1);
+			JsonParser jp = new JsonParser(testString);
+			int initialPosition = jp.getPosition();
+			try {
+				JsonString.parseNext(jp);
+				throw new TestFailureException(String.format("Parsing of the string \"%s\" as JSON "
+						+ "strings should fail, but resulted in the parser %s.", 
+						testString, jp));
+			} catch (JsonStandardException e) {
+				TestSubject.assertTestCondition(jp.getPosition() == initialPosition,
+						String.format("The JSON parser %s should be reset to position %s after "
+								+ "failing to parse, but is at %s.", 
+								jp, initialPosition, jp.getPosition()));
+				
+			}
+		}
 	}
 
 
