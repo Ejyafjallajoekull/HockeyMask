@@ -44,7 +44,7 @@ public class JsonString {
 	 */
 	public static final String JSON_STRING_ESCAPE_CHARACTER = "\\";
 	
-	String value = null;
+	private String value = null;
 	
 	/**
 	 * Create a new JSON formatted string from a Java string.
