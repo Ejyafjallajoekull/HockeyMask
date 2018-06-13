@@ -97,40 +97,14 @@ public class JsonString {
 	 */
 	public static JsonString parse(String jsonString) throws JsonStandardException {
 		if (jsonString != null) {
-			JsonParser jp = new JsonParser(jsonString.trim());
-			if (jp.isNext(JsonString.JSON_STRING_IDENTIFIER, true)) {
-				// strip identifiers and create StringBuilder 
-				StringBuilder sb = new StringBuilder();
-				while (jp.hasNext()) {
-					// end condition
-					if (jp.isNext(JsonString.JSON_STRING_IDENTIFIER, true)) {
-						if (jp.hasNext()) { // check for remaining unparsed characters
-							throw new JsonStandardException(String.format("The parsed string \"%s\" "
-									+ "contains additional characters \"%s\"", jsonString, jp.getRemaining()));
-						} else {
-							return new JsonString(sb.toString());
-						}
-					} else if (jp.isNext(JsonString.JSON_STRING_ESCAPE_CHARACTER, true)) { // escape characters
-						for (String[] escape : JsonString.JSON_STRING_ESCAPED_CHARACTERS) {
-							if (jp.isNext(escape[1], true)) {
-								sb.append(escape[0]);
-								/*
-								 * Exit the loop if the according character is found, so 
-								 * subsequent meaningful characters are not processed afterwards.
-								 */
-								break;
-							}
-						}
-					} else { // standard characters
-						sb.append(jp.get());
-					}
-				}
-				// if the end condition has not been triggered throw an exception
-				throw new JsonStandardException(String.format("The string \"%s\" is not a JSON string.", 
-						jsonString));
-			} else {
-				throw new JsonStandardException(String.format("The string \"%s\" is not a JSON string.", 
-						jsonString));
+			JsonParser jp = new JsonParser(jsonString);
+			JsonString parsedString = JsonString.parseNext(jp);
+			jp.skipWhitespace(); // needed for checking against garbage data#
+			if (!jp.hasNext()) {
+				return parsedString;
+			} else { // the string should not contain any more garbage data
+				throw new JsonStandardException(String.format("The string \"%s\" is not a pure JSON string.", 
+						jsonString)); 
 			}
 		} else {
 			throw new JsonStandardException("A JSON formatted string may not be null.");
