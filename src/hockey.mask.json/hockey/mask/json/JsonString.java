@@ -65,12 +65,11 @@ public class JsonString {
 	 * Transforms the specified string to a JSON formatted string.
 	 * If the string is null, the JSON representation of null is returned.
 	 * 
-	 * @param string . the string to transform
 	 * @return the JSON string representation of the specified string
 	 */
 	public String toJson() {
-		if (this.toString() != null) {
-			StringBuilder sb = new StringBuilder(this.toString());
+		// the string cannot be null at this point
+		StringBuilder sb = new StringBuilder(this.toString());
 			int endIndex = 0;
 			for (int i = 0; i < sb.length(); i++) {
 				for (String[] escape : JsonString.JSON_STRING_ESCAPED_CHARACTERS) {
@@ -82,9 +81,6 @@ public class JsonString {
 				}
 			}
 			return sb.insert(0, JsonString.JSON_STRING_IDENTIFIER).append(JsonString.JSON_STRING_IDENTIFIER).toString();
-		} else {
-			return JsonValue.JSON_NULL_VALUE;
-		}
 	}
 	
 	/**
@@ -100,7 +96,7 @@ public class JsonString {
 		if (jsonString != null) {
 			JsonParser jp = new JsonParser(jsonString);
 			JsonString parsedString = JsonString.parseNext(jp);
-			jp.skipWhitespace(); // needed for checking against garbage data#
+			jp.skipWhitespace(); // needed for checking against garbage data
 			if (!jp.hasNext()) {
 				return parsedString;
 			} else { // the string should not contain any more garbage data

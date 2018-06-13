@@ -71,7 +71,7 @@ public class JsonStringTesting implements TestSubject {
 	/**
 	 * Test the conversion of the Java string representation to a JSON formatted string.
 	 * 
-	 * @throws TestFailureException - the test did fail
+	 * @throws TestFailureException the test did fail
 	 */
 	private static void testToJson() throws TestFailureException {
 		// test JSON string
@@ -107,13 +107,25 @@ public class JsonStringTesting implements TestSubject {
 	/**
 	 * Test parsing JSON formatted strings.
 	 * 
-	 * @throws TestFailureException - the test did fail
+	 * @throws TestFailureException the test did fail
 	 */
 	private static void testParsing() throws TestFailureException {
 		// test JSON null strings
 		try {
 			JsonString.parse(null);
 			throw new TestFailureException("Parsing of null for a JSON string should fail.");
+		} catch (NullPointerException e) {
+			/*
+			 * Do nothing as this is expected behaviour.
+			 */
+		} catch (JsonStandardException e) {
+			throw new TestFailureException("Parsing of null for a JSON string should throw a "
+					+ "NullPointerException.", e);
+		}
+		// test empty strings
+		try {
+			JsonString.parse("");
+			throw new TestFailureException("Parsing of empty for a JSON string should fail.");
 		} catch (JsonStandardException e) {
 			/*
 			 * Do nothing as this is expected behaviour.
@@ -142,17 +154,20 @@ public class JsonStringTesting implements TestSubject {
 	/**
 	 * Test sequentially parsing JSON formatted strings.
 	 * 
-	 * @throws TestFailureException - the test did fail
+	 * @throws TestFailureException the test did fail
 	 */
 	private static void testParsingNext() throws TestFailureException {
 		// test null
 		try {
-			JsonString.parse(null);
+			JsonString.parseNext(null);
 			throw new TestFailureException("Parsing of null for a JSON parser should fail.");
-		} catch (JsonStandardException e) {
+		} catch (NullPointerException e) {
 			/*
 			 * Do nothing as this is expected behaviour.
 			 */
+		} catch (JsonStandardException e) {
+			throw new TestFailureException("Parsing of null for a JSON string should throw a "
+					+ "NullPointerException.", e);
 		}
 		// test JSON string
 		for (int i = 0; i < 10000; i++) {
@@ -160,7 +175,7 @@ public class JsonStringTesting implements TestSubject {
 			String testString = "  "; // Some whitespace
 			for (int j = 0; j < jsonTestStrings.length; j++) {
 				// create random strings
-				byte[] randomString = new byte[JsonStringTesting.RANDOM.nextInt(4)];
+				byte[] randomString = new byte[JsonStringTesting.RANDOM.nextInt(200)];
 				JsonStringTesting.RANDOM.nextBytes(randomString);
 				jsonTestStrings[j] = new JsonString(new String(randomString));
 				testString += jsonTestStrings[j].toJson() + "   ";
@@ -184,25 +199,28 @@ public class JsonStringTesting implements TestSubject {
 		// test reseting position mark after exception
 		for (int i = 0; i < 10000; i++) {
 			// create random strings
-			byte[] randomString = new byte[JsonStringTesting.RANDOM.nextInt(4)];
+			byte[] randomString = new byte[JsonStringTesting.RANDOM.nextInt(200)];
 			JsonStringTesting.RANDOM.nextBytes(randomString);
 			JsonString jsonTestString = new JsonString(new String(randomString));
 			String testString = jsonTestString.toJson();
 			// remove the last apostrophe so an exception will be raised
 			testString = testString.substring(0, testString.length() - 1);
-			JsonParser jp = new JsonParser(testString);
-			int initialPosition = jp.getPosition();
 			try {
-				JsonString.parseNext(jp);
-				throw new TestFailureException(String.format("Parsing of the string \"%s\" as JSON "
-						+ "strings should fail, but resulted in the parser %s.", 
-						testString, jp));
+				JsonParser jp = new JsonParser(testString);
+				int initialPosition = jp.getPosition();
+				try {
+					JsonString.parseNext(jp);
+					throw new TestFailureException(String.format("Parsing of the string \"%s\" as JSON "
+							+ "strings should fail, but resulted in the parser %s.", 
+							testString, jp));
+				} catch (JsonStandardException e) {
+					TestSubject.assertTestCondition(jp.getPosition() == initialPosition,
+							String.format("The JSON parser %s should be reset to position %s after "
+									+ "failing to parse, but is at %s.", 
+									jp, initialPosition, jp.getPosition()));	
+				}
 			} catch (JsonStandardException e) {
-				TestSubject.assertTestCondition(jp.getPosition() == initialPosition,
-						String.format("The JSON parser %s should be reset to position %s after "
-								+ "failing to parse, but is at %s.", 
-								jp, initialPosition, jp.getPosition()));
-				
+				throw new TestFailureException("Creating the JSON parser failed.", e);
 			}
 		}
 	}
