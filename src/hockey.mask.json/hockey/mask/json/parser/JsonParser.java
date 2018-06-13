@@ -1,8 +1,10 @@
 package hockey.mask.json.parser;
 
+import hockey.mask.json.JsonStandardException;
+
 /**
  * The JsonParser class facilitates the processing of a plain string input into a JSON value. 
- * This is merely a helper class and should not be used directly. It works similar to a stream.
+ * It works similar to a stream.
  * 
  * @author Planters
  *
@@ -17,16 +19,16 @@ public class JsonParser {
 	 * throw an exception. The same holds true for empty strings.
 	 * 
 	 * @param jsonData - the data to parse
+	 * @throws JsonStandardException if an empty string is passed
 	 * @throws NullPointerException if null is passed
-	 * @throws IllegalArgumentException if an empty string is passed
 	 */
-	public JsonParser(String jsonData) {
+	public JsonParser(String jsonData) throws JsonStandardException {
 		// ensure the data is valid
 		if (jsonData == null) {
 			throw new NullPointerException("The null string \"" + jsonData
 					+ "\" cannot be parsed.");
 		} else if (jsonData.length() <= 0) {
-			throw new IllegalArgumentException("The empty string \"" + jsonData
+			throw new JsonStandardException("The empty string \"" + jsonData
 					+ "\" cannot be parsed.");
 		} else {
 			this.jsonData = jsonData;
@@ -128,7 +130,7 @@ public class JsonParser {
 	
 	/**
 	 * Checks whether the next characters are the query.
-	 * Optionally the position mark can be incremented if the query is found
+	 * Optionally the position mark can be incremented if the query is found.
 	 * 
 	 * @param query - the string to query for
 	 * @param incrementPosition - true to increment the position mark by the search if found
