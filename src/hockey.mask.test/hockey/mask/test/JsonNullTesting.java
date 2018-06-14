@@ -56,7 +56,7 @@ public class JsonNullTesting implements TestSubject {
 	}
 	
 	/**
-	 * Test parsing JSON formatted strings.
+	 * Test parsing JSON formatted null.
 	 * 
 	 * @throws TestFailureException the test did fail
 	 */
@@ -64,9 +64,9 @@ public class JsonNullTesting implements TestSubject {
 		// test JSON null strings
 		try {
 			JsonNull.parse(null);
-			throw new TestFailureException("Parsing of null for a JSON string should fail.");
+			throw new TestFailureException("Parsing of null for a JSON null should fail.");
 		} catch (JsonStandardException e) {
-			throw new TestFailureException("Parsing of null for a JSON string should throw a "
+			throw new TestFailureException("Parsing of null for a JSON null should throw a "
 					+ "NullPointerException.", e);
 		} catch (NullPointerException e) {
 			/*
@@ -111,7 +111,7 @@ public class JsonNullTesting implements TestSubject {
 	}
 	
 	/**
-	 * Test sequentially parsing JSON formatted strings.
+	 * Test sequentially parsing JSON formatted nulls.
 	 * 
 	 * @throws TestFailureException the test did fail
 	 */
@@ -125,7 +125,7 @@ public class JsonNullTesting implements TestSubject {
 			 * Do nothing as this is expected behaviour.
 			 */
 		} catch (JsonStandardException e) {
-			throw new TestFailureException("Parsing of null for a JSON string should throw a "
+			throw new TestFailureException("Parsing of null for a JSON null should throw a "
 					+ "NullPointerException.", e);
 		}
 		// test JSON string

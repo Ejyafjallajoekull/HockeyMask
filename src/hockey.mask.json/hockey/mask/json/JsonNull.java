@@ -32,23 +32,23 @@ public class JsonNull {
 	}
 
 	/**
-	 * Parse the specified JSON formatted string and return its internal representation.
+	 * Parse the specified JSON formatted null and return its internal representation.
 	 * 
-	 * @param jsonString - the JSON formatted string
-	 * @return the internal representation of the JSON formatted string
+	 * @param jsonNull - the JSON formatted null
+	 * @return the internal representation of the JSON formatted null
 	 * @throws JsonStandardException if the string was not JSON formatted
 	 * @throws NullPointerException - if null is passed as JSON input string
 	 */
-	public static JsonNull parse(String jsonString) throws JsonStandardException {
-		if (jsonString != null) {
-			JsonParser jp = new JsonParser(jsonString);
+	public static JsonNull parse(String jsonNull) throws JsonStandardException {
+		if (jsonNull != null) {
+			JsonParser jp = new JsonParser(jsonNull);
 			JsonNull parsedNull = JsonNull.parseNext(jp);
-			jp.skipWhitespace(); // needed for checking against garbage data#
+			jp.skipWhitespace(); // needed for checking against garbage data
 			if (!jp.hasNext()) {
 				return parsedNull;
 			} else { // the string should not contain any more garbage data
 				throw new JsonStandardException(String.format("The string \"%s\" is not a pure JSON null.", 
-						jsonString)); 
+						jsonNull)); 
 			}
 		} else {
 			throw new NullPointerException("A JSON formatted string may not be null.");
@@ -59,8 +59,8 @@ public class JsonNull {
 	 * Parse the next JSON formatted null from the specified JSON parser and return its 
 	 * internal representation.
 	 * 
-	 * @param parser - the parser to retrieve the JSON formatted string from
-	 * @return the internal representation of the JSON formatted string
+	 * @param parser - the parser to retrieve the JSON formatted null from
+	 * @return the internal representation of the JSON formatted null
 	 * @throws JsonStandardException if the next element in the parser is not a JSON formatted null
 	 * @throws NullPointerException - if null is passed as JSON parser
 	 */
