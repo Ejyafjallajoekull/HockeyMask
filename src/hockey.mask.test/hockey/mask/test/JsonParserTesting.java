@@ -23,6 +23,7 @@ public class JsonParserTesting implements TestSubject {
 		JsonParserTesting.testSettingGetting();
 		JsonParserTesting.testNext();
 		JsonParserTesting.testSkipWhitespace();
+		JsonParserTesting.testIsNextDigit();
 	}
 	
 	/**
@@ -302,6 +303,48 @@ public class JsonParserTesting implements TestSubject {
 	}
 	
 	/**
+	 * Test detecting if the next character is a digit.
+	 * 
+	 * @throws TestFailureException the test did fail
+	 */
+	private static void testIsNextDigit() throws TestFailureException {
+		for (int i = 0; i < 10000; i++) {
+			// test strings only consisting of digits
+			String digitString = JsonParserTesting.createRandomDigitSequence();
+			if (digitString.length() > 0) { // otherwise an exception will be thrown
+				try {
+					JsonParser digitParser = new JsonParser(digitString);
+					for (int j = 0; j < digitString.length(); j++) {
+						char nextChar = digitParser.get().charAt(0);
+						TestSubject.assertTestCondition(Character.isDigit(nextChar), 
+								String.format("The parsed char in the JSON parser %s should be a digit "
+										+ ", but is \"%s\".", 
+										digitParser, nextChar));
+					}	
+				} catch (JsonStandardException e) {
+					throw new TestFailureException("Creating the JSON parser failed.", e);
+				}
+			}
+			// test strings without digits
+			String stringWithoutDigits = JsonParserTesting.createRandomSequenceWithoutDigits();
+			if (stringWithoutDigits.length() > 0) { // otherwise an exception will be thrown
+				try {
+					JsonParser noDigitsParser = new JsonParser(stringWithoutDigits);
+					for (int j = 0; j < stringWithoutDigits.length(); j++) {
+						char nextChar = noDigitsParser.get().charAt(0);
+						TestSubject.assertTestCondition(!Character.isDigit(nextChar), 
+								String.format("The parsed char in the JSON parser %s should not be a digit "
+										+ ", but is \"%s\".", 
+										noDigitsParser, nextChar));
+					}	
+				} catch (JsonStandardException e) {
+					throw new TestFailureException("Creating the JSON parser failed.", e);
+				}
+			}
+		}
+	}
+	
+	/**
 	 * Helper function to create a string only containing random whitespaces.
 	 */
 	private static String createRandomWhitespaceSequence() {
@@ -335,6 +378,34 @@ public class JsonParserTesting implements TestSubject {
 		StringBuilder sb = new StringBuilder();
 		for(int i = 0; i < testString.length(); i++) {
 			if (!Character.isWhitespace(testString.charAt(i))) {
+				sb.append(testString.charAt(i));
+			}
+		}
+		return sb.toString();
+	}
+	
+	/**
+	 * Helper function to create a string only containing random digits.
+	 */
+	private static String createRandomDigitSequence() {
+		int length = JsonParserTesting.RANDOM.nextInt(200);
+		StringBuilder sb = new StringBuilder();
+		for(int i = 0; i < length; i++) {
+			sb.append(JsonParserTesting.RANDOM.nextInt(10));
+		}
+		return sb.toString();
+	}
+	
+	/**
+	 * Helper function to create a random string without any digits.
+	 */
+	private static String createRandomSequenceWithoutDigits() {
+		byte[] randomString = new byte[JsonParserTesting.RANDOM.nextInt(300)];
+		JsonParserTesting.RANDOM.nextBytes(randomString);
+		String testString = new String(randomString);
+		StringBuilder sb = new StringBuilder();
+		for(int i = 0; i < testString.length(); i++) {
+			if (!Character.isDigit(testString.charAt(i))) {
 				sb.append(testString.charAt(i));
 			}
 		}

@@ -149,6 +149,16 @@ public class JsonParser {
 			}
 		}
 		return false;
+	}	
+	
+	/**
+	 * Checks whether the next character is a digit.
+	 * This will not increment the position mark.
+	 * 
+	 * @return true if the next character is a digit
+	 */
+	public boolean isNextDigit() {
+		return this.hasNext() && Character.isDigit(this.getData().charAt(this.getPosition()));
 	}
 	
 	/**
