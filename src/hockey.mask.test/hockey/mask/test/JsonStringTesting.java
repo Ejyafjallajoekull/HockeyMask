@@ -59,7 +59,7 @@ public class JsonStringTesting implements TestSubject {
 			String testString = new String(randomString);
 			JsonString jsonTestString = new JsonString(testString);
 			JsonString similarTestString = new JsonString(testString);
-			TestSubject.assertTestCondition(testString.equals(jsonTestString.toString()), 
+			TestSubject.assertTestCondition(testString.equals(jsonTestString.getValue()), 
 					String.format("The JSON string should hold the value %s, but has %s.", 
 							testString, jsonTestString));
 			TestSubject.assertTestCondition(jsonTestString.equals(similarTestString), 

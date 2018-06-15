@@ -54,11 +54,30 @@ public class JsonString {
 	 * @throws NullPointerException if null is passed string value
 	 */
 	public JsonString(String value) {
+		this.setValue(value);
+	}
+	
+	/**
+	 * Set the JSON string to the specified string value.
+	 * 
+	 * @param value - the value to set
+	 */
+	private void setValue(String value) {
 		if (value != null) {
 			this.value = value;
 		} else {
 			throw new NullPointerException("A JSON formatted string cannot be null");
 		}
+	}
+	
+	/**
+	 * Get the value of this JSON string.
+	 * This will return the Java representation of the JSON string.
+	 * 
+	 * @return the string representation of this JSON string
+	 */
+	public String getValue() {
+		return this.value;
 	}
 	
 	/**
@@ -68,7 +87,7 @@ public class JsonString {
 	 */
 	public String toJson() {
 		// the string cannot be null at this point
-		StringBuilder sb = new StringBuilder(this.toString());
+		StringBuilder sb = new StringBuilder(this.getValue());
 			int endIndex = 0;
 			for (int i = 0; i < sb.length(); i++) {
 				for (String[] escape : JsonString.JSON_STRING_ESCAPED_CHARACTERS) {
@@ -155,19 +174,6 @@ public class JsonString {
 			throw new NullPointerException("The JSON parser may not be null.");
 		}
 	}
-	
-	/**
-	 * @param jsonString
-	 * @return true if the passed string is a JSON
-	 */
-//	public static boolean isJsonString(String jsonString) {
-//		if (jsonString != null) {
-//			String trimmed = jsonString.trim();
-//			return trimmed.startsWith(JsonString.JSON_STRING_IDENTIFIER) 
-//					&& trimmed.endsWith(JsonString.JSON_STRING_IDENTIFIER);
-//		}
-//		return false;
-//	}
 	
 	@Override
 	public String toString() {
