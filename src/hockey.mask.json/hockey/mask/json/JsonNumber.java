@@ -61,8 +61,9 @@ public class JsonNumber {
 	 * Create a new JSON number with the specified value.
 	 * 
 	 * @param jsonNumber - the value of this JSON number
+	 * @throws JsonStandardException if the passed number is infinity or NaN
 	 */
-	public JsonNumber(float jsonNumber) {
+	public JsonNumber(float jsonNumber) throws JsonStandardException {
 		this.setValue(jsonNumber);
 	}
 	
@@ -70,8 +71,9 @@ public class JsonNumber {
 	 * Create a new JSON number with the specified value.
 	 * 
 	 * @param jsonNumber - the value of this JSON number
+	 * @throws JsonStandardException if the passed number is infinity or NaN
 	 */
-	public JsonNumber(double jsonNumber) {
+	public JsonNumber(double jsonNumber) throws JsonStandardException {
 		this.setValue(jsonNumber);
 	}
 	
@@ -116,9 +118,16 @@ public class JsonNumber {
 	 * Internally the number is represented as BigDecimal.
 	 * 
 	 * @param number - the value to set
+	 * @throws JsonStandardException if the passed number is infinity or NaN
 	 */
-	private void setValue(float number) {
-		this.value = new BigDecimal(number);
+	private void setValue(float number) throws JsonStandardException {
+		if (number != Float.NEGATIVE_INFINITY && number != Float.POSITIVE_INFINITY 
+				&& !Float.isNaN(number)) {
+			this.value = new BigDecimal(number);
+		} else {
+			throw new JsonStandardException("The number " + number + "can not be represented "
+					+ "by the JSON foramt.");
+		}
 	}
 	
 	/**
@@ -127,9 +136,16 @@ public class JsonNumber {
 	 * Internally the number is represented as BigDecimal.
 	 * 
 	 * @param number - the value to set
+	 * @throws JsonStandardException if the passed number is infinity or NaN
 	 */
-	private void setValue(double number) {
-		this.value = new BigDecimal(number);
+	private void setValue(double number) throws JsonStandardException {
+		if (number != Double.NEGATIVE_INFINITY && number != Double.POSITIVE_INFINITY 
+				&& !Double.isNaN(number)) {
+			this.value = new BigDecimal(number);
+		} else {
+			throw new JsonStandardException("The number " + number + "can not be represented "
+					+ "by the JSON foramt.");
+		}
 	}
 	
 	/**
