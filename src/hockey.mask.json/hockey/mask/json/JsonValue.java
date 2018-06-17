@@ -2,6 +2,8 @@ package hockey.mask.json;
 
 import java.math.BigDecimal;
 
+import hockey.mask.json.parser.JsonParser;
+
 /**
  * The JsonValue class represents a single value formatted in the JSON format. This may 
  * be a string, a number, a boolean, null, an JSON object or a JSON array.
@@ -11,22 +13,7 @@ import java.math.BigDecimal;
  */
 public class JsonValue {
 	
-	/**
-	 * The JSON representation of a null value.
-	 */
-	public static final String JSON_NULL_VALUE = "null";
-	
-	/**
-	 * The JSON representation of a true boolean.
-	 */
-	public static final String JSON_TRUE_VALUE = "true";
-	
-	/**
-	 * The JSON representation of a false boolean.
-	 */
-	public static final String JSON_FALSE_VALUE = "false";
-	
-	Object value = null;
+	Object value = new JsonNull();
 	JsonValueTypes type = JsonValueTypes.NULL;
 
 	/**
@@ -34,6 +21,13 @@ public class JsonValue {
 	 */
 	public JsonValue() {
 		this.setValueToNull();
+	}
+	
+	/**
+	 * Create a null JSON value.
+	 */
+	public JsonValue(JsonNull jsonNull) {
+		this.setValue(jsonNull);
 	}
 	
 	/**
@@ -50,7 +44,7 @@ public class JsonValue {
 	 * 
 	 * @param bool - the value
 	 */
-	public JsonValue(boolean bool) {
+	public JsonValue(JsonBoolean bool) {
 		this.setValue(bool);
 	}
 	
@@ -59,43 +53,7 @@ public class JsonValue {
 	 * 
 	 * @param number - the value
 	 */
-	public JsonValue(int number) {
-		this.setValue(number);
-	}
-	
-	/**
-	 * Create a number JSON value.
-	 * 
-	 * @param number - the value
-	 */
-	public JsonValue(long number) {
-		this.setValue(number);
-	}
-	
-	/**
-	 * Create a number JSON value.
-	 * 
-	 * @param number - the value
-	 */
-	public JsonValue(float number) {
-		this.setValue(number);
-	}
-	
-	/**
-	 * Create a number JSON value.
-	 * 
-	 * @param number - the value
-	 */
-	public JsonValue(double number) {
-		this.setValue(number);
-	}
-	
-	/**
-	 * Create a number JSON value.
-	 * 
-	 * @param number - the value
-	 */
-	public JsonValue(BigDecimal number) {
+	public JsonValue(JsonNumber number) {
 		this.setValue(number);
 	}
 	
@@ -121,8 +79,22 @@ public class JsonValue {
 	 * Set the value of this JSON value to null.
 	 */
 	public void setValueToNull() {
-		this.value = null;
+		this.value = new JsonNull();
 		this.type = JsonValueTypes.NULL;
+	}
+	
+	/**
+	 * Set the value of this JSON value to a null.
+	 * 
+	 * @param jsonNull - the value to set
+	 */
+	public void setValue(JsonNull jsonNull) {
+		this.type = JsonValueTypes.NULL;
+		if (jsonNull != null) {
+			this.value = jsonNull;
+		} else {
+			this.value = new JsonNull();
+		}
 	}
 	
 	/**
@@ -132,86 +104,42 @@ public class JsonValue {
 	 */
 	public void setValue(JsonString string) {
 		if (string != null) {
+			this.value = string;
 			this.type = JsonValueTypes.STRING;
 		} else {
+			this.value = new JsonNull();
 			this.type = JsonValueTypes.NULL;
 		}
-		this.value = string;
 	}
 	
 	/**
-	 * Set the value of this JSON value to a boolean.
+	 * Set the value of this JSON value to a JSON boolean.
 	 * 
 	 * @param bool - the value to set
 	 */
-	public void setValue(boolean bool) {
-		this.type = JsonValueTypes.BOOLEAN;
-		this.value = bool;
-	}
-	
-	/**
-	 * Set the value of this JSON value to a number by 
-	 * supplying an integer.
-	 * Internally the number is represented as BigDecimal.
-	 * 
-	 * @param number - the value to set
-	 */
-	public void setValue(int number) {
-		this.type = JsonValueTypes.NUMBER;
-		this.value = new BigDecimal(number);
-	}
-	
-	/**
-	 * Set the value of this JSON value to a number by 
-	 * supplying a long.
-	 * Internally the number is represented as BigDecimal.
-	 * 
-	 * @param number - the value to set
-	 */
-	public void setValue(long number) {
-		this.type = JsonValueTypes.NUMBER;
-		this.value = new BigDecimal(number);
-	}
-	
-	/**
-	 * Set the value of this JSON value to a number by 
-	 * supplying a float.
-	 * Internally the number is represented as BigDecimal.
-	 * 
-	 * @param number - the value to set
-	 */
-	public void setValue(float number) {
-		this.type = JsonValueTypes.NUMBER;
-		this.value = new BigDecimal(number);
-	}
-	
-	/**
-	 * Set the value of this JSON value to a number by 
-	 * supplying a double.
-	 * Internally the number is represented as BigDecimal.
-	 * 
-	 * @param number - the value to set
-	 */
-	public void setValue(double number) {
-		this.type = JsonValueTypes.NUMBER;
-		this.value = new BigDecimal(number);
-	}
-	
-	/**
-	 * Set the value of this JSON value to a number by 
-	 * supplying a BigDecimal.
-	 * This is also how the number will be represented 
-	 * internally.
-	 * 
-	 * @param number - the value to set
-	 */
-	public void setValue(BigDecimal number) {
-		if (number != null) {
-			this.type = JsonValueTypes.NUMBER;
+	public void setValue(JsonBoolean bool) {
+		if (bool != null) {
+			this.type = JsonValueTypes.BOOLEAN;
+			this.value = bool;
 		} else {
+			this.value = new JsonNull();
 			this.type = JsonValueTypes.NULL;
 		}
-		this.value = number;
+	}
+	
+	/**
+	 * Set the value of this JSON value to a number.
+	 * 
+	 * @param number - the value to set
+	 */
+	public void setValue(JsonNumber number) {
+		if (number != null) {
+			this.value = number;
+			this.type = JsonValueTypes.NUMBER;
+		} else {
+			this.value = new JsonNull();
+			this.type = JsonValueTypes.NULL;
+		}
 	}
 	
 	/**
@@ -221,11 +149,12 @@ public class JsonValue {
 	 */
 	public void setValue(JsonObject jsonObject) {
 		if (jsonObject != null) {
+			this.value = jsonObject;
 			this.type = JsonValueTypes.OBJECT;
 		} else {
+			this.value = new JsonNull();
 			this.type = JsonValueTypes.NULL;
 		}
-		this.value = jsonObject;
 	}
 	
 	/**
@@ -235,11 +164,12 @@ public class JsonValue {
 	 */
 	public void setValue(JsonArray jsonArray) {
 		if (jsonArray != null) {
+			this.value = jsonArray;
 			this.type = JsonValueTypes.ARRAY;
 		} else {
+			this.value = new JsonNull();
 			this.type = JsonValueTypes.NULL;
 		}
-		this.value = jsonArray;
 	}
 	
 	/**
@@ -260,59 +190,98 @@ public class JsonValue {
 		return this.type;
 	}
 	
+	/**
+	 * Parse the specified JSON formatted value and return its internal representation.
+	 * 
+	 * @param jsonValue - the JSON formatted value
+	 * @return the internal representation of the JSON formatted value
+	 * @throws JsonStandardException if the string was not JSON formatted
+	 * @throws NullPointerException - if null is passed as JSON input string
+	 */
 	public static JsonValue parse(String jsonValue) throws JsonStandardException {
 		if (jsonValue != null) {
+			JsonParser jp = new JsonParser(jsonValue);
+			JsonValue parsedValue = JsonValue.parseNext(jp);
+			jp.skipWhitespace(); // needed for checking against garbage data
+			if (!jp.hasNext()) {
+				return parsedValue;
+			} else { // the string should not contain any more garbage data
+				throw new JsonStandardException(String.format("The string \"%s\" is not a pure "
+						+ "JSON value.", jsonValue)); 
+			}
+		} else {
+			throw new NullPointerException("A JSON formatted value may not be null.");
+		}
+	}
+	
+	/**
+	 * Parse the next JSON formatted value from the specified JSON parser and return its 
+	 * internal representation.
+	 * 
+	 * @param parser - the parser to retrieve the JSON formatted value from
+	 * @return the internal representation of the JSON formatted value
+	 * @throws JsonStandardException if the next element in the parser is not a JSON formatted value
+	 * @throws NullPointerException - if null is passed as JSON parser
+	 */
+	public static JsonValue parseNext(JsonParser parser) throws JsonStandardException {
+		if (parser != null) {
 			try {
 				/*
-				 * Try parsing it as JSON string, which will fail if its not a JSON 
+				 * Try parsing it as JSON string, which will fail if it is not a JSON 
 				 * formatted string.
 				 */
-				return new JsonValue(JsonString.parse(jsonValue));
-			} catch (JsonStandardException e) {
+				return new JsonValue(JsonString.parseNext(parser));
+			} catch (JsonStandardException stringException) {
 				try {
 					/*
 					 * Next, try parsing it as a JSON array, which may also fail if 
-					 * its not a JSON formatted array.
+					 * it is not a JSON formatted array.
 					 */
-					return new JsonValue(JsonArray.parse(jsonValue));
-				} catch (JsonStandardException e1) {
+					return new JsonValue(JsonArray.parseNext(parser));
+				} catch (JsonStandardException arrayException) {
 					try {
 						/*
 						 * Next, try parsing it as a JSON object, which may also fail if 
-						 * its not a JSON formatted object.
+						 * it is not a JSON formatted object.
 						 */
-						return new JsonValue(JsonObject.parse(jsonValue));
-					} catch (JsonStandardException e2) {
-						/*
-						 * Last, check if it is a JSON null or boolean. 
-						 * If not parse it as a number.
-						 */
-						if (jsonValue.equals(JsonValue.JSON_NULL_VALUE)) {
-							return new JsonValue();
-						} else if (jsonValue.equals(JsonValue.JSON_TRUE_VALUE)) {
-							return new JsonValue(true);
-						} else if (jsonValue.equals(JsonValue.JSON_FALSE_VALUE)) {
-							return new JsonValue(false);
-						} else {
+						return new JsonValue(JsonObject.parseNext(parser));
+					} catch (JsonStandardException ObjectException) {
+						try {
+							/*
+							 * Next, try parsing it as a JSON boolean, which may also fail if 
+							 * it is not a JSON formatted boolean.
+							 */
+							return new JsonValue(JsonBoolean.parseNext(parser));
+						} catch (JsonStandardException booleanExcption) {
 							try {
-								return new JsonValue(new BigDecimal(jsonValue));
-							} catch (Exception lastException) {
 								/*
-								 * Catch every other exception, which might be thrown 
-								 * by trying to read in the string as number and throw 
-								 * a exception flagging it as not JSON formatted.
+								 * Next, try parsing it as a JSON null, which may also fail if 
+								 * it is not a JSON formatted null.
 								 */
-								throw new JsonStandardException(String.format(
-										"The string \"%s\" is not a JSON formatted value.", 
-										jsonValue), lastException);
+								return new JsonValue(JsonNull.parseNext(parser));
+							} catch (JsonStandardException nullExcption) {
+								try {
+									/*
+									 * Last, parse it as a number. 
+									 */
+									return new JsonValue(JsonNumber.parseNext(parser));
+								} catch (Exception lastException) {
+									/*
+									 * Catch every other exception, which might be thrown 
+									 * by trying to read in the string as number and throw 
+									 * a exception flagging it as not JSON formatted.
+									 */
+									throw new JsonStandardException(String.format(
+											"The JSON parser %s does not hold a JSON formatted value.", 
+											parser), lastException);
+								}
 							}
 						}
 					}
-
 				}
 			}
 		} else {
-			return null;
+			throw new NullPointerException("The JSON parser may not be null.");
 		}
 	}
 	
@@ -325,13 +294,16 @@ public class JsonValue {
 		switch (this.type) {
 		
 		case NULL:
-			return JsonValue.JSON_NULL_VALUE;
+			return ((JsonNull) this.getValue()).toJson();
 			
 		case STRING:
 			return ((JsonString) this.getValue()).toJson();
 			
 		case NUMBER:
-			return ((BigDecimal) this.getValue()).toString();
+			return ((JsonNumber) this.getValue()).toJson();
+			
+		case BOOLEAN:
+			return ((JsonBoolean) this.getValue()).toJson();
 			
 		case OBJECT:
 			return ((JsonObject) this.getValue()).toJson();
@@ -340,7 +312,7 @@ public class JsonValue {
 			return ((JsonArray) this.getValue()).toJson();
 		
 		default:
-			return this.getValue().toString();
+			return null;
 			
 		}
 	}
@@ -350,12 +322,7 @@ public class JsonValue {
 		if (obj != null && obj instanceof JsonValue) {
 			JsonValue val = (JsonValue) obj;
 			if (this.getType() == val.getType()) {
-				// simplify the null check for values by using the type
-				if (this.getType() == JsonValueTypes.NULL) {
-					return true;
-				} else {
-					return this.getValue().equals(val.getValue());				
-				}
+				return this.getValue().equals(val.getValue());				
 			}
 		}
 		return false;
@@ -372,11 +339,7 @@ public class JsonValue {
 	
 	@Override
 	public String toString() {
-		if (this.getValue() != null) {
-			return this.getValue().toString();
-		} else {
-			return "null";
-		}
+		return String.format("%s:%s", this.getType(), this.getValue());
 	}
 
 }
