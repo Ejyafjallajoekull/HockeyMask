@@ -76,7 +76,7 @@ public class JsonNullTesting implements TestSubject {
 		// test empty strings
 		try {
 			JsonNull.parse("");
-			throw new TestFailureException("Parsing of empty for a JSON null should fail.");
+			throw new TestFailureException("Parsing of an empty string for a JSON null should fail.");
 		} catch (JsonStandardException e) {
 			/*
 			 * Do nothing as this is expected behaviour.

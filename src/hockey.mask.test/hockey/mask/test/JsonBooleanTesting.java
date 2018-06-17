@@ -109,7 +109,7 @@ public class JsonBooleanTesting implements TestSubject {
 		// test empty strings
 		try {
 			JsonBoolean.parse("");
-			throw new TestFailureException("Parsing of empty for a JSON boolean should fail.");
+			throw new TestFailureException("Parsing of an empty string for a JSON boolean should fail.");
 		} catch (JsonStandardException e) {
 			/*
 			 * Do nothing as this is expected behaviour.

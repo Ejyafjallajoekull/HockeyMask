@@ -23,7 +23,7 @@ public class JsonBoolean {
 	private boolean value = false;
 	
 	/**
-	 * Create a new JSON formatted boolean with the specified value.
+	 * Create a new JSON boolean with the specified value.
 	 * 
 	 * @param jsonBoolean - the value of this JSON boolean
 	 */
@@ -52,7 +52,7 @@ public class JsonBoolean {
 	/**
 	 * Get a JSON formatted string from the internal representation of this JSON boolean.
 	 * 
-	 * @return the JSON string representation of null
+	 * @return the JSON string representation of the according boolean
 	 */
 	public String toJson() {
 		if (this.getValue()) {
