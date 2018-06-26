@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Random;
 
 import hockey.mask.json.JsonArray;
+import hockey.mask.json.JsonNull;
 import hockey.mask.json.JsonObject;
 import hockey.mask.json.JsonStandardException;
 import hockey.mask.json.JsonString;
@@ -26,48 +27,68 @@ public class JsonValueTesting implements TestSubject {
 	public void runAllTests() throws TestFailureException {
 		JsonValueTesting.testConstructors();
 		JsonValueTesting.testSetterGetter();
-		JsonValueTesting.testParsing();
 		JsonValueTesting.testToJson();
+		JsonValueTesting.testParsing();
+		
 	}
 	
 	/**
 	 * Test constructors and some basic equality.
 	 */
 	private static void testConstructors() throws TestFailureException {
-		JsonValue testValue = new JsonValue();
 		// test JSON null
-		TestSubject.assertTestCondition(testValue.getType() == JsonValueTypes.NULL, 
+		JsonValue nullValue = new JsonValue();
+		JsonNull someNull = new JsonNull();
+		TestSubject.assertTestCondition(nullValue.getType() == JsonValueTypes.NULL, 
 				String.format("A JSON null should be of type %s, but is %s.", 
-						JsonValueTypes.NULL, testValue.getType()));
-		TestSubject.assertTestCondition(testValue.getValue() == null, 
-				String.format("A JSON null should have the value null, but has %s.", 
-						testValue.getValue()));
+						JsonValueTypes.NULL, nullValue.getType()));
+		TestSubject.assertTestCondition(nullValue.getValue().equals(someNull), 
+				String.format("A JSON null should have the value %s, but has %s.", 
+						someNull, nullValue.getValue()));
+		nullValue = new JsonValue(someNull);
+		TestSubject.assertTestCondition(nullValue.getType() == JsonValueTypes.NULL, 
+				String.format("A JSON null should be of type %s, but is %s.", 
+						JsonValueTypes.NULL, nullValue.getType()));
+		TestSubject.assertTestCondition(nullValue.getValue().equals(someNull), 
+				String.format("A JSON null should have the value %s, but has %s.", 
+						someNull, nullValue.getValue()));
+		nullValue = new JsonValue((JsonNull) null);
+		TestSubject.assertTestCondition(nullValue.getType() == JsonValueTypes.NULL, 
+				String.format("A JSON null should be of type %s, but is %s.", 
+						JsonValueTypes.NULL, nullValue.getType()));
+		TestSubject.assertTestCondition(nullValue.getValue().equals(someNull), 
+				String.format("A JSON null should have the value %s, but has %s.", 
+						someNull, nullValue.getValue()));
 		// test JSON string
+		JsonValue testStringValue = new JsonValue();
+
 		String testString = null;
 		byte[] randomString = null;
 		JsonString jsonTestString = null;
-		testValue = new JsonValue(jsonTestString);
-		TestSubject.assertTestCondition(testValue.getType() == JsonValueTypes.NULL, 
+		testStringValue = new JsonValue(jsonTestString);
+		TestSubject.assertTestCondition(testStringValue.getType() == JsonValueTypes.NULL, 
 				String.format("A JSON null string should be of type %s, but is %s.", 
-						JsonValueTypes.NULL, testValue.getType()));
-		TestSubject.assertTestCondition(testValue.getValue() == null, 
+						JsonValueTypes.NULL, testStringValue.getType()));
+		TestSubject.assertTestCondition(testStringValue.getValue() == null, 
 				String.format("A JSON null string should have the value null, but has %s.", 
-						testValue.getValue()));
+						testStringValue.getValue()));
 		for (int i = 0; i < 10000; i++) {
 			// create random strings
 			randomString = new byte[JsonValueTesting.RANDOM.nextInt(200)];
 			JsonValueTesting.RANDOM.nextBytes(randomString);
 			testString = new String(randomString);
 			jsonTestString = new JsonString(testString);
-			testValue = new JsonValue(jsonTestString);
-			TestSubject.assertTestCondition(testValue.getType() == JsonValueTypes.STRING, 
+			testStringValue = new JsonValue(jsonTestString);
+			TestSubject.assertTestCondition(testStringValue.getType() == JsonValueTypes.STRING, 
 					String.format("A JSON string should be of type %s, but is %s.", 
-							JsonValueTypes.STRING, testValue.getType()));
-			TestSubject.assertTestCondition(jsonTestString.equals(testValue.getValue()), 
+							JsonValueTypes.STRING, testStringValue.getType()));
+			TestSubject.assertTestCondition(jsonTestString.equals(testStringValue.getValue()), 
 					String.format("The JSON string should hold the value %s, but has %s.", 
-							jsonTestString, testValue.getValue()));
+							jsonTestString, testStringValue.getValue()));
 		}
 		// test JSON boolean
+		JsonValue testValue = new JsonValue();
+
 		boolean testBool = false;
 		for (int i = 0; i < 100; i++) {
 			testBool = JsonValueTesting.RANDOM.nextBoolean();
