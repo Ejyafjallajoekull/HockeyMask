@@ -101,7 +101,7 @@ public class JsonArrayTesting implements TestSubject {
 							+ "but holds %s instead.", simpleAdd, insertionValue, insertionIndex, 
 							simpleAdd.get(insertionIndex)));
 			try {
-				simpleAdd.add(simpleAdd.size() + 1, new JsonValue());;
+				simpleAdd.add(simpleAdd.size() + 1, new JsonValue());
 				throw new TestFailureException("Adding out of bounds to a JSON array should fail.");
 			} catch (IndexOutOfBoundsException e) {
 				/*
@@ -271,6 +271,30 @@ public class JsonArrayTesting implements TestSubject {
 	}
 	
 	/**
+	 * Test conversion to the JSON format.
+	 * 
+	 * @throws TestFailureException the test did fail
+	 */
+	private static void testToJson() throws TestFailureException {
+		for (int i = 0; i < 10000; i++) {
+			JsonArray testArray = new JsonArray();
+			ArrayList<JsonValue> testList = JsonArrayTesting.generateRandomList();
+			String perfectString = JsonArray.JSON_ARRAY_START_IDENTIFIER;
+			for (int j = 0; j < testList.size(); j++) {
+				testArray.add(testList.get(j));
+				perfectString += testList.get(j).toJson();
+				if (j < testList.size() - 1) {
+					perfectString += JsonArray.JSON_ARRAY_VALUE_SEPARATOR;
+				}
+			}
+			perfectString += JsonArray.JSON_ARRAY_END_IDENTIFIER;
+			TestSubject.assertTestCondition(testArray.toJson().equals(perfectString), 
+					String.format("The JSON array's JSON representation should be \"%s\", "
+							+ "but is \"%s\".",	perfectString, testArray.toJson()));
+		}		
+	}
+	
+	/**
 	 * Test the parsing of JSON formatted arrays to JSON arrays.
 	 * 
 	 * @throws TestFailureException the test did fail
@@ -357,9 +381,6 @@ public class JsonArrayTesting implements TestSubject {
 		}
 		// test reseting position mark after exception
 		for (int i = 0; i < 10000; i++) {
-			// create random strings
-			byte[] randomString = new byte[JsonArrayTesting.RANDOM.nextInt(200)];
-			JsonArrayTesting.RANDOM.nextBytes(randomString);
 			JsonArray jsonTestString = JsonArrayTesting.generateRandomArray();
 			String testString = jsonTestString.toJson();
 			// remove the last bracket so an exception will be raised
@@ -382,30 +403,6 @@ public class JsonArrayTesting implements TestSubject {
 				throw new TestFailureException("Creating the JSON parser failed.", e);
 			}
 		}
-	}
-	
-	/**
-	 * Test conversion to the JSON format.
-	 * 
-	 * @throws TestFailureException the test did fail
-	 */
-	private static void testToJson() throws TestFailureException {
-		for (int i = 0; i < 10000; i++) {
-			JsonArray testArray = new JsonArray();
-			ArrayList<JsonValue> testList = JsonArrayTesting.generateRandomList();
-			String perfectString = JsonArray.JSON_ARRAY_START_IDENTIFIER;
-			for (int j = 0; j < testList.size(); j++) {
-				testArray.add(testList.get(j));
-				perfectString += testList.get(j).toJson();
-				if (j < testList.size() - 1) {
-					perfectString += JsonArray.JSON_ARRAY_VALUE_SEPARATOR;
-				}
-			}
-			perfectString += JsonArray.JSON_ARRAY_END_IDENTIFIER;
-			TestSubject.assertTestCondition(testArray.toJson().equals(perfectString), 
-					String.format("The JSON array's JSON representation should be \"%s\", "
-							+ "but is \"%s\".",	perfectString, testArray.toJson()));
-		}		
 	}
 	
 	/**
