@@ -3,13 +3,13 @@ package hockey.mask.test;
 import java.util.Arrays;
 import java.util.Random;
 
-import hockey.mask.json.JsonNull;
-import hockey.mask.json.JsonNumber;
-import hockey.mask.json.JsonPair;
 import hockey.mask.json.JsonStandardException;
-import hockey.mask.json.JsonString;
-import hockey.mask.json.JsonValue;
 import hockey.mask.json.parser.JsonParser;
+import hockey.mask.json.values.JsonNull;
+import hockey.mask.json.values.JsonNumber;
+import hockey.mask.json.values.JsonPair;
+import hockey.mask.json.values.JsonString;
+import hockey.mask.json.values.JsonValue;
 import koro.sensei.tester.TestFailureException;
 import koro.sensei.tester.TestSubject;
 

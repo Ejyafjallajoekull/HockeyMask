@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
-import hockey.mask.json.JsonArray;
-import hockey.mask.json.JsonNull;
-import hockey.mask.json.JsonNumber;
 import hockey.mask.json.JsonStandardException;
-import hockey.mask.json.JsonValue;
-import hockey.mask.json.JsonValueTypes;
 import hockey.mask.json.parser.JsonParser;
+import hockey.mask.json.values.JsonArray;
+import hockey.mask.json.values.JsonNull;
+import hockey.mask.json.values.JsonNumber;
+import hockey.mask.json.values.JsonValue;
+import hockey.mask.json.values.JsonValueTypes;
 import koro.sensei.tester.TestFailureException;
 import koro.sensei.tester.TestSubject;
 

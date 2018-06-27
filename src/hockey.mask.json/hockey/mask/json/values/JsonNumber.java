@@ -1,7 +1,8 @@
-package hockey.mask.json;
+package hockey.mask.json.values;
 
 import java.math.BigDecimal;
 
+import hockey.mask.json.JsonStandardException;
 import hockey.mask.json.parser.JsonParser;
 
 /**

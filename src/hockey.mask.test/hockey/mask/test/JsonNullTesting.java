@@ -3,10 +3,10 @@ package hockey.mask.test;
 import java.util.Arrays;
 import java.util.Random;
 
-import hockey.mask.json.JsonNull;
 import hockey.mask.json.JsonStandardException;
-import hockey.mask.json.JsonValueTypes;
 import hockey.mask.json.parser.JsonParser;
+import hockey.mask.json.values.JsonNull;
+import hockey.mask.json.values.JsonValueTypes;
 import koro.sensei.tester.TestFailureException;
 import koro.sensei.tester.TestSubject;
 

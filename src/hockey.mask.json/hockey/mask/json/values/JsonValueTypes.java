@@ -1,4 +1,4 @@
-package hockey.mask.json;
+package hockey.mask.json.values;
 
 /**
  * The JsonValueTypes enum contains all types a JSON value can be.
