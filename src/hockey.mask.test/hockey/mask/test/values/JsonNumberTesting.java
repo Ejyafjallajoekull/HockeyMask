@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 import hockey.mask.json.JsonStandardException;
-import hockey.mask.json.parser.JsonParser;
+import hockey.mask.json.parser.JsonStringParser;
 import hockey.mask.json.values.JsonNumber;
 import hockey.mask.json.values.JsonValueTypes;
 import koro.sensei.tester.TestFailureException;
@@ -376,7 +376,7 @@ public class JsonNumberTesting implements TestSubject {
 				testString += jsonTestNumbers[j].toJson() + ",   ";
 			}
 			try {
-				JsonParser jp = new JsonParser(testString);
+				JsonStringParser jp = new JsonStringParser(testString);
 				JsonNumber[] parsedJsonNumbers = new JsonNumber[jsonTestNumbers.length];
 				for (int j = 0; j < jsonTestNumbers.length; j++) {
 					parsedJsonNumbers[j] = JsonNumber.parseNext(jp);
@@ -395,7 +395,7 @@ public class JsonNumberTesting implements TestSubject {
 		// test reseting position mark after exception
 		String testString = JsonNumberTesting.RANDOM.nextInt() + JsonNumber.JSON_EXPONENT_CAPITAL_VALUE;
 		try {
-			JsonParser jp = new JsonParser(testString);
+			JsonStringParser jp = new JsonStringParser(testString);
 			int initialPosition = jp.getPosition();
 			try {
 				JsonNumber.parseNext(jp);

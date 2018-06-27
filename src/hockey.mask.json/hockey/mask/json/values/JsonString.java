@@ -2,6 +2,7 @@ package hockey.mask.json.values;
 
 import hockey.mask.json.JsonStandardException;
 import hockey.mask.json.parser.JsonParser;
+import hockey.mask.json.parser.JsonStringParser;
 
 /**
  * The JsonString class represents a string formatted in the JSON format.
@@ -119,7 +120,7 @@ public class JsonString extends JsonValue {
 	 */
 	public static JsonString parse(String jsonString) throws JsonStandardException {
 		if (jsonString != null) {
-			JsonParser jp = new JsonParser(jsonString);
+			JsonStringParser jp = new JsonStringParser(jsonString);
 			JsonString parsedString = JsonString.parseNext(jp);
 			jp.skipWhitespace(); // needed for checking against garbage data
 			if (!jp.hasNext()) {

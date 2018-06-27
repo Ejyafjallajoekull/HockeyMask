@@ -6,6 +6,7 @@ import java.util.Iterator;
 
 import hockey.mask.json.JsonStandardException;
 import hockey.mask.json.parser.JsonParser;
+import hockey.mask.json.parser.JsonStringParser;
 
 /**
  * The JsonObject class represents an object formatted in the JSON standard. 
@@ -159,7 +160,7 @@ public class JsonObject extends JsonValue implements Iterable<JsonPair> {
 	 */
 	public static JsonObject parse(String jsonObject) throws JsonStandardException {
 		if (jsonObject != null) {
-			JsonParser jp = new JsonParser(jsonObject);
+			JsonStringParser jp = new JsonStringParser(jsonObject);
 			JsonObject parsedObject = JsonObject.parseNext(jp);
 			jp.skipWhitespace(); // needed for checking against garbage data
 			if (!jp.hasNext()) {

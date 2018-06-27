@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 import hockey.mask.json.JsonStandardException;
-import hockey.mask.json.parser.JsonParser;
+import hockey.mask.json.parser.JsonStringParser;
 import hockey.mask.json.values.JsonArray;
 import hockey.mask.json.values.JsonNull;
 import hockey.mask.json.values.JsonNumber;
@@ -469,7 +469,7 @@ public class JsonObjectTesting implements TestSubject {
 				testString += jsonTestObjects[j].toJson() + "   ";
 			}
 			try {
-				JsonParser jp = new JsonParser(testString);
+				JsonStringParser jp = new JsonStringParser(testString);
 				JsonObject[] parsedJsonObjects = new JsonObject[jsonTestObjects.length];
 				for (int j = 0; j < jsonTestObjects.length; j++) {
 					parsedJsonObjects[j] = JsonObject.parseNext(jp);
@@ -491,7 +491,7 @@ public class JsonObjectTesting implements TestSubject {
 			// remove the last curly bracket so an exception will be raised
 			testString = testString.substring(0, testString.length() - 1);
 			try {
-				JsonParser jp = new JsonParser(testString);
+				JsonStringParser jp = new JsonStringParser(testString);
 				int initialPosition = jp.getPosition();
 				try {
 					JsonArray.parseNext(jp);

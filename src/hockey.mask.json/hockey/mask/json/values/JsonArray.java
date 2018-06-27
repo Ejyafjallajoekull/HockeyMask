@@ -8,6 +8,7 @@ import java.util.ListIterator;
 
 import hockey.mask.json.JsonStandardException;
 import hockey.mask.json.parser.JsonParser;
+import hockey.mask.json.parser.JsonStringParser;
 
 /**
  * The JsonArray class represents an array formatted in the JSON standard. 
@@ -91,7 +92,7 @@ public class JsonArray extends JsonValue implements List<JsonValue> {
 	 */
 	public static JsonArray parse(String jsonArray) throws JsonStandardException {
 		if (jsonArray != null) {
-			JsonParser jp = new JsonParser(jsonArray);
+			JsonStringParser jp = new JsonStringParser(jsonArray);
 			JsonArray parsedArray = JsonArray.parseNext(jp);
 			jp.skipWhitespace(); // needed for checking against garbage data
 			if (!jp.hasNext()) {

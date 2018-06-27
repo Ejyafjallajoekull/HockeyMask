@@ -2,6 +2,7 @@ package hockey.mask.json.values;
 
 import hockey.mask.json.JsonStandardException;
 import hockey.mask.json.parser.JsonParser;
+import hockey.mask.json.parser.JsonStringParser;
 
 /**
  * The JsonBoolean class represents a JSON formatted boolean value.
@@ -79,7 +80,7 @@ public class JsonBoolean extends JsonValue {
 	 */
 	public static JsonBoolean parse(String jsonBoolean) throws JsonStandardException {
 		if (jsonBoolean != null) {
-			JsonParser jp = new JsonParser(jsonBoolean);
+			JsonStringParser jp = new JsonStringParser(jsonBoolean);
 			JsonBoolean parsedBoolean = JsonBoolean.parseNext(jp);
 			jp.skipWhitespace(); // needed for checking against garbage data
 			if (!jp.hasNext()) {

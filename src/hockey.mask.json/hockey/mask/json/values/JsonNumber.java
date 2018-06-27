@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 import hockey.mask.json.JsonStandardException;
 import hockey.mask.json.parser.JsonParser;
+import hockey.mask.json.parser.JsonStringParser;
 
 /**
  * The JsonNumber class represents a JSON formatted number.
@@ -199,7 +200,7 @@ public class JsonNumber extends JsonValue {
 	 */
 	public static JsonNumber parse(String jsonNumber) throws JsonStandardException {
 		if (jsonNumber != null) {
-			JsonParser jp = new JsonParser(jsonNumber);
+			JsonStringParser jp = new JsonStringParser(jsonNumber);
 			JsonNumber parsedNumber = JsonNumber.parseNext(jp);
 			jp.skipWhitespace(); // needed for checking against garbage data
 			if (!jp.hasNext()) {

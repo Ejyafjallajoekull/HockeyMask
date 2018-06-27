@@ -2,6 +2,7 @@ package hockey.mask.json.values;
 
 import hockey.mask.json.JsonStandardException;
 import hockey.mask.json.parser.JsonParser;
+import hockey.mask.json.parser.JsonStringParser;
 
 /**
  * The JsonPair class represents a single name-value-pair formated in JSON.
@@ -101,7 +102,7 @@ public class JsonPair {
 	 */
 	public static JsonPair parse(String jsonPair) throws JsonStandardException {
 		if (jsonPair != null) {
-			JsonParser jp = new JsonParser(jsonPair);
+			JsonStringParser jp = new JsonStringParser(jsonPair);
 			JsonPair parsedPair = JsonPair.parseNext(jp);
 			jp.skipWhitespace(); // needed for checking against garbage data
 			if (!jp.hasNext()) {

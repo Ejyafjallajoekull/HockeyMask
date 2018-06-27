@@ -2,6 +2,7 @@ package hockey.mask.json.values;
 
 import hockey.mask.json.JsonStandardException;
 import hockey.mask.json.parser.JsonParser;
+import hockey.mask.json.parser.JsonStringParser;
 
 /**
  * The JsonNull class represents a JSON formatted null value.
@@ -48,7 +49,7 @@ public class JsonNull extends JsonValue {
 	 */
 	public static JsonNull parse(String jsonNull) throws JsonStandardException {
 		if (jsonNull != null) {
-			JsonParser jp = new JsonParser(jsonNull);
+			JsonStringParser jp = new JsonStringParser(jsonNull);
 			JsonNull parsedNull = JsonNull.parseNext(jp);
 			jp.skipWhitespace(); // needed for checking against garbage data
 			if (!jp.hasNext()) {

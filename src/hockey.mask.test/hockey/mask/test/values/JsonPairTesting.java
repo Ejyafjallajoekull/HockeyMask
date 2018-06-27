@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 import hockey.mask.json.JsonStandardException;
-import hockey.mask.json.parser.JsonParser;
+import hockey.mask.json.parser.JsonStringParser;
 import hockey.mask.json.values.JsonNull;
 import hockey.mask.json.values.JsonNumber;
 import hockey.mask.json.values.JsonPair;
@@ -224,7 +224,7 @@ public class JsonPairTesting implements TestSubject {
 				testString += jsonTestPairs[j].toJson() + "   ";
 			}
 			try {
-				JsonParser jp = new JsonParser(testString);
+				JsonStringParser jp = new JsonStringParser(testString);
 				JsonPair[] parsedJsonStrings = new JsonPair[jsonTestPairs.length];
 				for (int j = 0; j < jsonTestPairs.length; j++) {
 					parsedJsonStrings[j] = JsonPair.parseNext(jp);
@@ -249,7 +249,7 @@ public class JsonPairTesting implements TestSubject {
 			// remove the separator
 			testString = testString.replace(JsonPair.JSON_PAIR_SEPARATOR, "");
 			try {
-				JsonParser jp = new JsonParser(testString);
+				JsonStringParser jp = new JsonStringParser(testString);
 				int initialPosition = jp.getPosition();
 				try {
 					JsonPair.parseNext(jp);

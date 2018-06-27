@@ -1,94 +1,48 @@
 package hockey.mask.json.parser;
 
-import hockey.mask.json.JsonStandardException;
-
 /**
- * The JsonParser class facilitates the processing of a plain string input into a JSON value. 
- * It works similar to a stream.
+ * The JsonParser class facilitates the processing of an input into a JSON value. 
  * 
  * @author Planters
  *
  */
-public class JsonParser {
-	
-	private String jsonData = null; // the string to parse
-	private int pos = 0; // the current position of the parser
+public abstract class JsonParser {
 	
 	/**
-	 * Create a new JsonParser based on the supplied string. Null cannot be parsed and will 
-	 * throw an exception. The same holds true for empty strings.
+	 * Get the current position in the parsed data.
 	 * 
-	 * @param jsonData - the data to parse
-	 * @throws JsonStandardException if an empty string is passed
-	 * @throws NullPointerException if null is passed
+	 * @return the position inside the data
 	 */
-	public JsonParser(String jsonData) throws JsonStandardException {
-		// ensure the data is valid
-		if (jsonData == null) {
-			throw new NullPointerException("The null string \"" + jsonData
-					+ "\" cannot be parsed.");
-		} else if (jsonData.length() <= 0) {
-			throw new JsonStandardException("The empty string \"" + jsonData
-					+ "\" cannot be parsed.");
-		} else {
-			this.jsonData = jsonData;
-		}
-	}
-	
-	/**
-	 * Get the current position in the parsed string.
-	 * 
-	 * @return the position inside the string
-	 */
-	public int getPosition() {
-		return this.pos;
-	}
+	public abstract int getPosition();
 	
 	/**
 	 * Set the position mark of the parser to the specified value.
 	 * 
 	 * @param position - the position to set the parser to
 	 * @throws IndexOutOfBoundsException if the passed value is outside of the bounds of the 
-	 * parsed string
+	 * parsed data
 	 */
-	public void setPosition(int position) throws IndexOutOfBoundsException {
-		if (position <= this.getData().length() && position >= 0) {
-			this.pos = position;
-		} else {
-			throw new IndexOutOfBoundsException(String.format("The index %s is outside of the "
-					+ "bounds of a string of length %s.", position, jsonData.length()));
-		}
-	}
+	public abstract void setPosition(int position) throws IndexOutOfBoundsException;
 	
 	/**
-	 * Get the next characters of the string as substring. A substring with the specified length 
+	 * Get the next characters of the data as string. A string with the specified length 
 	 * will be returned starting with the character at the current parsers position mark and 
-	 * increment the position mark by the length of the substring.
+	 * increment the position mark by the length of the string.
 	 * 
-	 * @param length the length of the substring to return
-	 * @return a substring of the specified length
-	 * @throws IndexOutOfBoundsException if the end of the substring is outside of the bounds 
-	 * of the parsed string
+	 * @param length the length of the string to return
+	 * @return a string of the specified length
+	 * @throws IndexOutOfBoundsException if the end of the string is outside of the bounds 
+	 * of the parsed data
 	 */
-	public String get(int length) throws IndexOutOfBoundsException {
-		int end = this.getPosition() + length;
-		if (end <= this.getData().length()) {
-			String sub = this.getData().substring(this.getPosition(), end);
-			this.setPosition(this.getPosition() + length); // increment the position mark
-			return sub;
-		} else {
-			throw new IndexOutOfBoundsException(String.format("The index %s is outside of the "
-					+ "bounds of a string of length %s.", end, jsonData.length()));
-		}
-	}
+	public abstract String get(int length) throws IndexOutOfBoundsException;
 	
 	/**
-	 * Get the next character of the string as substring. A substring containing
+	 * Get the next character of the data as string. A string containing
 	 * the character at the current parsers position mark will be returned and 
 	 * the position mark incremented by one.
 	 * 
-	 * @return the next character as substring 
-	 * @throws IndexOutOfBoundsException if the end of the parsed string has been reached
+	 * @return the next character as string 
+	 * @throws IndexOutOfBoundsException if the end of the parsed data has been reached
 	 */
 	public String get() throws IndexOutOfBoundsException {
 		return this.get(1);
@@ -97,36 +51,25 @@ public class JsonParser {
 	/**
 	 * Get the data held by this parser.
 	 * 
-	 * @return the string to be parsed
+	 * @return the data to be parsed
 	 */
-	public String getData() {
-		return this.jsonData;
-	}
+	public abstract String getData();
 	
 	/**
-	 * Checks there are still characters remaining to parse.
+	 * Checks if there are still characters remaining to parse.
 	 * 
 	 * @return true if there are remaining characters
 	 */
-	public boolean hasNext() {
-		return this.getPosition() < this.getData().length();
-	}
+	public abstract boolean hasNext();
 	
 	/**
 	 * Checks whether the next characters are the query.
+	 * The position mark will not be incremented.
 	 * 
 	 * @param query - the string to query for
 	 * @return true if the next characters equal the query
 	 */
-	public boolean isNext(String query) {
-		if (query != null) {
-			int end = this.getPosition() + query.length();
-			if (end <= this.getData().length()) {
-				return this.getData().substring(this.getPosition(), end).equals(query);
-			}
-		}
-		return false;
-	}
+	public abstract boolean isNext(String query);
 	
 	/**
 	 * Checks whether the next characters are the query.
@@ -136,20 +79,7 @@ public class JsonParser {
 	 * @param incrementPosition - true to increment the position mark by the search if found
 	 * @return true if the next characters equal the query
 	 */
-	public boolean isNext(String query, boolean incrementPosition) {
-		if (query != null) {
-			int end = this.getPosition() + query.length();
-			if (end <= this.getData().length()) {
-				if (this.getData().substring(this.getPosition(), end).equals(query)) {
-					if (incrementPosition) {
-						this.setPosition(this.getPosition() + query.length());
-					}
-					return true;
-				}
-			}
-		}
-		return false;
-	}	
+	public abstract boolean isNext(String query, boolean incrementPosition);	
 	
 	/**
 	 * Checks whether the next character is a digit.
@@ -157,69 +87,25 @@ public class JsonParser {
 	 * 
 	 * @return true if the next character is a digit
 	 */
-	public boolean isNextDigit() {
-		return this.hasNext() && Character.isDigit(this.getData().charAt(this.getPosition()));
-	}
+	public abstract boolean isNextDigit();
 	
 	/**
-	 * Get the remaining characters of the parsed string as substring.
+	 * Get the remaining characters of the parsed data as string.
 	 * 
-	 * @return a substring from the parsers position mark to the end of the parsed string
+	 * @return a string from the parsers position mark to the end of the parsed data
 	 */
-	public String getRemaining() {
-		return this.getData().substring(this.getPosition(), this.getData().length());
-	}
+	public abstract String getRemaining();
 	
 	/**
 	 * Reset the position mark to zero.
 	 */
-	public void rewind() {
-		this.setPosition(0);
-	}
+	public abstract void rewind();
 	
 	/**
 	 * Moves the position mark to the next non-whitespace character in the parser. If the 
 	 * parser only contains whitespace characters, the position mark is moved to the end 
 	 * position, at which no character resides.
 	 */
-	public void skipWhitespace() {
-		while (this.hasNext() && Character.isWhitespace(this.getData().charAt(this.getPosition()))) {
-			this.setPosition(this.getPosition() + 1);
-		}
-	}
-	
-	@Override
-	public String toString() {
-		return String.format("[Position %s : \"%s\"]", this.getPosition(), this.getData());
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((jsonData == null) ? 0 : jsonData.hashCode());
-		result = prime * result + pos;
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		JsonParser other = (JsonParser) obj;
-		if (jsonData == null) {
-			if (other.jsonData != null)
-				return false;
-		} else if (!jsonData.equals(other.jsonData))
-			return false;
-		if (pos != other.pos)
-			return false;
-		return true;
-	}
-	
+	public abstract void skipWhitespace();
 
 }

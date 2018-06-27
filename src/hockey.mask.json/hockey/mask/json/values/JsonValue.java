@@ -2,6 +2,7 @@ package hockey.mask.json.values;
 
 import hockey.mask.json.JsonStandardException;
 import hockey.mask.json.parser.JsonParser;
+import hockey.mask.json.parser.JsonStringParser;
 
 /**
  * The abstract JsonValue class represents a single value formatted in the JSON format. This may 
@@ -37,7 +38,7 @@ public abstract class JsonValue {
 	 */
 	public static JsonValue parse(String jsonValue) throws JsonStandardException {
 		if (jsonValue != null) {
-			JsonParser jp = new JsonParser(jsonValue);
+			JsonStringParser jp = new JsonStringParser(jsonValue);
 			JsonValue parsedValue = JsonValue.parseNext(jp);
 			jp.skipWhitespace(); // needed for checking against garbage data
 			if (!jp.hasNext()) {

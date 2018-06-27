@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 import hockey.mask.json.JsonStandardException;
-import hockey.mask.json.parser.JsonParser;
+import hockey.mask.json.parser.JsonStringParser;
 import hockey.mask.json.values.JsonString;
 import hockey.mask.json.values.JsonValueTypes;
 import koro.sensei.tester.TestFailureException;
@@ -183,7 +183,7 @@ public class JsonStringTesting implements TestSubject {
 				testString += jsonTestStrings[j].toJson() + "   ";
 			}
 			try {
-				JsonParser jp = new JsonParser(testString);
+				JsonStringParser jp = new JsonStringParser(testString);
 				JsonString[] parsedJsonStrings = new JsonString[jsonTestStrings.length];
 				for (int j = 0; j < jsonTestStrings.length; j++) {
 					parsedJsonStrings[j] = JsonString.parseNext(jp);
@@ -208,7 +208,7 @@ public class JsonStringTesting implements TestSubject {
 			// remove the last apostrophe so an exception will be raised
 			testString = testString.substring(0, testString.length() - 1);
 			try {
-				JsonParser jp = new JsonParser(testString);
+				JsonStringParser jp = new JsonStringParser(testString);
 				int initialPosition = jp.getPosition();
 				try {
 					JsonString.parseNext(jp);
