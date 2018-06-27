@@ -3,6 +3,7 @@ package hockey.mask.test;
 import java.util.Arrays;
 import java.util.Random;
 
+import hockey.mask.json.JsonNull;
 import hockey.mask.json.JsonNumber;
 import hockey.mask.json.JsonPair;
 import hockey.mask.json.JsonStandardException;
@@ -43,7 +44,7 @@ public class JsonPairTesting implements TestSubject {
 			JsonPairTesting.RANDOM.nextBytes(randomString);
 			JsonString testName = new JsonString(new String(randomString));
 			JsonPairTesting.RANDOM.nextBytes(randomString);
-			JsonValue testValue = new JsonValue(new JsonString(new String(randomString)));
+			JsonValue testValue = new JsonString(new String(randomString));
 			JsonPair jp = new JsonPair(testName, testValue);
 			JsonPair jjp = new JsonPair(jp.getName(), jp.getValue());
 			TestSubject.assertTestCondition(jp.getName().equals(testName), 
@@ -84,11 +85,11 @@ public class JsonPairTesting implements TestSubject {
 			JsonPairTesting.RANDOM.nextBytes(randomString);
 			JsonString testName = new JsonString(new String(randomString));
 			JsonPairTesting.RANDOM.nextBytes(randomString);
-			JsonValue testValue = new JsonValue(new JsonString(new String(randomString)));
+			JsonValue testValue = new JsonString(new String(randomString));
 //				jp.setName(testName); // immutable
 			// test null values
 			JsonPair jp = new JsonPair(testName, null);
-			JsonValue someNull = new JsonValue();
+			JsonValue someNull = new JsonNull();
 			TestSubject.assertTestCondition(jp.getName().equals(testName), 
 					String.format("The JSON pair %s should have the name \"%s\", "
 							+ "but has the name \"%s\".", jp, testName, jp.getName()));
@@ -157,7 +158,7 @@ public class JsonPairTesting implements TestSubject {
 			JsonPairTesting.RANDOM.nextBytes(randomString);
 			JsonString testName = new JsonString(new String(randomString));
 			JsonPairTesting.RANDOM.nextBytes(randomString);
-			JsonValue testValue = new JsonValue(new JsonString(new String(randomString)));
+			JsonValue testValue = new JsonString(new String(randomString));
 			JsonPair jp = new JsonPair(testName, testValue);
 			try {
 				JsonPair jjp = JsonPair.parse(jp.toJson());
@@ -183,7 +184,7 @@ public class JsonPairTesting implements TestSubject {
 			JsonPairTesting.RANDOM.nextBytes(randomString);
 			JsonString testName = new JsonString(new String(randomString));
 			JsonPairTesting.RANDOM.nextBytes(randomString);
-			JsonValue testValue = new JsonValue(new JsonString(new String(randomString)));
+			JsonValue testValue = new JsonString(new String(randomString));
 			JsonPair jp = new JsonPair(testName, testValue);
 			String perfectString = testName.toJson() + JsonPair.JSON_PAIR_SEPARATOR + testValue.toJson();
 			TestSubject.assertTestCondition(jp.toJson().equals(perfectString), 
@@ -219,7 +220,7 @@ public class JsonPairTesting implements TestSubject {
 				byte[] randomString = new byte[JsonPairTesting.RANDOM.nextInt(200)];
 				JsonPairTesting.RANDOM.nextBytes(randomString);
 				jsonTestPairs[j] = new JsonPair(new JsonString(new String(randomString)), 
-						new JsonValue(new JsonNumber(JsonPairTesting.RANDOM.nextInt())));
+						new JsonNumber(JsonPairTesting.RANDOM.nextInt()));
 				testString += jsonTestPairs[j].toJson() + "   ";
 			}
 			try {
@@ -243,7 +244,7 @@ public class JsonPairTesting implements TestSubject {
 			// create random strings
 			byte[] randomString = new byte[JsonPairTesting.RANDOM.nextInt(200)];
 			JsonPairTesting.RANDOM.nextBytes(randomString);
-			JsonPair jsonTestString = new JsonPair(new JsonString(new String(randomString)), new JsonValue());
+			JsonPair jsonTestString = new JsonPair(new JsonString(new String(randomString)), new JsonNull());
 			String testString = jsonTestString.toJson();
 			// remove the separator
 			testString = testString.replace(JsonPair.JSON_PAIR_SEPARATOR, "");

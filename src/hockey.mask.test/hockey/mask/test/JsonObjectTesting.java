@@ -5,12 +5,14 @@ import java.util.Arrays;
 import java.util.Random;
 
 import hockey.mask.json.JsonArray;
+import hockey.mask.json.JsonNull;
 import hockey.mask.json.JsonNumber;
 import hockey.mask.json.JsonObject;
 import hockey.mask.json.JsonPair;
 import hockey.mask.json.JsonStandardException;
 import hockey.mask.json.JsonString;
 import hockey.mask.json.JsonValue;
+import hockey.mask.json.JsonValueTypes;
 import hockey.mask.json.parser.JsonParser;
 import koro.sensei.tester.TestFailureException;
 import koro.sensei.tester.TestSubject;
@@ -40,6 +42,7 @@ public class JsonObjectTesting implements TestSubject {
 		JsonObjectTesting.testToJson();
 		JsonObjectTesting.testParsing();
 		JsonObjectTesting.testParsingNext();
+		JsonObjectTesting.testType();
 	}
 	
 	/**
@@ -249,7 +252,7 @@ public class JsonObjectTesting implements TestSubject {
 			// test setting a null key
 			try {
 				JsonObject setNull = new JsonObject();
-				setNull.set(null, new JsonValue());
+				setNull.set(null, new JsonNull());
 				throw new TestFailureException("Setting a null member at a JSON object should fail.");
 			} catch (NullPointerException e) {
 				/*
@@ -260,7 +263,7 @@ public class JsonObjectTesting implements TestSubject {
 			JsonObject nullValueObject = new JsonObject();
 			JsonString nullValueKey = JsonObjectTesting.generateRandomString();
 			nullValueObject.set(nullValueKey, null);
-			JsonValue someNull = new JsonValue();
+			JsonValue someNull = new JsonNull();
 			TestSubject.assertTestCondition(nullValueObject.get(nullValueKey).equals(someNull), 
 					String.format("Setting the member %s of the JSON object %s to null should result "
 							+ "in the value %s, but resulted into %s.", 
@@ -287,7 +290,7 @@ public class JsonObjectTesting implements TestSubject {
 			JsonPair setPair = JsonObjectTesting.generateRandomPair();
 			setObject.remove(setPair.getName()); // remove potential collisions to ensure a correct test
 			setObject.set(setPair.getName(), setPair.getValue());
-			JsonValue newValue = new JsonValue(new JsonNumber(JsonObjectTesting.RANDOM.nextInt()));
+			JsonValue newValue = new JsonNumber(JsonObjectTesting.RANDOM.nextInt());
 			int sizeBeforeSetting = setObject.size();
 			JsonValue setReturn  = setObject.set(setPair.getName(), newValue);
 
@@ -345,7 +348,7 @@ public class JsonObjectTesting implements TestSubject {
 			TestSubject.assertTestCondition(testObject.get(testMember) == null, 
 					String.format("The JSON object %s should hold the value %s for the member %s "
 					+ "but holds %s instead.", testObject, null, testMember, testObject.get(testMember)));
-			JsonValue testValue = new JsonValue(new JsonNumber(JsonObjectTesting.RANDOM.nextInt()));
+			JsonValue testValue = new JsonNumber(JsonObjectTesting.RANDOM.nextInt());
 			testObject.set(testMember, testValue);
 			TestSubject.assertTestCondition(testObject.get(testMember).equals(testValue), 
 					String.format("The JSON object %s should hold the value %s for the member %s "
@@ -358,7 +361,7 @@ public class JsonObjectTesting implements TestSubject {
 			int memberCount = JsonObjectTesting.RANDOM.nextInt(20);
 			JsonValue[] testValues = new JsonValue[memberCount];
 			for (int j = 0; j < testValues.length; j++) {
-				testValues[j] = new JsonValue(new JsonNumber(JsonObjectTesting.RANDOM.nextInt()));
+				testValues[j] = new JsonNumber(JsonObjectTesting.RANDOM.nextInt());
 				testObject.add(new JsonPair(testMember, testValues[j]));
 			}
 			TestSubject.assertTestCondition(Arrays.equals(testObject.getValues(testMember), testValues), 
@@ -508,6 +511,18 @@ public class JsonObjectTesting implements TestSubject {
 	}
 	
 	/**
+	 * Test getting the correct type for a JSON object.
+	 * 
+	 * @throws TestFailureException
+	 */
+	private static void testType() throws TestFailureException {
+			JsonObject testObject = new JsonObject();
+			TestSubject.assertTestCondition(testObject.getType() == JsonValueTypes.OBJECT, 
+					String.format("The JSON object %s should be of type %s, but is of type %s "
+					+ "instead.", testObject, JsonValueTypes.OBJECT, testObject.getType()));
+	}
+	
+	/**
 	 * Generate a JSON object with random members.
 	 * 
 	 * @return a random JSON object
@@ -554,10 +569,10 @@ public class JsonObjectTesting implements TestSubject {
 	private static JsonPair generateRandomPair() {
 		try {
 			return new JsonPair(JsonObjectTesting.generateRandomString(), 
-					new JsonValue(new JsonNumber(JsonObjectTesting.RANDOM.nextDouble())));
+					new JsonNumber(JsonObjectTesting.RANDOM.nextDouble()));
 		} catch (JsonStandardException e) {
 			return new JsonPair(JsonObjectTesting.generateRandomString(), 
-					new JsonValue(new JsonNumber(JsonObjectTesting.RANDOM.nextLong())));
+					new JsonNumber(JsonObjectTesting.RANDOM.nextLong()));
 		}
 	}
 

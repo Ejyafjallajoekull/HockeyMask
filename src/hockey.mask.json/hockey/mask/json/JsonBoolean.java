@@ -8,7 +8,7 @@ import hockey.mask.json.parser.JsonParser;
  * @author Planters
  *
  */
-public class JsonBoolean {
+public class JsonBoolean extends JsonValue {
 
 	/**
 	 * The JSON representation of a true boolean.
@@ -48,12 +48,18 @@ public class JsonBoolean {
 	public boolean getValue() {
 		return this.value;
 	}
+
+	@Override
+	public JsonValueTypes getType() {
+		return JsonValueTypes.BOOLEAN;
+	}
 	
 	/**
 	 * Get a JSON formatted string from the internal representation of this JSON boolean.
 	 * 
 	 * @return the JSON string representation of the according boolean
 	 */
+	@Override
 	public String toJson() {
 		if (this.getValue()) {
 			return JsonBoolean.JSON_TRUE_VALUE;

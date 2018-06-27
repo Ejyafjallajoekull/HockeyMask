@@ -10,7 +10,7 @@ import hockey.mask.json.parser.JsonParser;
  * @author Planters
  *
  */
-public class JsonNumber {
+public class JsonNumber extends JsonValue {
 	
 	/**
 	 * The JSON representation of a minus.
@@ -173,11 +173,17 @@ public class JsonNumber {
 		return this.value;
 	}
 	
+	@Override
+	public JsonValueTypes getType() {
+		return JsonValueTypes.NUMBER;
+	}
+	
 	/**
 	 * Get a JSON formatted number from the internal representation of this JSON number.
 	 * 
 	 * @return the JSON string representation of the according number
 	 */
+	@Override
 	public String toJson() {
 		return this.getValue().toString();
 	}

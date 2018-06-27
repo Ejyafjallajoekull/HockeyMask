@@ -5,9 +5,11 @@ import java.util.Arrays;
 import java.util.Random;
 
 import hockey.mask.json.JsonArray;
+import hockey.mask.json.JsonNull;
 import hockey.mask.json.JsonNumber;
 import hockey.mask.json.JsonStandardException;
 import hockey.mask.json.JsonValue;
+import hockey.mask.json.JsonValueTypes;
 import hockey.mask.json.parser.JsonParser;
 import koro.sensei.tester.TestFailureException;
 import koro.sensei.tester.TestSubject;
@@ -31,6 +33,7 @@ public class JsonArrayTesting implements TestSubject {
 		JsonArrayTesting.testToJson();
 		JsonArrayTesting.testParsing();
 		JsonArrayTesting.testParsingNext();
+		JsonArrayTesting.testType();
 	}
 	
 	/**
@@ -45,10 +48,10 @@ public class JsonArrayTesting implements TestSubject {
 				String.format("The JSON array %s should equal %s.", firstArray, secondArray));
 		TestSubject.assertTestCondition(!firstArray.equals(null), 
 				String.format("The JSON array %s should not equal %s.", firstArray, null));
-		secondArray.add(new JsonValue());
+		secondArray.add(new JsonNull());
 		TestSubject.assertTestCondition(!firstArray.equals(secondArray), 
 				String.format("The JSON array %s should not equal %s.", firstArray, secondArray));
-		firstArray.add(new JsonValue());
+		firstArray.add(new JsonNull());
 		TestSubject.assertTestCondition(firstArray.equals(secondArray), 
 				String.format("The JSON array %s should equal %s.", firstArray, secondArray));
 	}
@@ -65,7 +68,7 @@ public class JsonArrayTesting implements TestSubject {
 			int sizeSimpleAdd = JsonArrayTesting.RANDOM.nextInt(20);
 			JsonValue[] testArray = new JsonValue[sizeSimpleAdd];
 			for (int j = 0; j < sizeSimpleAdd; j++) {
-				testArray[j] = new JsonValue(new JsonNumber(JsonArrayTesting.RANDOM.nextInt()));
+				testArray[j] = new JsonNumber(JsonArrayTesting.RANDOM.nextInt());
 				boolean addBool = simpleAdd.add(testArray[j]);
 				TestSubject.assertTestCondition(addBool, 
 						String.format("Adding the value %s to the JSON array %s should return true.", 
@@ -87,7 +90,7 @@ public class JsonArrayTesting implements TestSubject {
 			TestSubject.assertTestCondition(simpleAdd.equals(forEachArray), 
 					String.format("The JSON array %s should equal %s.", simpleAdd, forEachArray));
 			// test insertion
-			JsonValue insertionValue = new JsonValue();
+			JsonValue insertionValue = new JsonNull();
 			int insertionIndex = 0;
 			if (simpleAdd.size() > 0) {
 				insertionIndex = JsonArrayTesting.RANDOM.nextInt(simpleAdd.size());
@@ -101,7 +104,7 @@ public class JsonArrayTesting implements TestSubject {
 							+ "but holds %s instead.", simpleAdd, insertionValue, insertionIndex, 
 							simpleAdd.get(insertionIndex)));
 			try {
-				simpleAdd.add(simpleAdd.size() + 1, new JsonValue());
+				simpleAdd.add(simpleAdd.size() + 1, new JsonNull());
 				throw new TestFailureException("Adding out of bounds to a JSON array should fail.");
 			} catch (IndexOutOfBoundsException e) {
 				/*
@@ -122,7 +125,7 @@ public class JsonArrayTesting implements TestSubject {
 			int sizeAddAll = JsonArrayTesting.RANDOM.nextInt(20);
 			ArrayList<JsonValue> testArrayAll = new ArrayList<JsonValue>();
 			for (int j = 0; j < sizeAddAll; j++) {
-				testArrayAll.add(new JsonValue(new JsonNumber(JsonArrayTesting.RANDOM.nextInt())));
+				testArrayAll.add(new JsonNumber(JsonArrayTesting.RANDOM.nextInt()));
 			}
 			boolean addAllBool = addAll.addAll(testArrayAll);
 			if (testArrayAll.size() != 0) {
@@ -157,7 +160,7 @@ public class JsonArrayTesting implements TestSubject {
 			int sizeBeforeNull = addCollContainingNull.size();
 			ArrayList<JsonValue> testListContainingNull = new ArrayList<JsonValue>();
 			for (int j = JsonArrayTesting.RANDOM.nextInt(20); j >= 0; j--) {
-				testListContainingNull.add(new JsonValue(new JsonNumber(JsonArrayTesting.RANDOM.nextInt())));
+				testListContainingNull.add(new JsonNumber(JsonArrayTesting.RANDOM.nextInt()));
 				testListContainingNull.add(null);
 			}
 			boolean addNullContainingListBool = addCollContainingNull.addAll(testListContainingNull);
@@ -173,7 +176,7 @@ public class JsonArrayTesting implements TestSubject {
 			ArrayList<JsonValue> testInsertList = new ArrayList<JsonValue>();
 			ArrayList<JsonValue> testInsertListAfter = new ArrayList<JsonValue>();
 			for (int j = 0; j < sizeInsert; j++) {
-				testInsertList.add(new JsonValue(new JsonNumber(JsonArrayTesting.RANDOM.nextInt())));
+				testInsertList.add(new JsonNumber(JsonArrayTesting.RANDOM.nextInt()));
 				insertAll.add(testInsertList.get(j));
 				testInsertListAfter.add(testInsertList.get(j));
 			}
@@ -216,7 +219,7 @@ public class JsonArrayTesting implements TestSubject {
 			int sizeBeforeNullInsertion = insertCollContainingNull.size();
 			ArrayList<JsonValue> testListContainingNullForInsertion = new ArrayList<JsonValue>();
 			for (int j = JsonArrayTesting.RANDOM.nextInt(20); j >= 0; j--) {
-				testListContainingNullForInsertion.add(new JsonValue(new JsonNumber(JsonArrayTesting.RANDOM.nextInt())));
+				testListContainingNullForInsertion.add(new JsonNumber(JsonArrayTesting.RANDOM.nextInt()));
 				testListContainingNullForInsertion.add(null);
 			}
 			boolean insertNullContainingListBool = insertCollContainingNull.addAll(0, testListContainingNullForInsertion);
@@ -262,7 +265,7 @@ public class JsonArrayTesting implements TestSubject {
 		JsonArray testArray = new JsonArray();
 		TestSubject.assertTestCondition(testArray.isEmpty(), String.format("The JSON array %s "
 				+ "should be empty.", testArray));
-		testArray.add(new JsonValue());
+		testArray.add(new JsonNull());
 		TestSubject.assertTestCondition(!testArray.isEmpty(), String.format("The JSON array %s "
 				+ "should not be empty.", testArray));
 		testArray.clear();
@@ -406,6 +409,18 @@ public class JsonArrayTesting implements TestSubject {
 	}
 	
 	/**
+	 * Test getting the correct type for a JSON array.
+	 * 
+	 * @throws TestFailureException
+	 */
+	private static void testType() throws TestFailureException {
+			JsonArray testArray = new JsonArray();
+			TestSubject.assertTestCondition(testArray.getType() == JsonValueTypes.ARRAY, 
+					String.format("The JSON array %s should be of type %s, but is of type %s "
+					+ "instead.", testArray, JsonValueTypes.ARRAY, testArray.getType()));
+	}
+	
+	/**
 	 * Generate a JSON array with random elements.
 	 * 
 	 * @return a random JSON array
@@ -414,7 +429,7 @@ public class JsonArrayTesting implements TestSubject {
 		JsonArray randomArray = new JsonArray();
 		int arraySize = JsonArrayTesting.RANDOM.nextInt(20);
 		for (int j = 0; j < arraySize; j++) {
-			randomArray.add(new JsonValue(new JsonNumber(JsonArrayTesting.RANDOM.nextInt())));
+			randomArray.add(new JsonNumber(JsonArrayTesting.RANDOM.nextInt()));
 		}
 		return randomArray;
 	}
@@ -428,7 +443,7 @@ public class JsonArrayTesting implements TestSubject {
 		ArrayList<JsonValue> randomList = new ArrayList<JsonValue>();
 		int listSize = JsonArrayTesting.RANDOM.nextInt(20);
 		for (int j = 0; j < listSize; j++) {
-			randomList.add(new JsonValue(new JsonNumber(JsonArrayTesting.RANDOM.nextInt())));
+			randomList.add(new JsonNumber(JsonArrayTesting.RANDOM.nextInt()));
 		}
 		return randomList;
 	}

@@ -15,7 +15,7 @@ import hockey.mask.json.parser.JsonParser;
  * @author Planters
  *
  */
-public class JsonObject implements Iterable<JsonPair> {
+public class JsonObject extends JsonValue implements Iterable<JsonPair> {
 
 	/**
 	 *  The identifier used to identify the start of a JSON formatted object.
@@ -124,11 +124,17 @@ public class JsonObject implements Iterable<JsonPair> {
 		return false;
 	}
 	
+	@Override
+	public JsonValueTypes getType() {
+		return JsonValueTypes.OBJECT;
+	}
+	
 	/**
 	 * Convert this JSON object to a JSON formatted object string. 
 	 * 
 	 * @return the JSON representation of this object
 	 */
+	@Override
 	public String toJson() {
 		StringBuilder jsonString = new StringBuilder(JsonObject.JSON_OBJECT_START_IDENTIFIER);
 		for (int i = 0; i < this.members.size(); i++) {

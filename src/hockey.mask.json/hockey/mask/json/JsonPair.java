@@ -75,7 +75,7 @@ public class JsonPair {
 		if (value != null) {
 			this.value = value;
 		} else {
-			this.value = new JsonValue();
+			this.value = new JsonNull();
 		}
 	}
 	

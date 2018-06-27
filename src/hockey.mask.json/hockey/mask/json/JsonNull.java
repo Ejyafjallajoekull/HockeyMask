@@ -8,7 +8,7 @@ import hockey.mask.json.parser.JsonParser;
  * @author Planters
  *
  */
-public class JsonNull {
+public class JsonNull extends JsonValue {
 	
 	/**
 	 * The JSON representation of a null value.
@@ -21,12 +21,18 @@ public class JsonNull {
 	public JsonNull() {
 		// empty constructor
 	}
+
+	@Override
+	public JsonValueTypes getType() {
+		return JsonValueTypes.NULL;
+	}
 	
 	/**
 	 * Get a JSON formatted string from the internal representation of this JSON null.
 	 * 
 	 * @return the JSON string representation of null
 	 */
+	@Override
 	public String toJson() {
 		return JsonNull.JSON_NULL_VALUE;
 	}

@@ -5,6 +5,7 @@ import java.util.Random;
 
 import hockey.mask.json.JsonBoolean;
 import hockey.mask.json.JsonStandardException;
+import hockey.mask.json.JsonValueTypes;
 import hockey.mask.json.parser.JsonParser;
 import koro.sensei.tester.TestFailureException;
 import koro.sensei.tester.TestSubject;
@@ -20,6 +21,7 @@ public class JsonBooleanTesting implements TestSubject {
 		JsonBooleanTesting.testToJson();
 		JsonBooleanTesting.testParsing();
 		JsonBooleanTesting.testParsingNext();
+		JsonBooleanTesting.testType();
 	}
 	
 	/**
@@ -219,6 +221,18 @@ public class JsonBooleanTesting implements TestSubject {
 		} catch (JsonStandardException e) {
 			throw new TestFailureException("Creating the JSON parser failed.", e);
 		}
+	}
+	
+	/**
+	 * Test getting the correct type for a JSON boolean.
+	 * 
+	 * @throws TestFailureException
+	 */
+	private static void testType() throws TestFailureException {
+			JsonBoolean testBoolean = new JsonBoolean(JsonBooleanTesting.RANDOM.nextBoolean());
+			TestSubject.assertTestCondition(testBoolean.getType() == JsonValueTypes.BOOLEAN, 
+					String.format("The JSON boolean %s should be of type %s, but is of type %s "
+					+ "instead.", testBoolean, JsonValueTypes.BOOLEAN, testBoolean.getType()));
 	}
 
 }

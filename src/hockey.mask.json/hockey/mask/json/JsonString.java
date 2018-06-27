@@ -8,7 +8,7 @@ import hockey.mask.json.parser.JsonParser;
  * @author Planters
  *
  */
-public class JsonString {
+public class JsonString extends JsonValue {
 
 	/*
 	 * String is final so the JsonString class cannot extend it.
@@ -79,12 +79,18 @@ public class JsonString {
 	public String getValue() {
 		return this.value;
 	}
+
+	@Override
+	public JsonValueTypes getType() {
+		return JsonValueTypes.STRING;
+	}
 	
 	/**
 	 * Get a JSON formatted string from the internal representation of this JSON string.
 	 * 
 	 * @return the JSON string representation of the specified string
 	 */
+	@Override
 	public String toJson() {
 		// the string cannot be null at this point
 		StringBuilder sb = new StringBuilder(this.getValue());

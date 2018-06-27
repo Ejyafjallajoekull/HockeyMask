@@ -5,6 +5,7 @@ import java.util.Random;
 
 import hockey.mask.json.JsonNull;
 import hockey.mask.json.JsonStandardException;
+import hockey.mask.json.JsonValueTypes;
 import hockey.mask.json.parser.JsonParser;
 import koro.sensei.tester.TestFailureException;
 import koro.sensei.tester.TestSubject;
@@ -25,6 +26,7 @@ public class JsonNullTesting implements TestSubject {
 		JsonNullTesting.testToJson();
 		JsonNullTesting.testParsing();
 		JsonNullTesting.testParsingNext();
+		JsonNullTesting.testType();
 	}
 	
 	/**
@@ -175,4 +177,16 @@ public class JsonNullTesting implements TestSubject {
 		}
 	}
 
+	/**
+	 * Test getting the correct type for a JSON null.
+	 * 
+	 * @throws TestFailureException
+	 */
+	private static void testType() throws TestFailureException {
+			JsonNull testNull = new JsonNull();
+			TestSubject.assertTestCondition(testNull.getType() == JsonValueTypes.NULL, 
+					String.format("The JSON null %s should be of type %s, but is of type %s "
+					+ "instead.", testNull, JsonValueTypes.NULL, testNull.getType()));
+	}
+	
 }

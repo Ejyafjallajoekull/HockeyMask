@@ -6,6 +6,7 @@ import java.util.Random;
 
 import hockey.mask.json.JsonNumber;
 import hockey.mask.json.JsonStandardException;
+import hockey.mask.json.JsonValueTypes;
 import hockey.mask.json.parser.JsonParser;
 import koro.sensei.tester.TestFailureException;
 import koro.sensei.tester.TestSubject;
@@ -21,6 +22,7 @@ public class JsonNumberTesting implements TestSubject {
 		JsonNumberTesting.testToJson();
 		JsonNumberTesting.testParsing();
 		JsonNumberTesting.testParsingNext();
+		JsonNumberTesting.testType();
 	}
 	
 	/**
@@ -370,14 +372,15 @@ public class JsonNumberTesting implements TestSubject {
 			JsonNumber[] jsonTestNumbers = new JsonNumber[JsonNumberTesting.RANDOM.nextInt(20) + 1];
 			String testString = "  "; // Some whitespace
 			for (int j = 0; j < jsonTestNumbers.length; j++) {
-				jsonTestNumbers[j] = new JsonNumber(-1l*Math.abs(JsonNumberTesting.RANDOM.nextLong()));
-				testString += jsonTestNumbers[j].toJson() + "   ";
+				jsonTestNumbers[j] = new JsonNumber(JsonNumberTesting.RANDOM.nextLong());
+				testString += jsonTestNumbers[j].toJson() + ",   ";
 			}
 			try {
 				JsonParser jp = new JsonParser(testString);
 				JsonNumber[] parsedJsonNumbers = new JsonNumber[jsonTestNumbers.length];
 				for (int j = 0; j < jsonTestNumbers.length; j++) {
 					parsedJsonNumbers[j] = JsonNumber.parseNext(jp);
+					jp.isNext(",", true);
 				}
 				TestSubject.assertTestCondition(Arrays.equals(jsonTestNumbers, parsedJsonNumbers),
 					String.format("The parsed JSON numbers %s should equal %s.", 
@@ -410,5 +413,16 @@ public class JsonNumberTesting implements TestSubject {
 		}
 	}
 
+	/**
+	 * Test getting the correct type for a JSON number.
+	 * 
+	 * @throws TestFailureException
+	 */
+	private static void testType() throws TestFailureException {
+			JsonNumber testNumber = new JsonNumber(JsonNumberTesting.RANDOM.nextInt());
+			TestSubject.assertTestCondition(testNumber.getType() == JsonValueTypes.NUMBER, 
+					String.format("The JSON number %s should be of type %s, but is of type %s "
+					+ "instead.", testNumber, JsonValueTypes.NUMBER, testNumber.getType()));
+	}
 
 }
