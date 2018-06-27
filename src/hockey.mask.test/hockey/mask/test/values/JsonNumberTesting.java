@@ -1,4 +1,4 @@
-package hockey.mask.test;
+package hockey.mask.test.values;
 
 import java.math.BigDecimal;
 import java.util.Arrays;

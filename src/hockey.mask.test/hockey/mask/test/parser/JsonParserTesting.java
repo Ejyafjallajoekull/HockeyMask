@@ -1,4 +1,4 @@
-package hockey.mask.test;
+package hockey.mask.test.parser;
 
 import java.util.Random;
 

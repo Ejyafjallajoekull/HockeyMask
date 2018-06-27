@@ -1,4 +1,4 @@
-package hockey.mask.test;
+package hockey.mask.test.values;
 
 import java.util.Arrays;
 import java.util.Random;

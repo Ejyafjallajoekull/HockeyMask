@@ -1,4 +1,4 @@
-package hockey.mask.test;
+package hockey.mask.test.values;
 
 import java.util.ArrayList;
 import java.util.Arrays;

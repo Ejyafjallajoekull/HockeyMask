@@ -7,6 +7,8 @@
 module hockey.mask.test {
 
 	exports hockey.mask.test;
+	exports hockey.mask.test.parser;
+	exports hockey.mask.test.values;
 	
 	requires hockey.mask.json;
 	requires java.base;
