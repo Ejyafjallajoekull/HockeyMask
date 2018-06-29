@@ -29,7 +29,7 @@ public abstract class JsonParser {
 	 * will be returned starting with the character at the current parsers position mark and 
 	 * increment the position mark by the length of the string.
 	 * 
-	 * @param length the length of the string to return
+	 * @param length - the length of the string to return
 	 * @return a string of the specified length
 	 * @throws IndexOutOfBoundsException if the end of the string is outside of the bounds 
 	 * of the parsed data
@@ -99,13 +99,40 @@ public abstract class JsonParser {
 	/**
 	 * Reset the position mark to zero.
 	 */
-	public abstract void rewind();
+	public void rewind() {
+		this.setPosition(0);
+	}
 	
 	/**
 	 * Moves the position mark to the next non-whitespace character in the parser. If the 
 	 * parser only contains whitespace characters, the position mark is moved to the end 
 	 * position, at which no character resides.
 	 */
-	public abstract void skipWhitespace();
+	public abstract void skipWhitespace();	
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.getData() == null) ? 0 : this.getData().hashCode());
+		result = prime * result + this.getPosition();
+		return result;
+	}
+	
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj != null && obj instanceof JsonParser) {
+			JsonParser compare = (JsonParser) obj;
+			return compare.getPosition() == this.getPosition() 
+					&& compare.getData().equals(this.getData()); // data should never be null
+		}
+		return false;
+	}
+	
+	@Override
+	public String toString() {
+		return String.format("[Position %s : \"%s\"]", this.getPosition(), this.getData());
+	}
 
 }

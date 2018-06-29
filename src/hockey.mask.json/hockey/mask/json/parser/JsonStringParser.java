@@ -67,7 +67,7 @@ public class JsonStringParser extends JsonParser {
 	 * will be returned starting with the character at the current parsers position mark and 
 	 * increment the position mark by the length of the substring.
 	 * 
-	 * @param length the length of the substring to return
+	 * @param length - the length of the substring to return
 	 * @return a substring of the specified length
 	 * @throws IndexOutOfBoundsException if the end of the substring is outside of the bounds 
 	 * of the parsed string
@@ -200,38 +200,10 @@ public class JsonStringParser extends JsonParser {
 			this.setPosition(this.getPosition() + 1);
 		}
 	}
-	
-	@Override
-	public String toString() {
-		return String.format("[Position %s : \"%s\"]", this.getPosition(), this.getData());
-	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((jsonData == null) ? 0 : jsonData.hashCode());
-		result = prime * result + pos;
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		JsonStringParser other = (JsonStringParser) obj;
-		if (jsonData == null) {
-			if (other.jsonData != null)
-				return false;
-		} else if (!jsonData.equals(other.jsonData))
-			return false;
-		if (pos != other.pos)
-			return false;
-		return true;
-	}
+	/*
+	 * The functions hashCode(), equals() and toString() of the super class should be 
+	 * sufficient.
+	 */
 	
 }
