@@ -8,7 +8,7 @@ import koro.sensei.tester.TestFailureException;
 import koro.sensei.tester.TestSubject;
 
 /**
- * The JsonPareserTesting class tests the JsonStringParser class for correct functionality.
+ * The JsonStringParserTesting class tests the JsonStringParser class for correct functionality.
  * 
  * @author Planters
  *
@@ -45,7 +45,7 @@ public class JsonStringParserTesting implements TestSubject {
 							String.format("The JSON parser %s should equal the parser %s.",	jp, jjp));
 					jjp = new JsonStringParser(testString + "test");
 					TestSubject.assertTestCondition(!jp.equals(jjp), 
-							String.format("The JSON parser %s should not equal the pair %s.",	jp, jjp));
+							String.format("The JSON parser %s should not equal the parser %s.",	jp, jjp));
 				} catch (JsonStandardException e) {
 					throw new TestFailureException("Creating the JSON parsers failed.", e);
 				}
@@ -123,7 +123,7 @@ public class JsonStringParserTesting implements TestSubject {
 					}
 					// test negative position marks
 					try {
-						pos = (JsonStringParserTesting.RANDOM.nextInt() - 1) * -1;
+						pos = (JsonStringParserTesting.RANDOM.nextInt(3000000) + 1) * -1;
 						jp.setPosition(pos);
 						throw new TestFailureException(String.format("An exception should have been thrown as "
 								+ "the position mark %s set for the JSON parser %s is negative.", pos, jp));
