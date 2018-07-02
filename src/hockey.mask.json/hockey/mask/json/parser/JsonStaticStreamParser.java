@@ -18,7 +18,7 @@ import hockey.mask.json.JsonStandardException;
  */
 public class JsonStaticStreamParser extends JsonParser implements Cloneable, AutoCloseable {
 	
-	private BufferedReader data = null;
+	private BufferedReader readerData = null;
 	private String jsonData = null; // the string to parse
 	private int pos = 0; // the current position of the parser
 	
@@ -36,7 +36,7 @@ public class JsonStaticStreamParser extends JsonParser implements Cloneable, Aut
 	 */
 	public JsonStaticStreamParser(InputStream in) throws JsonParserInternalException, JsonStandardException {
 		if (in != null) {
-				this.data = new BufferedReader(new InputStreamReader(in));
+				this.readerData = new BufferedReader(new InputStreamReader(in));
 				this.setData();
 		} else {
 			throw new NullPointerException("The input stream for the JSON parser may not be null.");
@@ -60,9 +60,9 @@ public class JsonStaticStreamParser extends JsonParser implements Cloneable, Aut
 	public JsonStaticStreamParser(InputStream in, Charset charset) throws JsonParserInternalException, JsonStandardException {
 		if (in != null) {
 			if (charset != null) {
-				this.data = new BufferedReader(new InputStreamReader(in, charset));
+				this.readerData = new BufferedReader(new InputStreamReader(in, charset));
 			} else {
-				this.data = new BufferedReader(new InputStreamReader(in));
+				this.readerData = new BufferedReader(new InputStreamReader(in));
 			}
 			this.setData();
 		} else {
@@ -80,7 +80,7 @@ public class JsonStaticStreamParser extends JsonParser implements Cloneable, Aut
 		try {
 			StringBuilder sb = new StringBuilder();
 			int next = -1;
-			while ((next = this.data.read()) >= 0) {
+			while ((next = this.readerData.read()) >= 0) {
 				sb.append((char) next);
 			}
 			String streamContent = sb.toString();
@@ -92,7 +92,25 @@ public class JsonStaticStreamParser extends JsonParser implements Cloneable, Aut
 			}
 		} catch (IOException e) {
 			throw new JsonParserInternalException(String.format("Reading from the buffered reader %s failed.", 
-					this.data), e);
+					this.readerData), e);
+		}
+	}
+	
+	public JsonStringParser toStringParser() {
+		try {
+			JsonStringParser equivalentStringParser = new JsonStringParser(this.getData());
+			equivalentStringParser.setPosition(this.getPosition());
+			return equivalentStringParser;
+		} catch (JsonStandardException e) {
+			/*
+			 * This should not be possible as the only way a JsonStringParser will throw a 
+			 * JsonStandardException is if the string has a length of zero, which would also 
+			 * cause the JsonStaticStreamParser to throw the same exception.
+			 * If it happens non the less, that means there is something utterly wrong in 
+			 * the code.
+			 */
+			throw new JsonParserInternalException("Every static JSON stream parser should be convertable to "
+					+ "a JSON string parser.",e);
 		}
 	}
 	
@@ -269,7 +287,7 @@ public class JsonStaticStreamParser extends JsonParser implements Cloneable, Aut
 	 */
 	@Override
 	public void close() throws IOException {
-		this.data.close();
+		this.readerData.close();
 	}
 
 	/*

@@ -10,6 +10,7 @@ import java.util.Random;
 import hockey.mask.json.JsonStandardException;
 import hockey.mask.json.parser.JsonParserInternalException;
 import hockey.mask.json.parser.JsonStaticStreamParser;
+import hockey.mask.json.parser.JsonStringParser;
 import koro.sensei.tester.TestFailureException;
 import koro.sensei.tester.TestSubject;
 
@@ -29,7 +30,8 @@ public class JsonStaticStreamParserTesting implements TestSubject {
 		JsonStaticStreamParserTesting.testGet();
 		JsonStaticStreamParserTesting.testGetRemaining();
 		JsonStaticStreamParserTesting.testSkipWhitespace();
-		JsonStaticStreamParserTesting.testIsNextDigit();		
+		JsonStaticStreamParserTesting.testIsNextDigit();
+		JsonStaticStreamParserTesting.testToStringParser();
 	}
 	
 	/**
@@ -566,6 +568,35 @@ public class JsonStaticStreamParserTesting implements TestSubject {
 									+ ", but is \"%s\".", 
 									noDigitsParser, nextChar));
 				}	
+			} catch (JsonParserInternalException | IOException e) {
+				throw new TestFailureException("Creating  or closing the JSON parsers failed.", e);
+			} catch (JsonStandardException e1) {
+				if (JsonStaticStreamParserTesting.streamLength(is) != 0) { // empty strings should throw an exception
+					throw new TestFailureException(String.format("Parsing the stream %s"
+							+ "should not fail.", is), e1);
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Test conversion to a JSON string parser.
+	 * 
+	 * @throws TestFailureException the test did fail
+	 */
+	private static void testToStringParser() throws TestFailureException {
+		for (int i = 0; i < 3000; i++) {
+			// test parser without incrementing the position
+			InputStream is = JsonStaticStreamParserTesting.createRandomStream();
+			try (JsonStaticStreamParser jp = new JsonStaticStreamParser(is)) {
+				String allData = jp.getData();
+				int randomPosition = JsonStaticStreamParserTesting.RANDOM.nextInt(allData.length());
+				jp.setPosition(randomPosition);
+				JsonStringParser equivalentStringParser = new JsonStringParser(allData);
+				equivalentStringParser.setPosition(randomPosition);
+				TestSubject.assertTestCondition(equivalentStringParser.equals(jp.toStringParser()), 
+						String.format("The JSON parser %s should be convert to the string parser %s, "
+						+ "but converts to %s.", jp, equivalentStringParser, jp.toStringParser()));
 			} catch (JsonParserInternalException | IOException e) {
 				throw new TestFailureException("Creating  or closing the JSON parsers failed.", e);
 			} catch (JsonStandardException e1) {
