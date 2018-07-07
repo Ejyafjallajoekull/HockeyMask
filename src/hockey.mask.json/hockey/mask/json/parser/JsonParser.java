@@ -44,8 +44,8 @@ public abstract class JsonParser {
 	 * @return the next character as string 
 	 * @throws IndexOutOfBoundsException if the end of the parsed data has been reached
 	 */
-	public String get() throws IndexOutOfBoundsException {
-		return this.get(1);
+	public char get() throws IndexOutOfBoundsException {
+		return this.get(1).charAt(0);
 	}
 	
 	/**
@@ -61,6 +61,25 @@ public abstract class JsonParser {
 	 * @return true if there are remaining characters
 	 */
 	public abstract boolean hasNext();
+	
+	/**
+	 * Checks whether the next character is the query.
+	 * The position mark will not be incremented.
+	 * 
+	 * @param query - the char to query for
+	 * @return true if the next character equals the query
+	 */
+	public abstract boolean isNext(char query);
+	
+	/**
+	 * Checks whether the next character is the query.
+	 * Optionally the position mark can be incremented if the query is found.
+	 * 
+	 * @param query - the char to query for
+	 * @param incrementPosition - true to increment the position mark by the search if found
+	 * @return true if the next character equals the query
+	 */
+	public abstract boolean isNext(char query, boolean incrementPosition);
 	
 	/**
 	 * Checks whether the next characters are the query.
@@ -79,7 +98,7 @@ public abstract class JsonParser {
 	 * @param incrementPosition - true to increment the position mark by the search if found
 	 * @return true if the next characters equal the query
 	 */
-	public abstract boolean isNext(String query, boolean incrementPosition);	
+	public abstract boolean isNext(String query, boolean incrementPosition);
 	
 	/**
 	 * Checks whether the next character is a digit.
