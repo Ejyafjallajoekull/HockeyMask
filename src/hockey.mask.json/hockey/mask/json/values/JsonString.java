@@ -19,32 +19,32 @@ public class JsonString extends JsonValue {
 	/**
 	 *  The identifier used to identify JSON formatted strings.
 	 */
-	public static final String JSON_STRING_IDENTIFIER = "\"";
+	public static final char JSON_STRING_IDENTIFIER = '\"';
 	/**
 	 * Characters to be escaped with the JSON string escape character.<br>
 	 * First element: Java character to escape<br>
 	 * Second element: JSON escaped character without escape character
 	 */
-	public static final String[][] JSON_STRING_ESCAPED_CHARACTERS =
+	public static final char[][] JSON_STRING_ESCAPED_CHARACTERS =
 			/*
 			 *  Backslash needs to be the first in order for the toJson() method to
 			 *  work correctly.
 			 *  An array is probably more efficient than a linked map.
 			 */
-			{	{"\\", "\\"},	// backslash
-				{"\"", "\""},	// apostrophe
-				{"/", "/"},		// slash
-				{"\b", "b"},	// backspace 
-				{"\r", "r"},	// carriage return
-				{"\f", "f"},	// formfeed
-				{"\n", "n"},	// new line
-				{"\t", "t"} };	// tab
+			{	{'\\', '\\'},	// backslash
+				{'\"', '\"'},	// apostrophe
+				{'/', '/'},		// slash
+				{'\b', 'b'},	// backspace 
+				{'\r', 'r'},	// carriage return
+				{'\f', 'f'},	// formfeed
+				{'\n', 'n'},	// new line
+				{'\t', 't'} };	// tab
 			// TODO: is \\u unicode support necessary?
 			
 	/**
 	 * The escape character for JSON formatted strings.
 	 */
-	public static final String JSON_STRING_ESCAPE_CHARACTER = "\\";
+	public static final char JSON_STRING_ESCAPE_CHARACTER = '\\';
 	
 	private String value = null;
 	
@@ -96,13 +96,11 @@ public class JsonString extends JsonValue {
 	public String toJson() {
 		// the string cannot be null at this point
 		StringBuilder sb = new StringBuilder(this.getValue());
-			int endIndex = 0;
 			for (int i = 0; i < sb.length(); i++) {
-				for (String[] escape : JsonString.JSON_STRING_ESCAPED_CHARACTERS) {
-					endIndex = i + escape[0].length();
-					if (endIndex <= sb.length() && sb.subSequence(i, endIndex).equals(escape[0])) {
-						sb.replace(i, endIndex, JsonString.JSON_STRING_ESCAPE_CHARACTER + escape[1]);
-						i += JsonString.JSON_STRING_ESCAPE_CHARACTER.length() + escape[1].length() - 1;
+				for (char[] escape : JsonString.JSON_STRING_ESCAPED_CHARACTERS) {
+					if (sb.charAt(i) == escape[0]) {
+						sb.replace(i, i+1, Character.toString(JsonString.JSON_STRING_ESCAPE_CHARACTER) + escape[1]);
+						i++; // skip the inserted character
 					}
 				}
 			}
@@ -155,7 +153,7 @@ public class JsonString extends JsonValue {
 					if (parser.isNext(JsonString.JSON_STRING_IDENTIFIER, true)) {
 						return new JsonString(sb.toString());
 					} else if (parser.isNext(JsonString.JSON_STRING_ESCAPE_CHARACTER, true)) { // escape characters
-						for (String[] escape : JsonString.JSON_STRING_ESCAPED_CHARACTERS) {
+						for (char[] escape : JsonString.JSON_STRING_ESCAPED_CHARACTERS) {
 							if (parser.isNext(escape[1], true)) {
 								sb.append(escape[0]);
 								/*

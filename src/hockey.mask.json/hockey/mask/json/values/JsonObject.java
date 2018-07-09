@@ -22,18 +22,18 @@ public class JsonObject extends JsonValue implements Iterable<JsonPair> {
 	/**
 	 *  The identifier used to identify the start of a JSON formatted object.
 	 */
-	public static final String JSON_OBJECT_START_IDENTIFIER = "{";
+	public static final char JSON_OBJECT_START_IDENTIFIER = '{';
 	
 	/**
 	 *  The identifier used to identify the end of a JSON formatted object.
 	 */
-	public static final String JSON_OBJECT_END_IDENTIFIER = "}";
+	public static final char JSON_OBJECT_END_IDENTIFIER = '}';
 
 	/**
 	 *  The separator used to separate JSON formatted pairs or members contained in 
 	 *  a JSON formatted object.
 	 */
-	public static final String JSON_OBJECT_PAIR_SEPARATOR = ",";
+	public static final char JSON_OBJECT_PAIR_SEPARATOR = ',';
 	
 	private ArrayList<JsonPair> members = new ArrayList<JsonPair>();
 	
@@ -138,7 +138,7 @@ public class JsonObject extends JsonValue implements Iterable<JsonPair> {
 	 */
 	@Override
 	public String toJson() {
-		StringBuilder jsonString = new StringBuilder(JsonObject.JSON_OBJECT_START_IDENTIFIER);
+		StringBuilder jsonString = new StringBuilder(Character.toString(JsonObject.JSON_OBJECT_START_IDENTIFIER));
 		for (int i = 0; i < this.members.size(); i++) {
 			JsonPair val = this.members.get(i);
 			jsonString.append(val.toJson());

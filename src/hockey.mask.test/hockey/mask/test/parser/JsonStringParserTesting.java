@@ -315,7 +315,7 @@ public class JsonStringParserTesting implements TestSubject {
 				try {
 					JsonStringParser digitParser = new JsonStringParser(digitString);
 					for (int j = 0; j < digitString.length(); j++) {
-						char nextChar = digitParser.get().charAt(0);
+						char nextChar = digitParser.get();
 						TestSubject.assertTestCondition(Character.isDigit(nextChar), 
 								String.format("The parsed char in the JSON parser %s should be a digit "
 										+ ", but is \"%s\".", 
@@ -331,7 +331,7 @@ public class JsonStringParserTesting implements TestSubject {
 				try {
 					JsonStringParser noDigitsParser = new JsonStringParser(stringWithoutDigits);
 					for (int j = 0; j < stringWithoutDigits.length(); j++) {
-						char nextChar = noDigitsParser.get().charAt(0);
+						char nextChar = noDigitsParser.get();
 						TestSubject.assertTestCondition(!Character.isDigit(nextChar), 
 								String.format("The parsed char in the JSON parser %s should not be a digit "
 										+ ", but is \"%s\".", 

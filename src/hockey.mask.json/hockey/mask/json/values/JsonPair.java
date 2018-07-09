@@ -18,7 +18,7 @@ public class JsonPair {
 	/**
 	 * The separator used to separate name and value in a JSON pair.
 	 */
-	public static final String JSON_PAIR_SEPARATOR = ":";
+	public static final char JSON_PAIR_SEPARATOR = ':';
 	
 	/**
 	 * Create a new JSON name-value-pair. The name will be immutable.

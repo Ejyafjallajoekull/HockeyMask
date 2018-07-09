@@ -278,7 +278,7 @@ public class JsonNumberTesting implements TestSubject {
 			// test plus sign
 			try {
 				int testInt = JsonNumberTesting.RANDOM.nextInt();
-				String plusString = JsonNumber.JSON_PLUS_VALUE + testInt;
+				String plusString = Character.toString(JsonNumber.JSON_PLUS_VALUE) + testInt;
 				JsonNumber.parse(plusString);
 				throw new TestFailureException(String.format("Parsing the number %s proceeded by a "
 						+ "plus sign should fail.", plusString));
@@ -302,7 +302,7 @@ public class JsonNumberTesting implements TestSubject {
 			// test wrong fraction
 			try {
 				int testInt = JsonNumberTesting.RANDOM.nextInt();
-				String fractionString = JsonNumber.JSON_FLOATING_SEPARATOR_VALUE + testInt;
+				String fractionString = Character.toString(JsonNumber.JSON_FLOATING_SEPARATOR_VALUE) + testInt;
 				JsonNumber.parse(fractionString);
 				throw new TestFailureException(String.format("Parsing the fraction %s without a "
 						+ "leading zero should fail.", fractionString));
@@ -313,7 +313,7 @@ public class JsonNumberTesting implements TestSubject {
 			}
 			try {
 				int testInt = JsonNumberTesting.RANDOM.nextInt();
-				String fractionString = testInt + JsonNumber.JSON_FLOATING_SEPARATOR_VALUE;
+				String fractionString = testInt + Character.toString(JsonNumber.JSON_FLOATING_SEPARATOR_VALUE);
 				JsonNumber.parse(fractionString);
 				throw new TestFailureException(String.format("Parsing the fraction %s without "
 						+ "trailing digits should fail.", fractionString));
@@ -325,7 +325,7 @@ public class JsonNumberTesting implements TestSubject {
 			// test wrong exponent
 			try {
 				int testInt = JsonNumberTesting.RANDOM.nextInt();
-				String exponentString = testInt + JsonNumber.JSON_EXPONENT_VALUE;
+				String exponentString = testInt + Character.toString(JsonNumber.JSON_EXPONENT_VALUE);
 				JsonNumber.parse(exponentString);
 				throw new TestFailureException(String.format("Parsing the number %s without "
 						+ "trailing digits at the exponent should fail.", exponentString));
@@ -393,7 +393,7 @@ public class JsonNumberTesting implements TestSubject {
 			}
 		}
 		// test reseting position mark after exception
-		String testString = JsonNumberTesting.RANDOM.nextInt() + JsonNumber.JSON_EXPONENT_CAPITAL_VALUE;
+		String testString = JsonNumberTesting.RANDOM.nextInt() + Character.toString(JsonNumber.JSON_EXPONENT_CAPITAL_VALUE);
 		try {
 			JsonStringParser jp = new JsonStringParser(testString);
 			int initialPosition = jp.getPosition();

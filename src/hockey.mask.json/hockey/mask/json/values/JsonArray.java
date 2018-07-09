@@ -22,18 +22,18 @@ public class JsonArray extends JsonValue implements List<JsonValue> {
 	/**
 	 *  The identifier used to identify the start of a JSON formatted array.
 	 */
-	public static final String JSON_ARRAY_START_IDENTIFIER = "[";
+	public static final char JSON_ARRAY_START_IDENTIFIER = '[';
 	
 	/**
 	 *  The identifier used to identify the end of a JSON formatted array.
 	 */
-	public static final String JSON_ARRAY_END_IDENTIFIER = "]";
+	public static final char JSON_ARRAY_END_IDENTIFIER = ']';
 
 	/**
 	 *  The separator used to separate JSON formatted values contained in 
 	 *  a JSON formatted array.
 	 */
-	public static final String JSON_ARRAY_VALUE_SEPARATOR = ",";
+	public static final char JSON_ARRAY_VALUE_SEPARATOR = ',';
 	
 	private ArrayList<JsonValue> array = new ArrayList<JsonValue>();
 		
@@ -66,7 +66,7 @@ public class JsonArray extends JsonValue implements List<JsonValue> {
 	 */
 	@Override
 	public String toJson() {
-		StringBuilder jsonString = new StringBuilder(JsonArray.JSON_ARRAY_START_IDENTIFIER);
+		StringBuilder jsonString = new StringBuilder(Character.toString(JsonArray.JSON_ARRAY_START_IDENTIFIER));
 		for (int i = 0; i < this.size(); i++) {
 			JsonValue val = this.get(i);
 			if (val != null) {

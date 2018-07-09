@@ -19,7 +19,7 @@ import hockey.mask.json.JsonStandardException;
 public class JsonStaticStreamParser extends JsonParser implements Cloneable, AutoCloseable {
 	
 	private BufferedReader readerData = null;
-	private String jsonData = null; // the string to parse
+	private char[] jsonData = null; // the string to parse
 	private int pos = 0; // the current position of the parser
 	
 	/**
@@ -85,7 +85,7 @@ public class JsonStaticStreamParser extends JsonParser implements Cloneable, Aut
 			}
 			String streamContent = sb.toString();
 			if (streamContent.length() > 0) {
-				this.jsonData = sb.toString();
+				this.jsonData = sb.toString().toCharArray();
 			} else {
 				throw new JsonStandardException("The empty string \"" + streamContent
 						+ "\" cannot be parsed.");
@@ -133,11 +133,11 @@ public class JsonStaticStreamParser extends JsonParser implements Cloneable, Aut
 	 */
 	@Override
 	public void setPosition(int position) throws IndexOutOfBoundsException {
-		if (position <= this.getData().length() && position >= 0) {
+		if (position <= this.jsonData.length && position >= 0) {
 			this.pos = position;
 		} else {
 			throw new IndexOutOfBoundsException(String.format("The index %s is outside of the "
-					+ "bounds of a string of length %s.", position, jsonData.length()));
+					+ "bounds of a string of length %s.", position, this.jsonData.length));
 		}
 	}
 	
@@ -153,28 +153,33 @@ public class JsonStaticStreamParser extends JsonParser implements Cloneable, Aut
 	 */
 	@Override
 	public String get(int length) throws IndexOutOfBoundsException {
-		int end = this.getPosition() + length;
-		if (end <= this.getData().length()) {
-			String sub = this.getData().substring(this.getPosition(), end);
+		if (this.getPosition() + length <= this.getData().length()) {
+			String sub = new String(this.jsonData, this.getPosition(), length);
 			this.setPosition(this.getPosition() + length); // increment the position mark
 			return sub;
 		} else {
 			throw new IndexOutOfBoundsException(String.format("The index %s is outside of the "
-					+ "bounds of a string of length %s.", end, jsonData.length()));
+					+ "bounds of a string of length %s.", this.getPosition() + length, this.jsonData.length));
 		}
 	}
 	
 	/**
-	 * Get the next character of the string as substring. A substring containing
-	 * the character at the current parsers position mark will be returned and 
-	 * the position mark incremented by one.
+	 * Get the next character of the string. 
+	 * The position mark will be incremented by one.
 	 * 
-	 * @return the next character as substring 
+	 * @return the next character
 	 * @throws IndexOutOfBoundsException if the end of the parsed string has been reached
 	 */
 	@Override
-	public String get() throws IndexOutOfBoundsException {
-		return this.get(1);
+	public char get() throws IndexOutOfBoundsException {
+		if (this.hasNext()) {
+			char c = this.jsonData[this.getPosition()];
+			this.setPosition(this.getPosition() + 1);
+			return c;
+		} else {
+			throw new IndexOutOfBoundsException(String.format("The index %s is outside of the "
+					+ "bounds of a string of length %s.", this.getPosition() + 1, this.jsonData.length));
+		}
 	}
 	
 	/**
@@ -184,7 +189,7 @@ public class JsonStaticStreamParser extends JsonParser implements Cloneable, Aut
 	 */
 	@Override
 	public String getData() {
-		return this.jsonData;
+		return new String(this.jsonData);
 	}
 	
 	/**
@@ -194,7 +199,36 @@ public class JsonStaticStreamParser extends JsonParser implements Cloneable, Aut
 	 */
 	@Override
 	public boolean hasNext() {
-		return this.getPosition() < this.getData().length();
+		return this.getPosition() < this.jsonData.length;
+	}
+	
+	/**
+	 * Checks whether the next character is the query.
+	 * The position mark will not be incremented.
+	 * 
+	 * @param query - the character to query for
+	 * @return true if the next character equals the query
+	 */
+	@Override
+	public boolean isNext(char query) {
+		return this.hasNext() && this.jsonData[this.getPosition()] == query;
+	}
+
+	/**
+	 * Checks whether the next character is the query.
+	 * Optionally the position mark can be incremented if the query is found.
+	 * 
+	 * @param query - the character to query for
+	 * @param incrementPosition - true to increment the position mark by the search if found
+	 * @return true if the next character equals the query
+	 */
+	@Override
+	public boolean isNext(char query, boolean incrementPosition) {
+		boolean next = this.isNext(query);
+		if (next && incrementPosition) {
+			this.setPosition(this.getPosition() + 1);
+		}
+		return next;
 	}
 	
 	/**
@@ -237,7 +271,7 @@ public class JsonStaticStreamParser extends JsonParser implements Cloneable, Aut
 			}
 		}
 		return false;
-	}	
+	}
 	
 	/**
 	 * Checks whether the next character is a digit.
@@ -247,7 +281,7 @@ public class JsonStaticStreamParser extends JsonParser implements Cloneable, Aut
 	 */
 	@Override
 	public boolean isNextDigit() {
-		return this.hasNext() && Character.isDigit(this.getData().charAt(this.getPosition()));
+		return this.hasNext() && Character.isDigit(this.jsonData[this.getPosition()]);
 	}
 	
 	/**
@@ -257,7 +291,7 @@ public class JsonStaticStreamParser extends JsonParser implements Cloneable, Aut
 	 */
 	@Override
 	public String getRemaining() {
-		return this.getData().substring(this.getPosition(), this.getData().length());
+		return new String(this.jsonData, this.getPosition(), this.jsonData.length - this.getPosition());
 	}
 	
 	/**
@@ -275,7 +309,7 @@ public class JsonStaticStreamParser extends JsonParser implements Cloneable, Aut
 	 */
 	@Override
 	public void skipWhitespace() {
-		while (this.hasNext() && Character.isWhitespace(this.getData().charAt(this.getPosition()))) {
+		while (this.hasNext() && Character.isWhitespace(this.jsonData[this.getPosition()])) {
 			this.setPosition(this.getPosition() + 1);
 		}
 	}

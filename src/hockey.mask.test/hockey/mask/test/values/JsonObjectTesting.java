@@ -384,7 +384,7 @@ public class JsonObjectTesting implements TestSubject {
 		for (int i = 0; i < 10000; i++) {
 			JsonObject testObject = new JsonObject();
 			ArrayList<JsonPair> testList = JsonObjectTesting.generateRandomMemberList();
-			String perfectString = JsonObject.JSON_OBJECT_START_IDENTIFIER;
+			String perfectString = Character.toString(JsonObject.JSON_OBJECT_START_IDENTIFIER);
 			for (int j = 0; j < testList.size(); j++) {
 				testObject.add(testList.get(j));
 				perfectString += testList.get(j).toJson();

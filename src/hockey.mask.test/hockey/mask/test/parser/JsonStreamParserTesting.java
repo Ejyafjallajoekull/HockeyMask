@@ -297,7 +297,7 @@ public class JsonStreamParserTesting implements TestSubject {
 				}
 				jp.setPosition(pos);
 				if (jp.hasNext()) {
-					String readCharacter = jp.get();
+					String readCharacter = Character.toString(jp.get());
 					TestSubject.assertTestCondition(readCharacter.equals(testString.substring(pos, pos + 1)), 
 							String.format("The JSON parsers data %s should read the data \"%s\", "
 									+ "but reads \"%s\" instead.", jp, testString.substring(pos, pos + 1), 
@@ -307,7 +307,7 @@ public class JsonStreamParserTesting implements TestSubject {
 									+ "%s, but is at %s.", jp, pos + 1, jp.getPosition()));
 				} else {
 					try {
-						String readCharacter = jp.get();
+						char readCharacter = jp.get();
 						throw new TestFailureException(String.format("An exception should have been thrown as "
 								+ "the parser %s has no characters left, but still %s is read.", jp, readCharacter));
 					} catch (IndexOutOfBoundsException e) {
@@ -449,7 +449,7 @@ public class JsonStreamParserTesting implements TestSubject {
 			try (JsonStreamParser digitParser = new JsonStreamParser(JsonStreamParserTesting.createRandomDigitSequence());) {
 				String digitString = digitParser.getData();
 				for (int j = 0; j < digitString.length(); j++) {
-					char nextChar = digitParser.get().charAt(0);
+					char nextChar = digitParser.get();
 					TestSubject.assertTestCondition(Character.isDigit(nextChar), 
 							String.format("The parsed char in the JSON parser %s should be a digit "
 									+ ", but is \"%s\".", 
@@ -462,7 +462,7 @@ public class JsonStreamParserTesting implements TestSubject {
 			try (JsonStreamParser noDigitsParser = new JsonStreamParser(JsonStreamParserTesting.createRandomSequenceWithoutDigits());) {
 				String stringWithoutDigits = noDigitsParser.getData();
 				for (int j = 0; j < stringWithoutDigits.length(); j++) {
-					char nextChar = noDigitsParser.get().charAt(0);
+					char nextChar = noDigitsParser.get();
 					TestSubject.assertTestCondition(!Character.isDigit(nextChar), 
 							String.format("The parsed char in the JSON parser %s should not be a digit "
 									+ ", but is \"%s\".", 

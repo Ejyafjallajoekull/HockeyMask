@@ -330,6 +330,20 @@ public class JsonStreamParser extends JsonParser implements Closeable, AutoClose
 					+ "reader %s.", this.data), e);
 		}
 	}
+	
+	@Override
+	public boolean isNext(char query) {
+		return this.hasNext() && query == this.getNextCharacters(1).charAt(0);
+	}
+
+	@Override
+	public boolean isNext(char query, boolean incrementPosition) {
+		boolean next = this.isNext(query);
+		if (incrementPosition && next) { // query cannot be null if true
+			this.setPosition(this.getPosition() + 1);
+		}
+		return next;
+	}
 
 	/**
 	 * Checks whether the next characters are the query.
@@ -406,7 +420,7 @@ public class JsonStreamParser extends JsonParser implements Closeable, AutoClose
 	@Override
 	public void skipWhitespace() throws JsonParserInternalException {
 		int position = this.getPosition();
-		while (this.hasNext() && Character.isWhitespace(this.get().charAt(0))) {
+		while (this.hasNext() && Character.isWhitespace(this.get())) {
 			position++;
 		}
 		this.setPosition(position);

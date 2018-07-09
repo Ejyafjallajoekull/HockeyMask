@@ -17,27 +17,32 @@ public class JsonNumber extends JsonValue {
 	/**
 	 * The JSON representation of a minus.
 	 */
-	public static final String JSON_MINUS_VALUE = "-";
+	public static final char JSON_MINUS_VALUE = '-';
+	
+	/**
+	 * The string representation of the minus value. Used for a helper function.
+	 */
+	private static final String JSON_MINUS_VALUE_STRING_REPRESENTATION = Character.toString(JsonNumber.JSON_MINUS_VALUE);
 	
 	/**
 	 * The JSON representation of a plus.
 	 */
-	public static final String JSON_PLUS_VALUE = "+";
+	public static final char JSON_PLUS_VALUE = '+';
 	
 	/**
 	 * The JSON representation of a exponent.
 	 */
-	public static final String JSON_EXPONENT_VALUE = "e";
+	public static final char JSON_EXPONENT_VALUE = 'e';
 	
 	/**
 	 * The JSON representation of a exponent.
 	 */
-	public static final String JSON_EXPONENT_CAPITAL_VALUE = "E";
+	public static final char JSON_EXPONENT_CAPITAL_VALUE = 'E';
 	
 	/**
 	 * The JSON representation of a floating point separator.
 	 */
-	public static final String JSON_FLOATING_SEPARATOR_VALUE = ".";
+	public static final char JSON_FLOATING_SEPARATOR_VALUE = '.';
 
 	private BigDecimal value = null;
 	
@@ -252,8 +257,8 @@ public class JsonNumber extends JsonValue {
 	 */
 	private static String parseSignificandSign(JsonParser parser) throws JsonStandardException {
 		parser.skipWhitespace();
-		if (parser.isNext(JsonNumber.JSON_MINUS_VALUE)) {
-			return parser.get(JsonNumber.JSON_MINUS_VALUE.length());
+		if (parser.isNext(JsonNumber.JSON_MINUS_VALUE, true)) {
+			return JsonNumber.JSON_MINUS_VALUE_STRING_REPRESENTATION;
 		} else if (parser.isNextDigit()) {
 			return "";
 		} else {
@@ -315,19 +320,19 @@ public class JsonNumber extends JsonValue {
 		StringBuilder exponentBuilder = new StringBuilder();
 		parser.skipWhitespace();
 		// check if there is an exponent character
-		if (parser.isNext(JsonNumber.JSON_EXPONENT_VALUE)) {
-			exponentBuilder.append(parser.get(JsonNumber.JSON_EXPONENT_VALUE.length()));
-		} else if (parser.isNext(JsonNumber.JSON_EXPONENT_CAPITAL_VALUE)) {
-			exponentBuilder.append(parser.get(JsonNumber.JSON_EXPONENT_CAPITAL_VALUE.length()));
+		if (parser.isNext(JsonNumber.JSON_EXPONENT_VALUE, true)) {
+			exponentBuilder.append(JsonNumber.JSON_EXPONENT_VALUE);
+		} else if (parser.isNext(JsonNumber.JSON_EXPONENT_CAPITAL_VALUE, true)) {
+			exponentBuilder.append(JsonNumber.JSON_EXPONENT_CAPITAL_VALUE);
 		} else {
 			return "";
 		}
 		parser.skipWhitespace();
 		// check if there is a sign for the exponent
-		if (parser.isNext(JsonNumber.JSON_MINUS_VALUE)) {
-			exponentBuilder.append(parser.get(JsonNumber.JSON_MINUS_VALUE.length()));
-		} else if (parser.isNext(JsonNumber.JSON_PLUS_VALUE)) {
-			exponentBuilder.append(parser.get(JsonNumber.JSON_PLUS_VALUE.length()));
+		if (parser.isNext(JsonNumber.JSON_MINUS_VALUE, true)) {
+			exponentBuilder.append(JsonNumber.JSON_MINUS_VALUE);
+		} else if (parser.isNext(JsonNumber.JSON_PLUS_VALUE, true)) {
+			exponentBuilder.append(JsonNumber.JSON_PLUS_VALUE);
 		}
 		parser.skipWhitespace();
 		int digitStart = exponentBuilder.length();
