@@ -87,10 +87,15 @@ public class JsonNull extends JsonValue {
 			throw new NullPointerException("The JSON parser may not be null.");
 		}
 	}
+
+	@Override
+	public int hashCode() {
+		return 0;
+	}
 	
 	@Override
 	public boolean equals(Object obj) {
-		return obj != null && obj instanceof JsonNull;
+		return obj != null && obj.getClass() == this.getClass();
 	}
 	
 	@Override

@@ -351,15 +351,12 @@ public class JsonNumber extends JsonValue {
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((this.value == null) ? 0 : this.value.hashCode());
-		return result;
+		return this.value.hashCode();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj != null && obj instanceof JsonNumber) {
+		if (obj != null && obj.getClass() == this.getClass()) {
 			return this.getValue().equals(((JsonNumber) obj).getValue());
 		}
 		return false;

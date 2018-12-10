@@ -389,15 +389,12 @@ public class JsonArray extends JsonValue implements List<JsonValue> {
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((array == null) ? 0 : array.hashCode());
-		return result;
+		return this.array.hashCode();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj != null && obj instanceof JsonArray) {
+		if (obj != null && obj.getClass() == this.getClass()) {
 			return this.array.equals(((JsonArray) obj).array);
 		}
 		return false;

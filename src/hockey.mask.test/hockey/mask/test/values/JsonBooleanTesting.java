@@ -10,6 +10,12 @@ import hockey.mask.json.values.JsonValueTypes;
 import koro.sensei.tester.TestFailureException;
 import koro.sensei.tester.TestSubject;
 
+/**
+ * The JsonBooleanTesting class test the JsonBoolean class for correct functionality.
+ * 
+ * @author Planters
+ *
+ */
 public class JsonBooleanTesting implements TestSubject {
 
 	private static final Random RANDOM = new Random();

@@ -133,7 +133,7 @@ public abstract class JsonParser {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((this.getData() == null) ? 0 : this.getData().hashCode());
+		result = prime * result + this.getData().hashCode();
 		result = prime * result + this.getPosition();
 		return result;
 	}
@@ -141,7 +141,7 @@ public abstract class JsonParser {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj != null && obj instanceof JsonParser) {
+		if (obj != null && obj.getClass() == this.getClass()) {
 			JsonParser compare = (JsonParser) obj;
 			return compare.getPosition() == this.getPosition() 
 					&& compare.getData().equals(this.getData()); // data should never be null

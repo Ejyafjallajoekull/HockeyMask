@@ -148,11 +148,11 @@ public class JsonPair {
 	
 	@Override
 	public boolean equals(Object obj) {
-		if (obj != null && obj instanceof JsonPair) {
+		if (obj != null && obj.getClass() == this.getClass()) {
 			JsonPair pair = (JsonPair) obj;
 			// neither name nor value can be null
-			return this.getValue().equals(pair.getValue()) 
-					&& this.getName().equals(pair.getName());
+			return this.value.equals(pair.value) 
+					&& this.name.equals(pair.name);
 		}
 		return false;
 	}
@@ -161,8 +161,8 @@ public class JsonPair {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((this.getName() == null) ? 0 : this.getName().hashCode());
-		result = prime * result + ((this.getValue() == null) ? 0 : this.getValue().hashCode());
+		result = prime * result + this.name.hashCode();
+		result = prime * result + this.value.hashCode();
 		return result;
 	}
 		

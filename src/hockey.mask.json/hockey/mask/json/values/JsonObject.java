@@ -331,15 +331,12 @@ public class JsonObject extends JsonValue implements Iterable<JsonPair> {
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((members == null) ? 0 : members.hashCode());
-		return result;
+		return this.members.hashCode();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj != null && obj instanceof JsonObject) {
+		if (obj != null && obj.getClass() == this.getClass()) {
 			return this.members.equals(((JsonObject) obj).members);
 		}
 		return false;
