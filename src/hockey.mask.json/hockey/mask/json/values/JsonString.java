@@ -176,7 +176,9 @@ public final class JsonString extends JsonValue implements Comparable<JsonString
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof JsonString) {
+		if (obj == this) {
+			return true;
+		} else if (obj instanceof JsonString) {
 			return this.value.equals(((JsonString) obj).value);
 		}
 		return false;

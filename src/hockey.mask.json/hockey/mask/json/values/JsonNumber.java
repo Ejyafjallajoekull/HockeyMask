@@ -1,6 +1,7 @@
 package hockey.mask.json.values;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 import hockey.mask.json.JsonStandardException;
 import hockey.mask.json.parser.JsonParser;
@@ -12,7 +13,7 @@ import hockey.mask.json.parser.JsonStringParser;
  * @author Planters
  *
  */
-public class JsonNumber extends JsonValue {
+public final class JsonNumber extends JsonValue {
 	
 	/**
 	 * The JSON representation of a minus.
@@ -44,7 +45,7 @@ public class JsonNumber extends JsonValue {
 	 */
 	public static final char JSON_FLOATING_SEPARATOR_VALUE = '.';
 
-	private BigDecimal value = null;
+	private final BigDecimal value;
 	
 	/**
 	 * Create a new JSON number with the specified value.
@@ -52,7 +53,7 @@ public class JsonNumber extends JsonValue {
 	 * @param jsonNumber - the value of this JSON number
 	 */
 	public JsonNumber(int jsonNumber) {
-		this.setValue(jsonNumber);
+		this.value = new BigDecimal(jsonNumber);
 	}
 	
 	/**
@@ -61,7 +62,7 @@ public class JsonNumber extends JsonValue {
 	 * @param jsonNumber - the value of this JSON number
 	 */
 	public JsonNumber(long jsonNumber) {
-		this.setValue(jsonNumber);
+		this.value = new BigDecimal(jsonNumber);
 	}
 	
 	/**
@@ -71,7 +72,12 @@ public class JsonNumber extends JsonValue {
 	 * @throws JsonStandardException if the passed number is infinity or NaN
 	 */
 	public JsonNumber(float jsonNumber) throws JsonStandardException {
-		this.setValue(jsonNumber);
+		if (Float.isFinite(jsonNumber)) {
+			this.value = new BigDecimal(jsonNumber);
+		} else {
+			throw new JsonStandardException("The number " + jsonNumber + "can not be represented "
+					+ "by the JSON foramt.");
+		}
 	}
 	
 	/**
@@ -81,7 +87,12 @@ public class JsonNumber extends JsonValue {
 	 * @throws JsonStandardException if the passed number is infinity or NaN
 	 */
 	public JsonNumber(double jsonNumber) throws JsonStandardException {
-		this.setValue(jsonNumber);
+		if (Double.isFinite(jsonNumber)) {
+			this.value = new BigDecimal(jsonNumber);
+		} else {
+			throw new JsonStandardException("The number " + jsonNumber + "can not be represented "
+					+ "by the JSON foramt.");
+		}
 	}
 	
 	/**
@@ -91,85 +102,10 @@ public class JsonNumber extends JsonValue {
 	 * @throws NullPointerException if the specified value is null
 	 */
 	public JsonNumber(BigDecimal jsonNumber) {
-		this.setValue(jsonNumber);
+			this.value = Objects.requireNonNull(jsonNumber, "A JSON number cannot be created from null.");
 	}
 	
-
 	
-	
-	/**
-	 * Set the value of this JSON number by 
-	 * supplying an integer.
-	 * Internally the number is represented as BigDecimal.
-	 * 
-	 * @param number - the value to set
-	 */
-	private void setValue(int number) {
-		this.value = new BigDecimal(number);
-	}
-	
-	/**
-	 * Set the value of this JSON number by 
-	 * supplying a long.
-	 * Internally the number is represented as BigDecimal.
-	 * 
-	 * @param number - the value to set
-	 */
-	private void setValue(long number) {
-		this.value = new BigDecimal(number);
-	}
-	
-	/**
-	 * Set the value of this JSON number by 
-	 * supplying a float.
-	 * Internally the number is represented as BigDecimal.
-	 * 
-	 * @param number - the value to set
-	 * @throws JsonStandardException if the passed number is infinity or NaN
-	 */
-	private void setValue(float number) throws JsonStandardException {
-		if (number != Float.NEGATIVE_INFINITY && number != Float.POSITIVE_INFINITY 
-				&& !Float.isNaN(number)) {
-			this.value = new BigDecimal(number);
-		} else {
-			throw new JsonStandardException("The number " + number + "can not be represented "
-					+ "by the JSON foramt.");
-		}
-	}
-	
-	/**
-	 * Set the value of this JSON number by 
-	 * supplying a double.
-	 * Internally the number is represented as BigDecimal.
-	 * 
-	 * @param number - the value to set
-	 * @throws JsonStandardException if the passed number is infinity or NaN
-	 */
-	private void setValue(double number) throws JsonStandardException {
-		if (number != Double.NEGATIVE_INFINITY && number != Double.POSITIVE_INFINITY 
-				&& !Double.isNaN(number)) {
-			this.value = new BigDecimal(number);
-		} else {
-			throw new JsonStandardException("The number " + number + "can not be represented "
-					+ "by the JSON foramt.");
-		}
-	}
-	
-	/**
-	 * Set the value of this JSON number by 
-	 * supplying a BigDecimal.
-	 * This is also how the number will be represented 
-	 * internally.
-	 * 
-	 * @param number - the value to set
-	 */
-	private void setValue(BigDecimal number) {
-		if (number != null) {
-			this.value = number;
-		} else {
-			throw new NullPointerException("A JSON number cannot be created from null.");
-		}
-	}
 	
 	/**
 	 * Get the value of this JSON number.
@@ -204,18 +140,15 @@ public class JsonNumber extends JsonValue {
 	 * @throws NullPointerException - if null is passed as JSON input string
 	 */
 	public static JsonNumber parse(String jsonNumber) throws JsonStandardException {
-		if (jsonNumber != null) {
-			JsonStringParser jp = new JsonStringParser(jsonNumber);
-			JsonNumber parsedNumber = JsonNumber.parseNext(jp);
-			jp.skipWhitespace(); // needed for checking against garbage data
-			if (!jp.hasNext()) {
-				return parsedNumber;
-			} else { // the string should not contain any more garbage data
-				throw new JsonStandardException(String.format("The string \"%s\" is not a pure "
-						+ "JSON number.", jsonNumber)); 
-			}
-		} else {
-			throw new NullPointerException("A JSON formatted number may not be null.");
+		Objects.requireNonNull(jsonNumber, "A JSON formatted number may not be null.");
+		JsonStringParser jp = new JsonStringParser(jsonNumber);
+		JsonNumber parsedNumber = JsonNumber.parseNext(jp);
+		jp.skipWhitespace(); // needed for checking against garbage data
+		if (!jp.hasNext()) {
+			return parsedNumber;
+		} else { // the string should not contain any more garbage data
+			throw new JsonStandardException(String.format("The string \"%s\" is not a pure "
+					+ "JSON number.", jsonNumber)); 
 		}
 	}
 	
@@ -229,21 +162,18 @@ public class JsonNumber extends JsonValue {
 	 * @throws NullPointerException - if null is passed as JSON parser
 	 */
 	public static JsonNumber parseNext(JsonParser parser) throws JsonStandardException {
-		if (parser != null) {
-			int startingPosition = parser.getPosition();
-			parser.skipWhitespace();
-			try {
-				// make sure the JSON specification is fulfilled
-				String numberAsString = JsonNumber.parseSignificandSign(parser) 
-						+ JsonNumber.parseSignificand(parser) + JsonNumber.parseExponent(parser);
-				return new JsonNumber(new BigDecimal(numberAsString));
-			} catch (NumberFormatException | JsonStandardException e) {
-				parser.setPosition(startingPosition); // the parser should not be modified
-				throw new JsonStandardException(String.format("The next element in the JSON parser "
-						+ "%s is not a JSON number.", parser), e);
-			}
-		} else {
-			throw new NullPointerException("The JSON parser may not be null.");
+		Objects.requireNonNull(parser, "The JSON parser may not be null.");
+		int startingPosition = parser.getPosition();
+		parser.skipWhitespace();
+		try {
+			// make sure the JSON specification is fulfilled
+			String numberAsString = JsonNumber.parseSignificandSign(parser) 
+					+ JsonNumber.parseSignificand(parser) + JsonNumber.parseExponent(parser);
+			return new JsonNumber(new BigDecimal(numberAsString));
+		} catch (NumberFormatException | JsonStandardException e) {
+			parser.setPosition(startingPosition); // the parser should not be modified
+			throw new JsonStandardException(String.format("The next element in the JSON parser "
+					+ "%s is not a JSON number.", parser), e);
 		}
 	}
 	
@@ -356,7 +286,9 @@ public class JsonNumber extends JsonValue {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj != null && obj.getClass() == this.getClass()) {
+		if (obj == this) {
+			return true;
+		} else if (obj instanceof JsonNumber) {
 			return this.getValue().equals(((JsonNumber) obj).getValue());
 		}
 		return false;
