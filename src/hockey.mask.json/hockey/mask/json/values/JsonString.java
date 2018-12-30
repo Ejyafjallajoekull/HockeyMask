@@ -1,5 +1,7 @@
 package hockey.mask.json.values;
 
+import java.util.Objects;
+
 import hockey.mask.json.JsonStandardException;
 import hockey.mask.json.parser.JsonParser;
 import hockey.mask.json.parser.JsonStringParser;
@@ -10,7 +12,7 @@ import hockey.mask.json.parser.JsonStringParser;
  * @author Planters
  *
  */
-public class JsonString extends JsonValue {
+public final class JsonString extends JsonValue implements Comparable<JsonString> {
 
 	/*
 	 * String is final so the JsonString class cannot extend it.
@@ -46,7 +48,7 @@ public class JsonString extends JsonValue {
 	 */
 	public static final char JSON_STRING_ESCAPE_CHARACTER = '\\';
 	
-	private String value = null;
+	private final String value;
 	
 	/**
 	 * Create a new JSON formatted string from a Java string.
@@ -56,20 +58,7 @@ public class JsonString extends JsonValue {
 	 * @throws NullPointerException if null is passed string value
 	 */
 	public JsonString(String value) {
-		this.setValue(value);
-	}
-	
-	/**
-	 * Set the JSON string to the specified string value.
-	 * 
-	 * @param value - the value to set
-	 */
-	private void setValue(String value) {
-		if (value != null) {
-			this.value = value;
-		} else {
-			throw new NullPointerException("A JSON formatted string cannot be null");
-		}
+		this.value = Objects.requireNonNull(value, "A JSON formatted string cannot be null.");
 	}
 	
 	/**
@@ -117,18 +106,15 @@ public class JsonString extends JsonValue {
 	 * @throws NullPointerException - if null is passed as JSON input string
 	 */
 	public static JsonString parse(String jsonString) throws JsonStandardException {
-		if (jsonString != null) {
-			JsonStringParser jp = new JsonStringParser(jsonString);
-			JsonString parsedString = JsonString.parseNext(jp);
-			jp.skipWhitespace(); // needed for checking against garbage data
-			if (!jp.hasNext()) {
-				return parsedString;
-			} else { // the string should not contain any more garbage data
-				throw new JsonStandardException(String.format("The string \"%s\" is not a pure JSON string.", 
-						jsonString)); 
-			}
-		} else {
-			throw new NullPointerException("A JSON formatted string may not be null.");
+		Objects.requireNonNull(jsonString, "A JSON formatted string may not be null.");
+		JsonStringParser jp = new JsonStringParser(jsonString);
+		JsonString parsedString = JsonString.parseNext(jp);
+		jp.skipWhitespace(); // needed for checking against garbage data
+		if (!jp.hasNext()) {
+			return parsedString;
+		} else { // the string should not contain any more garbage data
+			throw new JsonStandardException(String.format("The string \"%s\" is not a pure JSON string.", 
+					jsonString)); 
 		}
 	}
 	
@@ -142,42 +128,39 @@ public class JsonString extends JsonValue {
 	 * @throws NullPointerException - if null is passed as JSON parser
 	 */
 	public static JsonString parseNext(JsonParser parser) throws JsonStandardException {
-		if (parser != null) {
-			int startingPosition = parser.getPosition();
-			parser.skipWhitespace();
-			if (parser.isNext(JsonString.JSON_STRING_IDENTIFIER, true)) {
-				// strip identifiers and create StringBuilder 
-				StringBuilder sb = new StringBuilder();
-				while (parser.hasNext()) {
-					// end condition
-					if (parser.isNext(JsonString.JSON_STRING_IDENTIFIER, true)) {
-						return new JsonString(sb.toString());
-					} else if (parser.isNext(JsonString.JSON_STRING_ESCAPE_CHARACTER, true)) { // escape characters
-						for (char[] escape : JsonString.JSON_STRING_ESCAPED_CHARACTERS) {
-							if (parser.isNext(escape[1], true)) {
-								sb.append(escape[0]);
-								/*
-								 * Exit the loop if the according character is found, so 
-								 * subsequent meaningful characters are not processed afterwards.
-								 */
-								break;
-							}
+		Objects.requireNonNull(parser, "The JSON parser may not be null.");
+		int startingPosition = parser.getPosition();
+		parser.skipWhitespace();
+		if (parser.isNext(JsonString.JSON_STRING_IDENTIFIER, true)) {
+			// strip identifiers and create StringBuilder 
+			StringBuilder sb = new StringBuilder();
+			while (parser.hasNext()) {
+				// end condition
+				if (parser.isNext(JsonString.JSON_STRING_IDENTIFIER, true)) {
+					return new JsonString(sb.toString());
+				} else if (parser.isNext(JsonString.JSON_STRING_ESCAPE_CHARACTER, true)) { // escape characters
+					for (char[] escape : JsonString.JSON_STRING_ESCAPED_CHARACTERS) {
+						if (parser.isNext(escape[1], true)) {
+							sb.append(escape[0]);
+							/*
+							 * Exit the loop if the according character is found, so 
+							 * subsequent meaningful characters are not processed afterwards.
+							 */
+							break;
 						}
-					} else { // standard characters
-						sb.append(parser.get());
 					}
+				} else { // standard characters
+					sb.append(parser.get());
 				}
-				// if the end condition has not been triggered throw an exception
-				parser.setPosition(startingPosition); // do not modify the parser
-				throw new JsonStandardException(String.format("The next element in the JSON parser "
-						+ "%s is not a JSON string.", parser));
-			} else {
-				parser.setPosition(startingPosition); // the parser should not be modified
-				throw new JsonStandardException(String.format("The next element in the JSON parser "
-						+ "%s is not a JSON string.", parser));
 			}
+			// if the end condition has not been triggered throw an exception
+			parser.setPosition(startingPosition); // do not modify the parser
+			throw new JsonStandardException(String.format("The next element in the JSON parser "
+					+ "%s is not a JSON string.", parser));
 		} else {
-			throw new NullPointerException("The JSON parser may not be null.");
+			parser.setPosition(startingPosition); // the parser should not be modified
+			throw new JsonStandardException(String.format("The next element in the JSON parser "
+					+ "%s is not a JSON string.", parser));
 		}
 	}
 	
@@ -193,10 +176,16 @@ public class JsonString extends JsonValue {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj != null && obj.getClass() == this.getClass()) {
+		if (obj instanceof JsonString) {
 			return this.value.equals(((JsonString) obj).value);
 		}
 		return false;
+	}
+
+	@Override
+	public int compareTo(JsonString jsonString) {
+		Objects.requireNonNull(jsonString, String.format("The JSON string \"%s\" cannot be compared to null.", this));
+		return this.value.compareTo(jsonString.value);
 	}
 
 }
