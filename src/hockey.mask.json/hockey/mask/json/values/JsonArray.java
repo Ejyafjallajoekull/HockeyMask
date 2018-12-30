@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Objects;
 
 import hockey.mask.json.JsonStandardException;
 import hockey.mask.json.parser.JsonParser;
@@ -17,7 +18,7 @@ import hockey.mask.json.parser.JsonStringParser;
  * @author Planters
  *
  */
-public class JsonArray extends JsonValue implements List<JsonValue> {
+public final class JsonArray extends JsonValue implements List<JsonValue> {
 	
 	/**
 	 *  The identifier used to identify the start of a JSON formatted array.
@@ -35,13 +36,12 @@ public class JsonArray extends JsonValue implements List<JsonValue> {
 	 */
 	public static final char JSON_ARRAY_VALUE_SEPARATOR = ',';
 	
-	private ArrayList<JsonValue> array = new ArrayList<JsonValue>();
+	private final ArrayList<JsonValue> array = new ArrayList<JsonValue>();
 		
 	/**
 	 * Create a new, empty JSON array.
 	 */
-	public JsonArray() {
-		
+	public JsonArray() {		
 	}
 	
 	/**
@@ -91,18 +91,15 @@ public class JsonArray extends JsonValue implements List<JsonValue> {
 	 * @throws NullPointerException - if null is passed as JSON input string
 	 */
 	public static JsonArray parse(String jsonArray) throws JsonStandardException {
-		if (jsonArray != null) {
-			JsonStringParser jp = new JsonStringParser(jsonArray);
-			JsonArray parsedArray = JsonArray.parseNext(jp);
-			jp.skipWhitespace(); // needed for checking against garbage data
-			if (!jp.hasNext()) {
-				return parsedArray;
-			} else { // the string should not contain any more garbage data
-				throw new JsonStandardException(String.format("The string \"%s\" is not a pure JSON array.", 
-						jsonArray)); 
-			}
-		} else {
-			throw new NullPointerException("A JSON formatted array may not be null.");
+		Objects.requireNonNull(jsonArray, "A JSON formatted array may not be null.");
+		JsonStringParser jp = new JsonStringParser(jsonArray);
+		JsonArray parsedArray = JsonArray.parseNext(jp);
+		jp.skipWhitespace(); // needed for checking against garbage data
+		if (!jp.hasNext()) {
+			return parsedArray;
+		} else { // the string should not contain any more garbage data
+			throw new JsonStandardException(String.format("The string \"%s\" is not a pure JSON array.", 
+					jsonArray)); 
 		}
 	}
 	
@@ -116,42 +113,39 @@ public class JsonArray extends JsonValue implements List<JsonValue> {
 	 * @throws NullPointerException - if null is passed as JSON parser
 	 */
 	public static JsonArray parseNext(JsonParser parser) throws JsonStandardException {
-		if (parser != null) {
-			int startingPosition = parser.getPosition();
-			parser.skipWhitespace();
-			// start condition
-			if (parser.isNext(JsonArray.JSON_ARRAY_START_IDENTIFIER, true)) {
-				JsonArray parsedArray = new JsonArray();
-				boolean firstPassed = false;
-				while (parser.hasNext()) {
-					parser.skipWhitespace();
-					// end condition
-					if (parser.isNext(JsonArray.JSON_ARRAY_END_IDENTIFIER, true)) {
-						return parsedArray;
-					} else { // append value
-						if (firstPassed) {
-							if (parser.isNext(JsonArray.JSON_ARRAY_VALUE_SEPARATOR, true)) {
-								parsedArray.add(JsonValue.parseNext(parser));
-							} else {
-								// throw exception if there is no value separation
-								parser.setPosition(startingPosition); // the parser should not be modified
-								throw new JsonStandardException(String.format("The next element in the JSON parser "
-										+ "%s is not a JSON array.", parser));
-							}
-						} else { // there is no separator on the first element
+		Objects.requireNonNull(parser, "The JSON parser may not be null.");
+		int startingPosition = parser.getPosition();
+		parser.skipWhitespace();
+		// start condition
+		if (parser.isNext(JsonArray.JSON_ARRAY_START_IDENTIFIER, true)) {
+			JsonArray parsedArray = new JsonArray();
+			boolean firstPassed = false;
+			while (parser.hasNext()) {
+				parser.skipWhitespace();
+				// end condition
+				if (parser.isNext(JsonArray.JSON_ARRAY_END_IDENTIFIER, true)) {
+					return parsedArray;
+				} else { // append value
+					if (firstPassed) {
+						if (parser.isNext(JsonArray.JSON_ARRAY_VALUE_SEPARATOR, true)) {
 							parsedArray.add(JsonValue.parseNext(parser));
-							firstPassed = true;
+						} else {
+							// throw exception if there is no value separation
+							parser.setPosition(startingPosition); // the parser should not be modified
+							throw new JsonStandardException(String.format("The next element in the JSON parser "
+									+ "%s is not a JSON array.", parser));
 						}
+					} else { // there is no separator on the first element
+						parsedArray.add(JsonValue.parseNext(parser));
+						firstPassed = true;
 					}
 				}
 			}
-			// throw exception if end condition is not reached
-			parser.setPosition(startingPosition); // the parser should not be modified
-			throw new JsonStandardException(String.format("The next element in the JSON parser "
-					+ "%s is not a JSON array.", parser));
-		} else {
-			throw new NullPointerException("The JSON parser may not be null.");
 		}
+		// throw exception if end condition is not reached
+		parser.setPosition(startingPosition); // the parser should not be modified
+		throw new JsonStandardException(String.format("The next element in the JSON parser "
+				+ "%s is not a JSON array.", parser));
 	}
 	
 	/**
@@ -181,14 +175,11 @@ public class JsonArray extends JsonValue implements List<JsonValue> {
 	 */
 	@Override
 	public boolean addAll(Collection<? extends JsonValue> elementsToAdd) {
-		if (elementsToAdd != null) {
-			if (!elementsToAdd.contains(null)) {
-				return this.array.addAll(elementsToAdd);
-			} else {
-				return false;
-			}
+		Objects.requireNonNull(elementsToAdd, "The collection " + elementsToAdd + " cannot be added.");
+		if (!elementsToAdd.contains(null)) {
+			return this.array.addAll(elementsToAdd);
 		} else {
-			throw new NullPointerException("The collection " + elementsToAdd + " cannot be added.");
+			return false;
 		}
 	}
 	
@@ -202,11 +193,8 @@ public class JsonArray extends JsonValue implements List<JsonValue> {
 	 */
 	@Override
 	public void add(int index, JsonValue value) {
-		if (value != null) {
-			this.array.add(index, value);
-		} else {
-			throw new NullPointerException("Null cannot be added to a JSON array.");
-		}		
+		Objects.requireNonNull(value, "Null cannot be added to a JSON array.");
+		this.array.add(index, value);		
 	}
 
 	/**
@@ -221,15 +209,12 @@ public class JsonArray extends JsonValue implements List<JsonValue> {
 	 */
 	@Override
 	public boolean addAll(int index, Collection<? extends JsonValue> elementsToAdd) {
-		if (elementsToAdd != null) {
-			if (!elementsToAdd.contains(null)) {
-				return this.array.addAll(index, elementsToAdd);
-			} else {
-				return false;
-			}
+		Objects.requireNonNull(elementsToAdd, String.format("The collection %s cannot be added at "
+				+ "position %s.", elementsToAdd, index));
+		if (!elementsToAdd.contains(null)) {
+			return this.array.addAll(index, elementsToAdd);
 		} else {
-			throw new NullPointerException(String.format("The collection %s cannot be added at "
-					+ "position %s.", elementsToAdd, index));
+			return false;
 		}
 	}
 
@@ -374,11 +359,8 @@ public class JsonArray extends JsonValue implements List<JsonValue> {
 	 */
 	@Override
 	public JsonValue set(int index, JsonValue value) {
-		if (value != null) {
-			return this.array.set(index, value);
-		} else {
-			throw new NullPointerException("Null cannot be inserted into a JSON array.");
-		}
+		Objects.requireNonNull(value, "Null cannot be inserted into a JSON array.");
+		return this.array.set(index, value);
 	}
 
 	@Override
@@ -394,7 +376,9 @@ public class JsonArray extends JsonValue implements List<JsonValue> {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj != null && obj.getClass() == this.getClass()) {
+		if (obj == this) {
+			return true;
+		} else if (obj instanceof JsonArray) {
 			return this.array.equals(((JsonArray) obj).array);
 		}
 		return false;
