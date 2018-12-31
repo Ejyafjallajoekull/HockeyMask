@@ -260,14 +260,16 @@ public class JsonObjectTesting implements TestSubject {
 				 */
 			}
 			// test setting a null value
-			JsonObject nullValueObject = new JsonObject();
-			JsonString nullValueKey = JsonObjectTesting.generateRandomString();
-			nullValueObject.set(nullValueKey, null);
-			JsonValue someNull = new JsonNull();
-			TestSubject.assertTestCondition(nullValueObject.get(nullValueKey).equals(someNull), 
-					String.format("Setting the member %s of the JSON object %s to null should result "
-							+ "in the value %s, but resulted into %s.", 
-							nullValueKey, nullValueObject, someNull, nullValueObject.get(nullValueKey)));
+			try {
+				JsonObject nullValueObject = new JsonObject();
+				JsonString nullValueKey = JsonObjectTesting.generateRandomString();
+				nullValueObject.set(nullValueKey, null);
+				throw new TestFailureException("Setting a null member at a JSON object should fail.");
+			} catch (NullPointerException e) {
+				/*
+				 * Do nothing as this is expected behaviour.
+				 */
+			}
 			// test adding new members by setting
 			JsonObject addObject = JsonObjectTesting.generateRandomObject();
 			JsonPair addPair = JsonObjectTesting.generateRandomPair();

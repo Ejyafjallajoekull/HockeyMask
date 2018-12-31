@@ -3,6 +3,7 @@ package hockey.mask.json.values;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Objects;
 
 import hockey.mask.json.JsonStandardException;
 import hockey.mask.json.parser.JsonParser;
@@ -17,7 +18,7 @@ import hockey.mask.json.parser.JsonStringParser;
  * @author Planters
  *
  */
-public class JsonObject extends JsonValue implements Iterable<JsonPair> {
+public final class JsonObject extends JsonValue implements Iterable<JsonPair> {
 
 	/**
 	 *  The identifier used to identify the start of a JSON formatted object.
@@ -35,31 +36,13 @@ public class JsonObject extends JsonValue implements Iterable<JsonPair> {
 	 */
 	public static final char JSON_OBJECT_PAIR_SEPARATOR = ',';
 	
-	private ArrayList<JsonPair> members = new ArrayList<JsonPair>();
+	private final ArrayList<JsonPair> members = new ArrayList<JsonPair>();
 	
 	/**
 	 * Create a new JSON object without any members.
 	 */
 	public JsonObject() {
 	}
-	
-	/**
-	 * Create a new JSON object containing the specified content.
-	 * 
-	 * @param members - the content to be contained
-	 */
-//	public JsonObject(Collection<? extends JsonPair> members) {
-//		super(members);
-//	}
-	
-	/**
-	 * Create a new JSON object with the specified capacity.
-	 * 
-	 * @param capacity - the underlying lists capacity
-	 */
-//	public JsonObject(int capacity) {
-//		super(capacity);
-//	}
 	
 	/**
 	 * Get the names of all members of this JSON object.
@@ -159,18 +142,15 @@ public class JsonObject extends JsonValue implements Iterable<JsonPair> {
 	 * @throws NullPointerException - if null is passed as JSON input string
 	 */
 	public static JsonObject parse(String jsonObject) throws JsonStandardException {
-		if (jsonObject != null) {
-			JsonStringParser jp = new JsonStringParser(jsonObject);
-			JsonObject parsedObject = JsonObject.parseNext(jp);
-			jp.skipWhitespace(); // needed for checking against garbage data
-			if (!jp.hasNext()) {
-				return parsedObject;
-			} else { // the string should not contain any more garbage data
-				throw new JsonStandardException(String.format("The string \"%s\" is not a pure JSON object.", 
-						jsonObject)); 
-			}
-		} else {
-			throw new NullPointerException("A JSON formatted object may not be null.");
+		Objects.requireNonNull(jsonObject, "A JSON formatted object may not be null.");
+		JsonStringParser jp = new JsonStringParser(jsonObject);
+		JsonObject parsedObject = JsonObject.parseNext(jp);
+		jp.skipWhitespace(); // needed for checking against garbage data
+		if (!jp.hasNext()) {
+			return parsedObject;
+		} else { // the string should not contain any more garbage data
+			throw new JsonStandardException(String.format("The string \"%s\" is not a pure JSON object.", 
+					jsonObject)); 
 		}
 	}
 	
@@ -184,42 +164,39 @@ public class JsonObject extends JsonValue implements Iterable<JsonPair> {
 	 * @throws NullPointerException - if null is passed as JSON parser
 	 */
 	public static JsonObject parseNext(JsonParser parser) throws JsonStandardException {
-		if (parser != null) {
-			int startingPosition = parser.getPosition();
-			parser.skipWhitespace();
-			// start condition
-			if (parser.isNext(JsonObject.JSON_OBJECT_START_IDENTIFIER, true)) {
-				JsonObject parsedObject = new JsonObject();
-				boolean firstPassed = false;
-				while (parser.hasNext()) {
-					parser.skipWhitespace();
-					// end condition
-					if (parser.isNext(JsonObject.JSON_OBJECT_END_IDENTIFIER, true)) {
-						return parsedObject;
-					} else { // append value
-						if (firstPassed) {
-							if (parser.isNext(JsonObject.JSON_OBJECT_PAIR_SEPARATOR, true)) {
-								parsedObject.add(JsonPair.parseNext(parser));
-							} else {
-								// throw exception if there is no value separation
-								parser.setPosition(startingPosition); // the parser should not be modified
-								throw new JsonStandardException(String.format("The next element in the JSON parser "
-										+ "%s is not a JSON object.", parser));
-							}
-						} else { // there is no separator on the first element
+		Objects.requireNonNull(parser, "The JSON parser may not be null.");
+		int startingPosition = parser.getPosition();
+		parser.skipWhitespace();
+		// start condition
+		if (parser.isNext(JsonObject.JSON_OBJECT_START_IDENTIFIER, true)) {
+			JsonObject parsedObject = new JsonObject();
+			boolean firstPassed = false;
+			while (parser.hasNext()) {
+				parser.skipWhitespace();
+				// end condition
+				if (parser.isNext(JsonObject.JSON_OBJECT_END_IDENTIFIER, true)) {
+					return parsedObject;
+				} else { // append value
+					if (firstPassed) {
+						if (parser.isNext(JsonObject.JSON_OBJECT_PAIR_SEPARATOR, true)) {
 							parsedObject.add(JsonPair.parseNext(parser));
-							firstPassed = true;
+						} else {
+							// throw exception if there is no value separation
+							parser.setPosition(startingPosition); // the parser should not be modified
+							throw new JsonStandardException(String.format("The next element in the JSON parser "
+									+ "%s is not a JSON object.", parser));
 						}
+					} else { // there is no separator on the first element
+						parsedObject.add(JsonPair.parseNext(parser));
+						firstPassed = true;
 					}
 				}
 			}
-			// throw exception if end condition is not reached
-			parser.setPosition(startingPosition); // the parser should not be modified
-			throw new JsonStandardException(String.format("The next element in the JSON parser "
-					+ "%s is not a JSON object.", parser));
-		} else {
-			throw new NullPointerException("The JSON parser may not be null.");
 		}
+		// throw exception if end condition is not reached
+		parser.setPosition(startingPosition); // the parser should not be modified
+		throw new JsonStandardException(String.format("The next element in the JSON parser "
+				+ "%s is not a JSON object.", parser));
 	}
 	
 	/**
@@ -231,11 +208,8 @@ public class JsonObject extends JsonValue implements Iterable<JsonPair> {
 	 * @throws NullPointerException if the member to add is null
 	 */
 	public void add(JsonPair pair) {
-		if (pair != null) {
-			this.members.add(pair);
-		} else {
-			throw new NullPointerException("Null is no valid member for a JSON object.");
-		}
+		Objects.requireNonNull(pair, "Null is no valid member for a JSON object.");
+		this.members.add(pair);
 	}
 
 	/**
@@ -249,14 +223,11 @@ public class JsonObject extends JsonValue implements Iterable<JsonPair> {
 	 * @throws NullPointerException if the specified collection is null
 	 */
 	public boolean addAll(Collection<? extends JsonPair> pairsToAdd) {
-		if (pairsToAdd != null) {
-			if (!pairsToAdd.contains(null)) {
-				return this.members.addAll(pairsToAdd);
-			} else {
-				return false;
-			}
+		Objects.requireNonNull(pairsToAdd, "The collection " + pairsToAdd + " cannot be added.");
+		if (!pairsToAdd.contains(null)) {
+			return this.members.addAll(pairsToAdd);
 		} else {
-			throw new NullPointerException("The collection " + pairsToAdd + " cannot be added.");
+			return false;
 		}
 	}
 
@@ -314,7 +285,7 @@ public class JsonObject extends JsonValue implements Iterable<JsonPair> {
 	 * @param value - the value to set for the specified member
 	 * @return the value previously held by the set member or null if the member has not 
 	 * existed prior to this function call
-	 * @throws NullPointerException if the name is null
+	 * @throws NullPointerException if name or value is null
 	 */
 	public JsonValue set(JsonString name, JsonValue value) {
 		for (JsonPair pair : this.members) {
@@ -336,7 +307,9 @@ public class JsonObject extends JsonValue implements Iterable<JsonPair> {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj != null && obj.getClass() == this.getClass()) {
+		if (obj == this) {
+			return true;
+		} else if (obj instanceof JsonObject) {
 			return this.members.equals(((JsonObject) obj).members);
 		}
 		return false;

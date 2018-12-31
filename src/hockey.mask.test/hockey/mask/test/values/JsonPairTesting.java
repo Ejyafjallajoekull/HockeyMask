@@ -58,9 +58,15 @@ public class JsonPairTesting implements TestSubject {
 			jjp = new JsonPair(new JsonString(testName.getValue() + "test"), testValue);
 			TestSubject.assertTestCondition(!jp.equals(jjp), 
 					String.format("The JSON pair %s should not equal the pair %s.",	jp, jjp));
-			jjp = new JsonPair(testName, null);
-			TestSubject.assertTestCondition(!jp.equals(jjp), 
-					String.format("The JSON pair %s should not equal the pair %s.",	jp, jjp));
+			try {
+				JsonPair nullJP = new JsonPair(testName, null);
+				throw new TestFailureException(String.format("An exception should have been thrown as "
+						+ "the a JSON value cannot be null, instead %s has been returned.", nullJP));
+			} catch (NullPointerException e) {
+				/*
+				 * Do nothing as this is the expected behaviour.
+				 */
+			}
 			try {
 				jp = new JsonPair(null ,testValue);
 				throw new TestFailureException("An exception should have been thrown as "
@@ -86,18 +92,18 @@ public class JsonPairTesting implements TestSubject {
 			JsonString testName = new JsonString(new String(randomString));
 			JsonPairTesting.RANDOM.nextBytes(randomString);
 			JsonValue testValue = new JsonString(new String(randomString));
-//				jp.setName(testName); // immutable
 			// test null values
-			JsonPair jp = new JsonPair(testName, null);
-			JsonValue someNull = new JsonNull();
-			TestSubject.assertTestCondition(jp.getName().equals(testName), 
-					String.format("The JSON pair %s should have the name \"%s\", "
-							+ "but has the name \"%s\".", jp, testName, jp.getName()));
-			TestSubject.assertTestCondition(jp.getValue().equals(someNull), 
-					String.format("The JSON pair %s should have the value \"%s\", "
-							+ "but has the value \"%s\".", jp, testValue, jp.getValue()));
+			try {
+				JsonPair nullJP = new JsonPair(testName, null);
+				throw new TestFailureException(String.format("An exception should have been thrown as "
+						+ "the a JSON value cannot be null, instead %s has been returned.", nullJP));
+			} catch (NullPointerException e) {
+				/*
+				 * Do nothing as this is the expected behaviour.
+				 */
+			}
 			// test actual values
-			jp.setValue(testValue);
+			JsonPair jp = new JsonPair(testName, testValue);
 			TestSubject.assertTestCondition(jp.getName().equals(testName), 
 					String.format("The JSON pair %s should have the name \"%s\", "
 							+ "but has the name \"%s\".", jp, testName, jp.getName()));
@@ -105,23 +111,15 @@ public class JsonPairTesting implements TestSubject {
 					String.format("The JSON pair %s should have the value \"%s\", "
 							+ "but has the value \"%s\".", jp, testValue, jp.getValue()));
 			// test setting null
-			jp.setValue(null);
-			TestSubject.assertTestCondition(jp.getName().equals(testName), 
-					String.format("The JSON pair %s should have the name \"%s\", "
-							+ "but has the name \"%s\".", jp, testName, jp.getName()));
-			TestSubject.assertTestCondition(jp.getValue().equals(someNull), 
-					String.format("The JSON pair %s should have the value \"%s\", "
-							+ "but has the value \"%s\".", jp, someNull, jp.getValue()));
-			// name is now immutable
-//			try {
-//				jp.setName(null);
-//				throw new TestFailureException("An exception should have been thrown as "
-//						+ "the JSON standard has been violated.");
-//			} catch (JsonStandardException e) {
-//				/*
-//				 * Do nothing as this is the expected behaviour.
-//				 */
-//			}
+			try {
+				jp.setValue(null);
+				throw new TestFailureException("An exception should have been thrown as "
+						+ "the a JSON value cannot be null.");
+			} catch (NullPointerException e) {
+				/*
+				 * Do nothing as this is the expected behaviour.
+				 */
+			}
 		}
 	}
 	
