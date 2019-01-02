@@ -252,7 +252,7 @@ public class JsonValueTesting implements TestSubject {
 		} else if (randomChoice < 0.77d) {	// the chance needs to be small or otherwise very big arrays will be created
 			return JsonValueTesting.generateRandomArray();
 		} else {
-			return new JsonNull();
+			return JsonNull.JSON_NULL;
 		}
 	}
 

@@ -48,10 +48,10 @@ public class JsonArrayTesting implements TestSubject {
 				String.format("The JSON array %s should equal %s.", firstArray, secondArray));
 		TestSubject.assertTestCondition(!firstArray.equals(null), 
 				String.format("The JSON array %s should not equal %s.", firstArray, null));
-		secondArray.add(new JsonNull());
+		secondArray.add(JsonNull.JSON_NULL);
 		TestSubject.assertTestCondition(!firstArray.equals(secondArray), 
 				String.format("The JSON array %s should not equal %s.", firstArray, secondArray));
-		firstArray.add(new JsonNull());
+		firstArray.add(JsonNull.JSON_NULL);
 		TestSubject.assertTestCondition(firstArray.equals(secondArray), 
 				String.format("The JSON array %s should equal %s.", firstArray, secondArray));
 	}
@@ -90,7 +90,7 @@ public class JsonArrayTesting implements TestSubject {
 			TestSubject.assertTestCondition(simpleAdd.equals(forEachArray), 
 					String.format("The JSON array %s should equal %s.", simpleAdd, forEachArray));
 			// test insertion
-			JsonValue insertionValue = new JsonNull();
+			JsonValue insertionValue = JsonNull.JSON_NULL;
 			int insertionIndex = 0;
 			if (simpleAdd.size() > 0) {
 				insertionIndex = JsonArrayTesting.RANDOM.nextInt(simpleAdd.size());
@@ -104,7 +104,7 @@ public class JsonArrayTesting implements TestSubject {
 							+ "but holds %s instead.", simpleAdd, insertionValue, insertionIndex, 
 							simpleAdd.get(insertionIndex)));
 			try {
-				simpleAdd.add(simpleAdd.size() + 1, new JsonNull());
+				simpleAdd.add(simpleAdd.size() + 1, JsonNull.JSON_NULL);
 				throw new TestFailureException("Adding out of bounds to a JSON array should fail.");
 			} catch (IndexOutOfBoundsException e) {
 				/*
@@ -265,7 +265,7 @@ public class JsonArrayTesting implements TestSubject {
 		JsonArray testArray = new JsonArray();
 		TestSubject.assertTestCondition(testArray.isEmpty(), String.format("The JSON array %s "
 				+ "should be empty.", testArray));
-		testArray.add(new JsonNull());
+		testArray.add(JsonNull.JSON_NULL);
 		TestSubject.assertTestCondition(!testArray.isEmpty(), String.format("The JSON array %s "
 				+ "should not be empty.", testArray));
 		testArray.clear();

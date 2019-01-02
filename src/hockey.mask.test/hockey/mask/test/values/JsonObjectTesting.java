@@ -252,7 +252,7 @@ public class JsonObjectTesting implements TestSubject {
 			// test setting a null key
 			try {
 				JsonObject setNull = new JsonObject();
-				setNull.set(null, new JsonNull());
+				setNull.set(null, JsonNull.JSON_NULL);
 				throw new TestFailureException("Setting a null member at a JSON object should fail.");
 			} catch (NullPointerException e) {
 				/*

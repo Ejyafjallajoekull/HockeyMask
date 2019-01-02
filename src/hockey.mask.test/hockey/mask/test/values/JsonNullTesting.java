@@ -35,8 +35,8 @@ public class JsonNullTesting implements TestSubject {
 	 * @throws TestFailureException the test did fail
 	 */
 	private static void testConstructors() throws TestFailureException {
-		JsonNull firstNull = new JsonNull();
-		JsonNull secondNull = new JsonNull();
+		JsonNull firstNull = JsonNull.JSON_NULL;
+		JsonNull secondNull = JsonNull.JSON_NULL;
 		TestSubject.assertTestCondition(firstNull.equals(secondNull), 
 				String.format("The JSON null %s should equal %s", 
 						firstNull, secondNull));
@@ -50,7 +50,7 @@ public class JsonNullTesting implements TestSubject {
 	 * @throws TestFailureException the test did fail
 	 */
 	private static void testToJson() throws TestFailureException {
-		JsonNull testNull = new JsonNull();
+		JsonNull testNull = JsonNull.JSON_NULL;
 		TestSubject.assertTestCondition(testNull.toJson().equals(JsonNull.JSON_NULL_VALUE), 
 				String.format("The JSON representation of null "
 						+ "should equal the value \"%s\", but is \"%s\".", 
@@ -135,7 +135,7 @@ public class JsonNullTesting implements TestSubject {
 			JsonNull[] jsonTestNulls = new JsonNull[JsonNullTesting.RANDOM.nextInt(20) + 1];
 			String testString = "  "; // Some whitespace
 			for (int j = 0; j < jsonTestNulls.length; j++) {
-				jsonTestNulls[j] = new JsonNull();
+				jsonTestNulls[j] = JsonNull.JSON_NULL;
 				testString += jsonTestNulls[j].toJson() + "   ";
 			}
 			try {
@@ -183,7 +183,7 @@ public class JsonNullTesting implements TestSubject {
 	 * @throws TestFailureException
 	 */
 	private static void testType() throws TestFailureException {
-			JsonNull testNull = new JsonNull();
+			JsonNull testNull = JsonNull.JSON_NULL;
 			TestSubject.assertTestCondition(testNull.getType() == JsonValueTypes.NULL, 
 					String.format("The JSON null %s should be of type %s, but is of type %s "
 					+ "instead.", testNull, JsonValueTypes.NULL, testNull.getType()));

@@ -72,7 +72,7 @@ public final class JsonArray extends JsonValue implements List<JsonValue> {
 			if (val != null) {
 				jsonString.append(val.toJson());
 			} else {
-				jsonString.append((new JsonNull()).toJson());
+				jsonString.append(JsonNull.JSON_NULL.toJson());
 			}
 			if (i != this.size() - 1) {
 				jsonString.append(JsonArray.JSON_ARRAY_VALUE_SEPARATOR);

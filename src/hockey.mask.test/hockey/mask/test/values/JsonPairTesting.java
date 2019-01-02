@@ -242,7 +242,7 @@ public class JsonPairTesting implements TestSubject {
 			// create random strings
 			byte[] randomString = new byte[JsonPairTesting.RANDOM.nextInt(200)];
 			JsonPairTesting.RANDOM.nextBytes(randomString);
-			JsonPair jsonTestString = new JsonPair(new JsonString(new String(randomString)), new JsonNull());
+			JsonPair jsonTestString = new JsonPair(new JsonString(new String(randomString)), JsonNull.JSON_NULL);
 			String testString = jsonTestString.toJson();
 			// remove the separator
 			testString = testString.replace(Character.toString(JsonPair.JSON_PAIR_SEPARATOR), "");
