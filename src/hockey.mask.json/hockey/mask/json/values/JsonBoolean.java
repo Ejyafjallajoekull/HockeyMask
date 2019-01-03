@@ -1,5 +1,7 @@
 package hockey.mask.json.values;
 
+import java.util.Objects;
+
 import hockey.mask.json.JsonStandardException;
 import hockey.mask.json.parser.JsonParser;
 import hockey.mask.json.parser.JsonStringParser;
@@ -10,7 +12,7 @@ import hockey.mask.json.parser.JsonStringParser;
  * @author Planters
  *
  */
-public class JsonBoolean extends JsonValue {
+public final class JsonBoolean extends JsonValue {
 
 	/**
 	 * The JSON representation of a true boolean.
@@ -22,6 +24,16 @@ public class JsonBoolean extends JsonValue {
 	 */
 	public static final String JSON_FALSE_VALUE = "false";
 	
+	/**
+	 * The JSON boolean true.
+	 */
+	public static final JsonBoolean JSON_TRUE = new JsonBoolean(true);
+	
+	/**
+	 * The JSON boolean false.
+	 */
+	public static final JsonBoolean JSON_FALSE = new JsonBoolean(false);
+	
 	private boolean value = false;
 	
 	/**
@@ -29,17 +41,9 @@ public class JsonBoolean extends JsonValue {
 	 * 
 	 * @param jsonBoolean - the value of this JSON boolean
 	 */
-	public JsonBoolean(boolean jsonBoolean) {
-		this.setValue(jsonBoolean);
-	}
-	
-	/**
-	 * Set the JSON boolean to the specified boolean value.
-	 * 
-	 * @param value - the value to set
-	 */
-	private void setValue(boolean value) {
-		this.value = value;
+	private JsonBoolean(boolean jsonBoolean) {
+		// private constructor to prevent instantiation
+		this.value = jsonBoolean;
 	}
 	
 	/**
@@ -63,7 +67,7 @@ public class JsonBoolean extends JsonValue {
 	 */
 	@Override
 	public String toJson() {
-		if (this.getValue()) {
+		if (this.value) {
 			return JsonBoolean.JSON_TRUE_VALUE;
 		} else {
 			return JsonBoolean.JSON_FALSE_VALUE;
@@ -79,18 +83,15 @@ public class JsonBoolean extends JsonValue {
 	 * @throws NullPointerException - if null is passed as JSON input string
 	 */
 	public static JsonBoolean parse(String jsonBoolean) throws JsonStandardException {
-		if (jsonBoolean != null) {
-			JsonStringParser jp = new JsonStringParser(jsonBoolean);
-			JsonBoolean parsedBoolean = JsonBoolean.parseNext(jp);
-			jp.skipWhitespace(); // needed for checking against garbage data
-			if (!jp.hasNext()) {
-				return parsedBoolean;
-			} else { // the string should not contain any more garbage data
-				throw new JsonStandardException(String.format("The string \"%s\" is not a pure "
-						+ "JSON boolean.", jsonBoolean)); 
-			}
-		} else {
-			throw new NullPointerException("A JSON formatted boolean may not be null.");
+		Objects.requireNonNull(jsonBoolean, "A JSON formatted boolean may not be null.");
+		JsonStringParser jp = new JsonStringParser(jsonBoolean);
+		JsonBoolean parsedBoolean = JsonBoolean.parseNext(jp);
+		jp.skipWhitespace(); // needed for checking against garbage data
+		if (!jp.hasNext()) {
+			return parsedBoolean;
+		} else { // the string should not contain any more garbage data
+			throw new JsonStandardException(String.format("The string \"%s\" is not a pure "
+					+ "JSON boolean.", jsonBoolean)); 
 		}
 	}
 	
@@ -104,32 +105,31 @@ public class JsonBoolean extends JsonValue {
 	 * @throws NullPointerException - if null is passed as JSON parser
 	 */
 	public static JsonBoolean parseNext(JsonParser parser) throws JsonStandardException {
-		if (parser != null) {
-			int startingPosition = parser.getPosition();
-			parser.skipWhitespace();
-			if (parser.isNext(JsonBoolean.JSON_TRUE_VALUE, true)) {
-				return new JsonBoolean(true);
-			} else if (parser.isNext(JsonBoolean.JSON_FALSE_VALUE, true)) {
-				return new JsonBoolean(false);
-			} else {
-				parser.setPosition(startingPosition); // the parser should not be modified
-				throw new JsonStandardException(String.format("The next element in the JSON parser "
-						+ "%s is not a JSON boolean.", parser));
-			}
+		Objects.requireNonNull(parser, "The JSON parser may not be null.");
+		int startingPosition = parser.getPosition();
+		parser.skipWhitespace();
+		if (parser.isNext(JsonBoolean.JSON_TRUE_VALUE, true)) {
+			return new JsonBoolean(true);
+		} else if (parser.isNext(JsonBoolean.JSON_FALSE_VALUE, true)) {
+			return new JsonBoolean(false);
 		} else {
-			throw new NullPointerException("The JSON parser may not be null.");
+			parser.setPosition(startingPosition); // the parser should not be modified
+			throw new JsonStandardException(String.format("The next element in the JSON parser "
+					+ "%s is not a JSON boolean.", parser));
 		}
 	}
 	
 	@Override
 	public int hashCode() {
-		return (this.value ? 1231 : 1237);
+		return Boolean.hashCode(this.value);
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj != null && obj.getClass() == this.getClass()) {
-			return this.getValue() == ((JsonBoolean) obj).getValue();
+		if (obj == this) {
+			return true;
+		} else if (obj instanceof JsonBoolean) {
+			return this.value == ((JsonBoolean) obj).value;
 		}
 		return false;
 	}

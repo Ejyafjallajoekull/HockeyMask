@@ -199,7 +199,7 @@ public class JsonValueTesting implements TestSubject {
 	 * @return a random JSON boolean
 	 */
 	private static JsonBoolean generateRandomBoolean() {
-		return new JsonBoolean(JsonValueTesting.RANDOM.nextBoolean());
+		return JsonValueTesting.RANDOM.nextBoolean() ? JsonBoolean.JSON_TRUE : JsonBoolean.JSON_FALSE;
 	}
 	
 	/**

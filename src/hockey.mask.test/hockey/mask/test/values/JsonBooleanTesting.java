@@ -37,8 +37,8 @@ public class JsonBooleanTesting implements TestSubject {
 	 */
 	private static void testConstructors() throws TestFailureException {
 		// test true and true
-		JsonBoolean firstBool = new JsonBoolean(true);
-		JsonBoolean secondBool = new JsonBoolean(true);
+		JsonBoolean firstBool = JsonBoolean.JSON_TRUE;
+		JsonBoolean secondBool = JsonBoolean.JSON_TRUE;
 		TestSubject.assertTestCondition(firstBool.equals(secondBool), 
 				String.format("The JSON boolean %s should equal %s", 
 						firstBool, secondBool));
@@ -46,8 +46,8 @@ public class JsonBooleanTesting implements TestSubject {
 		TestSubject.assertTestCondition(!firstBool.equals(null), 
 				String.format("The JSON boolean %s should not equal a Java null.", firstBool));
 		// test false and false
-		firstBool = new JsonBoolean(false);
-		secondBool = new JsonBoolean(false);
+		firstBool = JsonBoolean.JSON_FALSE;
+		secondBool = JsonBoolean.JSON_FALSE;
 		TestSubject.assertTestCondition(firstBool.equals(secondBool), 
 				String.format("The JSON boolean %s should equal %s", 
 						firstBool, secondBool));
@@ -55,8 +55,8 @@ public class JsonBooleanTesting implements TestSubject {
 		TestSubject.assertTestCondition(!firstBool.equals(null), 
 				String.format("The JSON boolean %s should not equal a Java null.", firstBool));
 		// test false and false
-		firstBool = new JsonBoolean(true);
-		secondBool = new JsonBoolean(false);
+		firstBool = JsonBoolean.JSON_TRUE;
+		secondBool = JsonBoolean.JSON_FALSE;
 		TestSubject.assertTestCondition(!firstBool.equals(secondBool), 
 				String.format("The JSON boolean %s should not equal %s", 
 						firstBool, secondBool));
@@ -68,11 +68,11 @@ public class JsonBooleanTesting implements TestSubject {
 	 * @throws TestFailureException the test did fail
 	 */
 	private static void testGetValue() throws TestFailureException {
-		JsonBoolean testBool = new JsonBoolean(true);
+		JsonBoolean testBool = JsonBoolean.JSON_TRUE;
 		TestSubject.assertTestCondition(testBool.getValue(), 
 				String.format("The JSON boolean %s should hold the value %s, but holds %s.", 
 						testBool, true, testBool.getValue()));
-		testBool = new JsonBoolean(false);
+		testBool = JsonBoolean.JSON_FALSE;
 		TestSubject.assertTestCondition(!testBool.getValue(), 
 				String.format("The JSON boolean %s should hold the value %s, but holds %s.", 
 						testBool, false, testBool.getValue()));
@@ -84,12 +84,12 @@ public class JsonBooleanTesting implements TestSubject {
 	 * @throws TestFailureException the test did fail
 	 */
 	private static void testToJson() throws TestFailureException {
-		JsonBoolean testBool = new JsonBoolean(true);
+		JsonBoolean testBool = JsonBoolean.JSON_TRUE;
 		TestSubject.assertTestCondition(testBool.toJson().equals(JsonBoolean.JSON_TRUE_VALUE), 
 				String.format("The JSON representation of a true boolean "
 						+ "should equal the value \"%s\", but is \"%s\".", 
 						JsonBoolean.JSON_TRUE_VALUE, testBool.toJson()));
-		testBool = new JsonBoolean(false);
+		testBool = JsonBoolean.JSON_FALSE;
 		TestSubject.assertTestCondition(testBool.toJson().equals(JsonBoolean.JSON_FALSE_VALUE), 
 				String.format("The JSON representation of a false boolean "
 						+ "should equal the value \"%s\", but is \"%s\".", 
@@ -187,7 +187,7 @@ public class JsonBooleanTesting implements TestSubject {
 			JsonBoolean[] jsonTestBools = new JsonBoolean[JsonBooleanTesting.RANDOM.nextInt(20) + 1];
 			String testString = "  "; // Some whitespace
 			for (int j = 0; j < jsonTestBools.length; j++) {
-				jsonTestBools[j] = new JsonBoolean(JsonBooleanTesting.RANDOM.nextBoolean());
+				jsonTestBools[j] = JsonBooleanTesting.RANDOM.nextBoolean() ? JsonBoolean.JSON_TRUE : JsonBoolean.JSON_FALSE;
 				testString += jsonTestBools[j].toJson() + "   ";
 			}
 			try {
@@ -235,7 +235,7 @@ public class JsonBooleanTesting implements TestSubject {
 	 * @throws TestFailureException
 	 */
 	private static void testType() throws TestFailureException {
-			JsonBoolean testBoolean = new JsonBoolean(JsonBooleanTesting.RANDOM.nextBoolean());
+			JsonBoolean testBoolean = JsonBooleanTesting.RANDOM.nextBoolean() ? JsonBoolean.JSON_TRUE : JsonBoolean.JSON_FALSE;
 			TestSubject.assertTestCondition(testBoolean.getType() == JsonValueTypes.BOOLEAN, 
 					String.format("The JSON boolean %s should be of type %s, but is of type %s "
 					+ "instead.", testBoolean, JsonValueTypes.BOOLEAN, testBoolean.getType()));
