@@ -1,7 +1,7 @@
 package hockey.mask.test.values;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Random;
 
 import hockey.mask.json.JsonStandardException;
@@ -10,7 +10,6 @@ import hockey.mask.json.values.JsonArray;
 import hockey.mask.json.values.JsonNull;
 import hockey.mask.json.values.JsonNumber;
 import hockey.mask.json.values.JsonObject;
-import hockey.mask.json.values.JsonPair;
 import hockey.mask.json.values.JsonString;
 import hockey.mask.json.values.JsonValue;
 import hockey.mask.json.values.JsonValueTypes;
@@ -31,7 +30,6 @@ public class JsonObjectTesting implements TestSubject {
 	public void runAllTests() throws TestFailureException {
 		JsonObjectTesting.testConstructors();
 		JsonObjectTesting.testAdding();
-		JsonObjectTesting.testAddingAll();
 		JsonObjectTesting.testClear();
 		JsonObjectTesting.testHasMembers();
 		JsonObjectTesting.testHasMember();
@@ -57,11 +55,12 @@ public class JsonObjectTesting implements TestSubject {
 				String.format("The JSON object %s should equal %s.", firstObject, secondObject));
 		TestSubject.assertTestCondition(!firstObject.equals(null), 
 				String.format("The JSON object %s should not equal %s.", firstObject, null));
-		JsonPair pair = JsonObjectTesting.generateRandomPair();
-		secondObject.add(pair);
+		JsonString s = JsonObjectTesting.generateRandomString();
+		JsonValue v = JsonValueTesting.generateRandomValue();
+		secondObject.add(s, v);
 		TestSubject.assertTestCondition(!firstObject.equals(secondObject), 
 				String.format("The JSON object %s should not equal %s.", firstObject, secondObject));
-		firstObject.add(pair);
+		firstObject.add(s, v);
 		TestSubject.assertTestCondition(firstObject.equals(secondObject), 
 				String.format("The JSON object %s should equal %s.", firstObject, secondObject));
 	}
@@ -76,82 +75,53 @@ public class JsonObjectTesting implements TestSubject {
 			// test adding null
 			try {
 				JsonObject addNull = new JsonObject();
-				addNull.add(null);
-				throw new TestFailureException("Adding a null member to a JSON object should fail.");
+				addNull.add(null, JsonValueTesting.generateRandomValue());
+				throw new TestFailureException("Adding a null member name to a JSON object should fail.");
 			} catch (NullPointerException e) {
 				/*
 				 * Do nothing as this is expected behaviour.
 				 */
 			}
-			// test adding random members
-			JsonObject addObject = new JsonObject();
-			ArrayList<JsonPair> testMembers = JsonObjectTesting.generateRandomMemberList();
-			for (int j = 0; j < testMembers.size(); j++) {
-				addObject.add(testMembers.get(j));
-			}
-			TestSubject.assertTestCondition(addObject.size() == testMembers.size(), 
-					String.format("The JSON object %s should have the size %s, but has %s.", 
-							addObject, testMembers.size(), addObject.size()));
-			int indexMember = 0;
-			for (JsonPair member : addObject) {
-				TestSubject.assertTestCondition(member.equals(testMembers.get(indexMember)), 
-						String.format("The JSON object %s should hold the value %s at index %s, "
-								+ "but holds %s instead.", addObject, testMembers.get(indexMember), indexMember, member));
-				indexMember++;
-			}
-		}
-	}
-	
-	/**
-	 * Test adding multiple members to JSON objects. Additionally tests size function and iterator.
-	 * 
-	 * @throws TestFailureException the test did fail
-	 */
-	private static void testAddingAll() throws TestFailureException {
-		for (int i = 0; i < 10000; i++) {
-			// test adding null
 			try {
 				JsonObject addNull = new JsonObject();
-				addNull.addAll(null);
-				throw new TestFailureException("Adding a null member to a JSON object should fail.");
+				addNull.add(JsonObjectTesting.generateRandomString(), null);
+				throw new TestFailureException("Adding a null member value to a JSON object should fail.");
 			} catch (NullPointerException e) {
 				/*
 				 * Do nothing as this is expected behaviour.
 				 */
 			}
-			// test adding null containing collections
-			JsonObject addContainNullObject = new JsonObject();
-			ArrayList<JsonPair> testContainNullMembers = JsonObjectTesting.generateRandomMemberList();
-			testContainNullMembers.add(null);
-			boolean addContainNullBool = addContainNullObject.addAll(testContainNullMembers);
-			TestSubject.assertTestCondition(!addContainNullBool, 
-					String.format("Adding the collection %s to the JSON object %s should return false.", 
-							testContainNullMembers, addContainNullObject));
-			TestSubject.assertTestCondition(addContainNullObject.size() == 0, 
-					String.format("The JSON object %s should have the size %s, but has %s.", 
-							addContainNullObject, 0, addContainNullObject.size()));
 			// test adding random members
 			JsonObject addObject = new JsonObject();
-			ArrayList<JsonPair> testMembers = JsonObjectTesting.generateRandomMemberList();
-			boolean addBool = addObject.addAll(testMembers);
-			if (testMembers.size() != 0) {
-				TestSubject.assertTestCondition(addBool, 
-						String.format("Adding the collection %s to the JSON object %s should return true.", 
-								testMembers, addObject));
-			} else {
-				TestSubject.assertTestCondition(!addBool, 
-						String.format("Adding the collection %s to the JSON object %s should return false.", 
-								testMembers, addObject));
+			JsonString[] testNames = new JsonString[JsonObjectTesting.RANDOM.nextInt(50)];
+			JsonValue[] testValues = new JsonValue[testNames.length];
+			for (int j = 0; j < testNames.length; j++) {
+				testNames[j] = JsonObjectTesting.generateRandomString();
+				testValues[j] = JsonValueTesting.generateRandomValue();
+				addObject.add(testNames[j], testValues[j]);
 			}
-			TestSubject.assertTestCondition(addObject.size() == testMembers.size(), 
+			TestSubject.assertTestCondition(addObject.size() == testNames.length, 
 					String.format("The JSON object %s should have the size %s, but has %s.", 
-							addObject, testMembers.size(), addObject.size()));
-			int indexMember = 0;
-			for (JsonPair member : addObject) {
-				TestSubject.assertTestCondition(member.equals(testMembers.get(indexMember)), 
+							addObject, testNames.length, addObject.size()));
+			JsonString[] memberNames = addObject.getNames();
+			HashMap<JsonString, Integer> memberMap = new HashMap<JsonString, Integer>();
+			for (int j = 0; j < memberNames.length; j++) {
+				// keep track of potential multiple occurrences of member names
+				Integer memberCount = memberMap.get(memberNames[j]); 
+				if (memberCount != null) {
+					memberCount++;
+				} else {
+					memberCount = 0;
+				}
+				memberMap.put(memberNames[j], memberCount);
+				TestSubject.assertTestCondition(memberNames[j].equals(testNames[j]), 
+						String.format("The JSON object %s should hold the member %s at index %s, "
+								+ "but holds %s instead.", 
+								addObject, testNames[j], j, memberNames[j]));
+				TestSubject.assertTestCondition(addObject.getValues(memberNames[j])[memberCount].equals(testValues[j]), 
 						String.format("The JSON object %s should hold the value %s at index %s, "
-								+ "but holds %s instead.", addObject, testMembers.get(indexMember), indexMember, member));
-				indexMember++;
+								+ "but holds %s instead.", 
+								addObject, testValues[j], j, addObject.getValues(memberNames[j])[memberCount]));
 			}
 		}
 	}
@@ -187,7 +157,7 @@ public class JsonObjectTesting implements TestSubject {
 		JsonObject testObject = new JsonObject();
 		TestSubject.assertTestCondition(!testObject.hasMembers(), String.format("The JSON object %s "
 				+ "should not have any members.", testObject));
-		testObject.add(JsonObjectTesting.generateRandomPair());
+		testObject.add(JsonObjectTesting.generateRandomString(), JsonValueTesting.generateRandomValue());
 		TestSubject.assertTestCondition(testObject.hasMembers(), String.format("The JSON object %s "
 				+ "should have members.", testObject));
 	}
@@ -202,13 +172,13 @@ public class JsonObjectTesting implements TestSubject {
 			JsonObject testObject = JsonObjectTesting.generateRandomObject();
 			TestSubject.assertTestCondition(!testObject.hasMember(null), String.format("The JSON object %s "
 					+ "can not contain a member with a null key.", testObject));
-			JsonPair query = JsonObjectTesting.generateRandomPair();
-			testObject.add(query);
-			TestSubject.assertTestCondition(testObject.hasMember(query.getName()), String.format("The JSON object %s "
-					+ "should have the member %s.", testObject, query.getName()));
-			testObject.remove(query.getName());
-			TestSubject.assertTestCondition(!testObject.hasMember(query.getName()), String.format("The JSON object %s "
-					+ "should not have the member %s.", testObject, query.getName()));
+			JsonString query = JsonObjectTesting.generateRandomString();
+			testObject.add(query, JsonValueTesting.generateRandomValue());
+			TestSubject.assertTestCondition(testObject.hasMember(query), String.format("The JSON object %s "
+					+ "should have the member %s.", testObject, query));
+			testObject.remove(query);
+			TestSubject.assertTestCondition(!testObject.hasMember(query), String.format("The JSON object %s "
+					+ "should not have the member %s.", testObject, query));
 		}
 	}
 	
@@ -227,18 +197,18 @@ public class JsonObjectTesting implements TestSubject {
 					+ "should have the size %s after removal of null, but has %s.", testObject, 
 					sizeBeforeRemoval, testObject.size()));
 			// test removal of random member
-			JsonPair query = JsonObjectTesting.generateRandomPair();
-			testObject.remove(query.getName()); // remove potential collisions to ensure a correct test
+			JsonString query = JsonObjectTesting.generateRandomString();
+			testObject.remove(query); // remove potential collisions to ensure a correct test
 			int sizeBefore = testObject.size();
 			for (int j = JsonObjectTesting.RANDOM.nextInt(20); j >= 0; j--) {
-				testObject.add(query);
+				testObject.add(query, JsonValueTesting.generateRandomValue());
 			}
-			testObject.remove(query.getName());
+			testObject.remove(query);
 			TestSubject.assertTestCondition(testObject.size() == sizeBefore, String.format("The JSON object %s "
 					+ "should have the size %s after removal of %s, but has %s.", testObject, 
-					sizeBeforeRemoval, query.getName(), testObject.size()));
-			TestSubject.assertTestCondition(!testObject.hasMember(query.getName()), String.format("The JSON object %s "
-					+ "should not have the member %s after removal.", testObject, query.getName()));
+					sizeBeforeRemoval, query, testObject.size()));
+			TestSubject.assertTestCondition(!testObject.hasMember(query), String.format("The JSON object %s "
+					+ "should not have the member %s after removal.", testObject, query));
 		}
 	}
 	
@@ -272,41 +242,43 @@ public class JsonObjectTesting implements TestSubject {
 			}
 			// test adding new members by setting
 			JsonObject addObject = JsonObjectTesting.generateRandomObject();
-			JsonPair addPair = JsonObjectTesting.generateRandomPair();
-			addObject.remove(addPair.getName()); // remove potential collisions to ensure a correct test
+			JsonString addName = JsonObjectTesting.generateRandomString();
+			JsonValue addValue = JsonValueTesting.generateRandomValue();
+			addObject.remove(addName); // remove potential collisions to ensure a correct test
 			int sizeBeforeAdding = addObject.size();
-			JsonValue addReturn  = addObject.set(addPair.getName(), addPair.getValue());
+			JsonValue addReturn  = addObject.set(addName, addValue);
 			TestSubject.assertTestCondition(addObject.size() == sizeBeforeAdding + 1, 
 					String.format("The JSON object %s should have the size %s, but has %s.", 
 							addObject, sizeBeforeAdding + 1, addObject.size()));
 			TestSubject.assertTestCondition(addReturn == null, 
-					String.format("Adding the member %s to the JSON object %s by setting should return "
+					String.format("Adding the member %s:%s to the JSON object %s by setting should return "
 							+ "null, but returned %s instead.", 
-							addPair, addObject, addReturn));
-			TestSubject.assertTestCondition(addPair.getValue().equals(addObject.get(addPair.getName())), 
+							addName, addValue, addObject, addReturn));
+			TestSubject.assertTestCondition(addValue.equals(addObject.get(addName)), 
 					String.format("The JSON object %s should hold the value %s at member %s, "
-							+ "but holds %s instead.", addObject, addPair.getValue(), 
-							addPair.getName(), addObject.get(addPair.getName())));
+							+ "but holds %s instead.", addObject, addValue, 
+							addName, addObject.get(addName)));
 			// test setting existent members
 			JsonObject setObject = JsonObjectTesting.generateRandomObject();
-			JsonPair setPair = JsonObjectTesting.generateRandomPair();
-			setObject.remove(setPair.getName()); // remove potential collisions to ensure a correct test
-			setObject.set(setPair.getName(), setPair.getValue());
+			JsonString setName = JsonObjectTesting.generateRandomString();
+			JsonValue setValue = JsonValueTesting.generateRandomValue();
+			setObject.remove(setName); // remove potential collisions to ensure a correct test
+			setObject.set(setName, setValue);
 			JsonValue newValue = new JsonNumber(JsonObjectTesting.RANDOM.nextInt());
 			int sizeBeforeSetting = setObject.size();
-			JsonValue setReturn  = setObject.set(setPair.getName(), newValue);
+			JsonValue setReturn  = setObject.set(setName, newValue);
 
 			TestSubject.assertTestCondition(setObject.size() == sizeBeforeSetting, 
 					String.format("The JSON object %s should have the size %s, but has %s.", 
 							setObject, sizeBeforeSetting, setObject.size()));
-			TestSubject.assertTestCondition(setReturn.equals(setPair.getValue()), 
-					String.format("Setting the member %s to %s for the JSON object %s should return "
+			TestSubject.assertTestCondition(setReturn.equals(setValue), 
+					String.format("Setting the member %s:%s to %s for the JSON object %s should return "
 							+ "%s, but returned %s instead.", 
-							setPair, newValue, setObject, setPair.getValue(), setReturn));
-			TestSubject.assertTestCondition(newValue.equals(setObject.get(setPair.getName())), 
+							setName, setValue, newValue, setObject, setValue, setReturn));
+			TestSubject.assertTestCondition(newValue.equals(setObject.get(setName)), 
 					String.format("The JSON object %s should hold the value %s at member %s, "
 							+ "but holds %s instead.", setObject, newValue, 
-							setPair.getName(), setObject.get(setPair.getName())));
+							setName, setObject.get(setName)));
 		}
 	}
 	
@@ -341,7 +313,7 @@ public class JsonObjectTesting implements TestSubject {
 		for (int i = 0; i < 10000; i++) {
 			// test singular members
 			JsonObject testObject = JsonObjectTesting.generateRandomObject();
-			testObject.add(JsonObjectTesting.generateRandomPair()); // needed since empty objects can be generated
+			testObject.add(JsonObjectTesting.generateRandomString(), JsonValueTesting.generateRandomValue()); // needed since empty objects can be generated
 			// pick a random member
 			JsonString[] memberNames = testObject.getNames();
 			JsonString testMember = memberNames[JsonObjectTesting.RANDOM.nextInt(memberNames.length)];
@@ -364,7 +336,7 @@ public class JsonObjectTesting implements TestSubject {
 			JsonValue[] testValues = new JsonValue[memberCount];
 			for (int j = 0; j < testValues.length; j++) {
 				testValues[j] = new JsonNumber(JsonObjectTesting.RANDOM.nextInt());
-				testObject.add(new JsonPair(testMember, testValues[j]));
+				testObject.add(testMember, testValues[j]);
 			}
 			TestSubject.assertTestCondition(Arrays.equals(testObject.getValues(testMember), testValues), 
 					String.format("The JSON object %s should hold the values %s for the member %s "
@@ -385,12 +357,14 @@ public class JsonObjectTesting implements TestSubject {
 	private static void testToJson() throws TestFailureException {
 		for (int i = 0; i < 10000; i++) {
 			JsonObject testObject = new JsonObject();
-			ArrayList<JsonPair> testList = JsonObjectTesting.generateRandomMemberList();
+			int testNumMembers = JsonObjectTesting.RANDOM.nextInt(50);
 			String perfectString = Character.toString(JsonObject.JSON_OBJECT_START_IDENTIFIER);
-			for (int j = 0; j < testList.size(); j++) {
-				testObject.add(testList.get(j));
-				perfectString += testList.get(j).toJson();
-				if (j < testList.size() - 1) {
+			for (int j = 0; j < testNumMembers; j++) {
+				JsonString testName = JsonObjectTesting.generateRandomString();
+				JsonValue testValue = JsonValueTesting.generateRandomValue();
+				testObject.add(testName, testValue);
+				perfectString += testName.toJson() + JsonObject.JSON_OBJECT_NAME_VALUE_SEPARATOR + testValue.toJson();
+				if (j < testNumMembers - 1) {
 					perfectString += JsonObject.JSON_OBJECT_PAIR_SEPARATOR;
 				}
 			}
@@ -533,23 +507,9 @@ public class JsonObjectTesting implements TestSubject {
 		JsonObject randomObject = new JsonObject();
 		int objectSize = JsonObjectTesting.RANDOM.nextInt(20);
 		for (int j = 0; j < objectSize; j++) {
-			randomObject.add(JsonObjectTesting.generateRandomPair());
+			randomObject.add(JsonObjectTesting.generateRandomString(), JsonValueTesting.generateRandomValue());
 		}
 		return randomObject;
-	}
-	
-	/**
-	 * Generate a random list of JSON pairs to be used as members.
-	 * 
-	 * @return a random JSON pair list
-	 */
-	private static ArrayList<JsonPair> generateRandomMemberList() {
-		ArrayList<JsonPair> randomList = new ArrayList<JsonPair>();
-		int objectSize = JsonObjectTesting.RANDOM.nextInt(20);
-		for (int j = 0; j < objectSize; j++) {
-			randomList.add(JsonObjectTesting.generateRandomPair());
-		}
-		return randomList;
 	}
 	
 	/**
@@ -561,21 +521,6 @@ public class JsonObjectTesting implements TestSubject {
 		byte[] randomString = new byte[JsonObjectTesting.RANDOM.nextInt(200)];
 		JsonObjectTesting.RANDOM.nextBytes(randomString);
 		return new JsonString(new String(randomString));
-	}
-	
-	/**
-	 * Generate a random JSON pair.
-	 * 
-	 * @return a random JSON pair
-	 */
-	private static JsonPair generateRandomPair() {
-		try {
-			return new JsonPair(JsonObjectTesting.generateRandomString(), 
-					new JsonNumber(JsonObjectTesting.RANDOM.nextDouble()));
-		} catch (JsonStandardException e) {
-			return new JsonPair(JsonObjectTesting.generateRandomString(), 
-					new JsonNumber(JsonObjectTesting.RANDOM.nextLong()));
-		}
 	}
 
 }

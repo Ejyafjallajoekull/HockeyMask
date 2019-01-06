@@ -12,7 +12,7 @@ import hockey.mask.json.parser.JsonStringParser;
  * @author Planters
  *
  */
-public final class JsonPair {
+final class JsonPair {
 
 	private final JsonString name;
 	private JsonValue value = null;
@@ -28,7 +28,7 @@ public final class JsonPair {
 	 * @param name - the name of the pair
 	 * @param value - the value of the pair
 	 * @throws NullpointerException if null is supplied for name as it must be a JSON 
-	 * formatted string
+	 * formatted string or value as it must be any JSON formatted value
 	 */
 	public JsonPair(JsonString name, JsonValue value) {
 		this.name = Objects.requireNonNull(name, "JSON strings may not be null.");

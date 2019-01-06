@@ -1,7 +1,6 @@
 package hockey.mask.json.values;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Objects;
 
@@ -18,7 +17,7 @@ import hockey.mask.json.parser.JsonStringParser;
  * @author Planters
  *
  */
-public final class JsonObject extends JsonValue implements Iterable<JsonPair> {
+public final class JsonObject extends JsonValue {
 
 	/**
 	 *  The identifier used to identify the start of a JSON formatted object.
@@ -30,6 +29,11 @@ public final class JsonObject extends JsonValue implements Iterable<JsonPair> {
 	 */
 	public static final char JSON_OBJECT_END_IDENTIFIER = '}';
 
+	/**
+	 * The separator used to separate a name and value pair in a JSON object.
+	 */
+	public static final char JSON_OBJECT_NAME_VALUE_SEPARATOR = JsonPair.JSON_PAIR_SEPARATOR;
+	
 	/**
 	 *  The separator used to separate JSON formatted pairs or members contained in 
 	 *  a JSON formatted object.
@@ -207,28 +211,24 @@ public final class JsonObject extends JsonValue implements Iterable<JsonPair> {
 	 * @param pair - the member to add
 	 * @throws NullPointerException if the member to add is null
 	 */
-	public void add(JsonPair pair) {
+	private void add(JsonPair pair) {
 		Objects.requireNonNull(pair, "Null is no valid member for a JSON object.");
 		this.members.add(pair);
 	}
 
 	/**
-	 * Adds all pairs of the specified collection as members to this JSON object.
+	 * Adds the specified pair as member to the JSON object.
 	 * While not recommended, it is possible to add duplicate members to the JSON object.
-	 * This method will fail if the collection contains null values.
+	 * Null is not permitted.
 	 * 
-	 * @param pairsToAdd - the collection of members to add
-	 * @return true if the collection has successfully been added, false if the collection 
-	 * contains null
-	 * @throws NullPointerException if the specified collection is null
+	 * @param name - the name of the member to add
+	 * @param value - the value to add for the specified member
+	 * @throws NullPointerException if the member name or value is null
 	 */
-	public boolean addAll(Collection<? extends JsonPair> pairsToAdd) {
-		Objects.requireNonNull(pairsToAdd, "The collection " + pairsToAdd + " cannot be added.");
-		if (!pairsToAdd.contains(null)) {
-			return this.members.addAll(pairsToAdd);
-		} else {
-			return false;
-		}
+	public void add(JsonString name, JsonValue value) {
+		Objects.requireNonNull(name, "Null is no valid member name for a JSON object.");
+		Objects.requireNonNull(value, "Null is no valid member value for a JSON object.");
+		this.members.add(new JsonPair(name, value));
 	}
 
 	/**
@@ -245,11 +245,6 @@ public final class JsonObject extends JsonValue implements Iterable<JsonPair> {
 	 */
 	public boolean hasMembers() {
 		return !this.members.isEmpty();
-	}
-
-	@Override
-	public Iterator<JsonPair> iterator() {
-		return this.members.iterator();
 	}
 
 	/**
@@ -288,6 +283,8 @@ public final class JsonObject extends JsonValue implements Iterable<JsonPair> {
 	 * @throws NullPointerException if name or value is null
 	 */
 	public JsonValue set(JsonString name, JsonValue value) {
+		Objects.requireNonNull(name, "Null is no valid member name for a JSON object.");
+		Objects.requireNonNull(value, "Null is no valid member value for a JSON object.");
 		for (JsonPair pair : this.members) {
 			if (pair.getName().equals(name)) {
 				JsonValue oldValue = pair.getValue();
@@ -295,8 +292,7 @@ public final class JsonObject extends JsonValue implements Iterable<JsonPair> {
 				return oldValue;
 			}
 		}
-		// this will throw the necessary exception
-		this.add(new JsonPair(name, value));
+		this.add(name, value);
 		return null;
 	}
 

@@ -10,7 +10,6 @@ import hockey.mask.json.values.JsonBoolean;
 import hockey.mask.json.values.JsonNull;
 import hockey.mask.json.values.JsonNumber;
 import hockey.mask.json.values.JsonObject;
-import hockey.mask.json.values.JsonPair;
 import hockey.mask.json.values.JsonString;
 import hockey.mask.json.values.JsonValue;
 import koro.sensei.tester.TestFailureException;
@@ -153,7 +152,7 @@ public class JsonValueTesting implements TestSubject {
 		JsonObject randomObject = new JsonObject();
 		int objectSize = JsonValueTesting.RANDOM.nextInt(20);
 		for (int j = 0; j < objectSize; j++) {
-			randomObject.add(JsonValueTesting.generateRandomPair());
+			randomObject.add(JsonValueTesting.generateRandomString(), generateRandomValue());
 		}
 		return randomObject;
 	}
@@ -167,16 +166,6 @@ public class JsonValueTesting implements TestSubject {
 		byte[] randomString = new byte[JsonValueTesting.RANDOM.nextInt(200)];
 		JsonValueTesting.RANDOM.nextBytes(randomString);
 		return new JsonString(new String(randomString));
-	}
-	
-	/**
-	 * Generate a random JSON pair.
-	 * 
-	 * @return a random JSON pair
-	 */
-	private static JsonPair generateRandomPair() {
-		return new JsonPair(JsonValueTesting.generateRandomString(), 
-				JsonValueTesting.generateRandomValue());
 	}
 	
 	/**
@@ -239,7 +228,7 @@ public class JsonValueTesting implements TestSubject {
 	 * 
 	 * @return a random JSON value
 	 */
-	private static JsonValue generateRandomValue() {
+	public static JsonValue generateRandomValue() {
 		double randomChoice = JsonValueTesting.RANDOM.nextDouble();
 		if (randomChoice < 0.25d) {
 			return JsonValueTesting.generateRandomNumber();
