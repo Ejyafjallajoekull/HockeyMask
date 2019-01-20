@@ -13,7 +13,7 @@ import hockey.mask.json.parser.JsonStringParser;
  * @author Planters
  *
  */
-public final class JsonNumber extends JsonValue {
+public final class JsonNumber extends JsonValue implements Comparable<JsonNumber> {
 	
 	/**
 	 * The JSON representation of a minus.
@@ -297,6 +297,12 @@ public final class JsonNumber extends JsonValue {
 	@Override
 	public String toString() {
 		return this.toJson();
+	}
+
+	@Override
+	public int compareTo(JsonNumber jsonNumber) {
+		Objects.requireNonNull(jsonNumber, String.format("The JSON number \"%s\" cannot be compared to null.", this));
+		return this.value.compareTo(jsonNumber.value);
 	}
 
 }

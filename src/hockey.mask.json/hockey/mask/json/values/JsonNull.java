@@ -12,7 +12,7 @@ import hockey.mask.json.parser.JsonStringParser;
  * @author Planters
  *
  */
-public final class JsonNull extends JsonValue {
+public final class JsonNull extends JsonValue implements Comparable<JsonNull> {
 	
 	/**
 	 * The JSON representation of a null value.
@@ -102,6 +102,12 @@ public final class JsonNull extends JsonValue {
 	@Override
 	public String toString() {
 		return "null";
+	}
+	
+	@Override
+	public int compareTo(JsonNull jsonNull) {
+		Objects.requireNonNull(jsonNull, String.format("The JSON null \"%s\" cannot be compared to null.", this));
+		return 0;
 	}
 	
 }

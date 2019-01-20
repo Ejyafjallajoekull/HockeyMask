@@ -12,7 +12,7 @@ import hockey.mask.json.parser.JsonStringParser;
  * @author Planters
  *
  */
-public final class JsonBoolean extends JsonValue {
+public final class JsonBoolean extends JsonValue implements Comparable<JsonBoolean> {
 
 	/**
 	 * The JSON representation of a true boolean.
@@ -137,6 +137,12 @@ public final class JsonBoolean extends JsonValue {
 	@Override
 	public String toString() {
 		return this.toJson();
+	}
+	
+	@Override
+	public int compareTo(JsonBoolean jsonBoolean) {
+		Objects.requireNonNull(jsonBoolean, String.format("The JSON boolean \"%s\" cannot be compared to null.", this));
+		return Boolean.compare(this.value, jsonBoolean.value);
 	}
 
 }
