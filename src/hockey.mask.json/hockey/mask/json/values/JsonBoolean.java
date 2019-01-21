@@ -54,11 +54,6 @@ public final class JsonBoolean extends JsonValue implements Comparable<JsonBoole
 	public boolean getValue() {
 		return this.value;
 	}
-
-	@Override
-	public JsonValueTypes getType() {
-		return JsonValueTypes.BOOLEAN;
-	}
 	
 	/**
 	 * Get a JSON formatted string from the internal representation of this JSON boolean.

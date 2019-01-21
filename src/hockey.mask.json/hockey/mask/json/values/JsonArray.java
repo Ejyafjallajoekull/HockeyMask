@@ -52,11 +52,6 @@ public final class JsonArray extends JsonValue implements List<JsonValue> {
 //	public JsonArray(Collection<? extends JsonValue> content) {
 //		super(content);
 //	}
-
-	@Override
-	public JsonValueTypes getType() {
-		return JsonValueTypes.ARRAY;
-	}
 	
 	/**
 	 * Convert this JsonArray to a JSON formatted array string. 

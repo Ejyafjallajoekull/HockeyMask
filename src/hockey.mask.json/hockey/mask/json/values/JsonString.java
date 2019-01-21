@@ -70,11 +70,6 @@ public final class JsonString extends JsonValue implements Comparable<JsonString
 	public String getValue() {
 		return this.value;
 	}
-
-	@Override
-	public JsonValueTypes getType() {
-		return JsonValueTypes.STRING;
-	}
 	
 	/**
 	 * Get a JSON formatted string from the internal representation of this JSON string.

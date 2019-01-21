@@ -116,11 +116,6 @@ public final class JsonNumber extends JsonValue implements Comparable<JsonNumber
 		return this.value;
 	}
 	
-	@Override
-	public JsonValueTypes getType() {
-		return JsonValueTypes.NUMBER;
-	}
-	
 	/**
 	 * Get a JSON formatted number from the internal representation of this JSON number.
 	 * 

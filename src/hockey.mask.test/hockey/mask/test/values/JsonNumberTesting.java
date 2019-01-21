@@ -7,7 +7,6 @@ import java.util.Random;
 import hockey.mask.json.JsonStandardException;
 import hockey.mask.json.parser.JsonStringParser;
 import hockey.mask.json.values.JsonNumber;
-import hockey.mask.json.values.JsonValueTypes;
 import koro.sensei.tester.TestFailureException;
 import koro.sensei.tester.TestSubject;
 
@@ -22,7 +21,6 @@ public class JsonNumberTesting implements TestSubject {
 		JsonNumberTesting.testToJson();
 		JsonNumberTesting.testParsing();
 		JsonNumberTesting.testParsingNext();
-		JsonNumberTesting.testType();
 	}
 	
 	/**
@@ -411,18 +409,6 @@ public class JsonNumberTesting implements TestSubject {
 		} catch (JsonStandardException e) {
 			throw new TestFailureException("Creating the JSON parser failed.", e);
 		}
-	}
-
-	/**
-	 * Test getting the correct type for a JSON number.
-	 * 
-	 * @throws TestFailureException
-	 */
-	private static void testType() throws TestFailureException {
-			JsonNumber testNumber = new JsonNumber(JsonNumberTesting.RANDOM.nextInt());
-			TestSubject.assertTestCondition(testNumber.getType() == JsonValueTypes.NUMBER, 
-					String.format("The JSON number %s should be of type %s, but is of type %s "
-					+ "instead.", testNumber, JsonValueTypes.NUMBER, testNumber.getType()));
 	}
 
 }

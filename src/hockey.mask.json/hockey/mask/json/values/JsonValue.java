@@ -14,14 +14,6 @@ import hockey.mask.json.parser.JsonStringParser;
  *
  */
 public abstract class JsonValue {
-	
-	
-	/**
-	 * Get the type of this JSON value.
-	 * 
-	 * @return the type of the value
-	 */
-	public abstract JsonValueTypes getType();
 		
 	/**
 	 * Get a string representing the value following the JSON standard.

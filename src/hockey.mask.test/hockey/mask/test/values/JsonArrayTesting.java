@@ -10,7 +10,6 @@ import hockey.mask.json.values.JsonArray;
 import hockey.mask.json.values.JsonNull;
 import hockey.mask.json.values.JsonNumber;
 import hockey.mask.json.values.JsonValue;
-import hockey.mask.json.values.JsonValueTypes;
 import koro.sensei.tester.TestFailureException;
 import koro.sensei.tester.TestSubject;
 
@@ -33,7 +32,6 @@ public class JsonArrayTesting implements TestSubject {
 		JsonArrayTesting.testToJson();
 		JsonArrayTesting.testParsing();
 		JsonArrayTesting.testParsingNext();
-		JsonArrayTesting.testType();
 	}
 	
 	/**
@@ -406,18 +404,6 @@ public class JsonArrayTesting implements TestSubject {
 				throw new TestFailureException("Creating the JSON parser failed.", e);
 			}
 		}
-	}
-	
-	/**
-	 * Test getting the correct type for a JSON array.
-	 * 
-	 * @throws TestFailureException
-	 */
-	private static void testType() throws TestFailureException {
-			JsonArray testArray = new JsonArray();
-			TestSubject.assertTestCondition(testArray.getType() == JsonValueTypes.ARRAY, 
-					String.format("The JSON array %s should be of type %s, but is of type %s "
-					+ "instead.", testArray, JsonValueTypes.ARRAY, testArray.getType()));
 	}
 	
 	/**

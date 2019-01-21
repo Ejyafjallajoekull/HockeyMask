@@ -113,11 +113,6 @@ public final class JsonObject extends JsonValue {
 		return false;
 	}
 	
-	@Override
-	public JsonValueTypes getType() {
-		return JsonValueTypes.OBJECT;
-	}
-	
 	/**
 	 * Convert this JSON object to a JSON formatted object string. 
 	 * 

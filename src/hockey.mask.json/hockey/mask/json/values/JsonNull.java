@@ -30,11 +30,6 @@ public final class JsonNull extends JsonValue implements Comparable<JsonNull> {
 	private JsonNull() {
 		// empty private constructor to prevent instantiation
 	}
-
-	@Override
-	public JsonValueTypes getType() {
-		return JsonValueTypes.NULL;
-	}
 	
 	/**
 	 * Get a JSON formatted string from the internal representation of this JSON null.

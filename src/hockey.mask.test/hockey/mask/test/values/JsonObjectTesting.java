@@ -12,7 +12,6 @@ import hockey.mask.json.values.JsonNumber;
 import hockey.mask.json.values.JsonObject;
 import hockey.mask.json.values.JsonString;
 import hockey.mask.json.values.JsonValue;
-import hockey.mask.json.values.JsonValueTypes;
 import koro.sensei.tester.TestFailureException;
 import koro.sensei.tester.TestSubject;
 
@@ -40,7 +39,6 @@ public class JsonObjectTesting implements TestSubject {
 		JsonObjectTesting.testToJson();
 		JsonObjectTesting.testParsing();
 		JsonObjectTesting.testParsingNext();
-		JsonObjectTesting.testType();
 	}
 	
 	/**
@@ -484,18 +482,6 @@ public class JsonObjectTesting implements TestSubject {
 				throw new TestFailureException("Creating the JSON parser failed.", e);
 			}
 		}
-	}
-	
-	/**
-	 * Test getting the correct type for a JSON object.
-	 * 
-	 * @throws TestFailureException
-	 */
-	private static void testType() throws TestFailureException {
-			JsonObject testObject = new JsonObject();
-			TestSubject.assertTestCondition(testObject.getType() == JsonValueTypes.OBJECT, 
-					String.format("The JSON object %s should be of type %s, but is of type %s "
-					+ "instead.", testObject, JsonValueTypes.OBJECT, testObject.getType()));
 	}
 	
 	/**

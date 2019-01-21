@@ -6,7 +6,6 @@ import java.util.Random;
 import hockey.mask.json.JsonStandardException;
 import hockey.mask.json.parser.JsonStringParser;
 import hockey.mask.json.values.JsonString;
-import hockey.mask.json.values.JsonValueTypes;
 import koro.sensei.tester.TestFailureException;
 import koro.sensei.tester.TestSubject;
 
@@ -26,7 +25,6 @@ public class JsonStringTesting implements TestSubject {
 		JsonStringTesting.testToJson();
 		JsonStringTesting.testParsing();
 		JsonStringTesting.testParsingNext();
-		JsonStringTesting.testType();
 	}
 	
 	/**
@@ -225,18 +223,6 @@ public class JsonStringTesting implements TestSubject {
 				throw new TestFailureException("Creating the JSON parser failed.", e);
 			}
 		}
-	}
-
-	/**
-	 * Test getting the correct type for a JSON string.
-	 * 
-	 * @throws TestFailureException
-	 */
-	private static void testType() throws TestFailureException {
-			JsonString testString = new JsonString("");
-			TestSubject.assertTestCondition(testString.getType() == JsonValueTypes.STRING, 
-					String.format("The JSON string %s should be of type %s, but is of type %s "
-					+ "instead.", testString, JsonValueTypes.STRING, testString.getType()));
 	}
 	
 }
