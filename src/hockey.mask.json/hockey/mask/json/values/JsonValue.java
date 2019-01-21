@@ -16,6 +16,16 @@ import hockey.mask.json.parser.JsonStringParser;
 public abstract class JsonValue {
 		
 	/**
+	 * Create a new JSON value.
+	 * 
+	 * <p>This constructor's only purpose it to prevent clients from 
+	 * extending this class.</p>
+	 */
+	JsonValue() {
+		// Empty constructor.
+	}
+	
+	/**
 	 * Get a string representing the value following the JSON standard.
 	 * 
 	 * @return this value in JSON format

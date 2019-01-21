@@ -46,6 +46,7 @@ public final class JsonObject extends JsonValue {
 	 * Create a new JSON object without any members.
 	 */
 	public JsonObject() {
+		super();
 	}
 	
 	/**

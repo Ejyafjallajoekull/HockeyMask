@@ -43,6 +43,7 @@ public final class JsonBoolean extends JsonValue implements Comparable<JsonBoole
 	 */
 	private JsonBoolean(boolean jsonBoolean) {
 		// private constructor to prevent instantiation
+		super();
 		this.value = jsonBoolean;
 	}
 	

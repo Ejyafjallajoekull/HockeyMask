@@ -28,7 +28,7 @@ public final class JsonNull extends JsonValue implements Comparable<JsonNull> {
 	 * Create a new JSON null value.
 	 */
 	private JsonNull() {
-		// empty private constructor to prevent instantiation
+		super();
 	}
 	
 	/**

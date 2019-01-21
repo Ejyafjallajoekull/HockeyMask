@@ -53,6 +53,7 @@ public final class JsonNumber extends JsonValue implements Comparable<JsonNumber
 	 * @param jsonNumber - the value of this JSON number
 	 */
 	public JsonNumber(int jsonNumber) {
+		super();
 		this.value = new BigDecimal(jsonNumber);
 	}
 	
@@ -62,6 +63,7 @@ public final class JsonNumber extends JsonValue implements Comparable<JsonNumber
 	 * @param jsonNumber - the value of this JSON number
 	 */
 	public JsonNumber(long jsonNumber) {
+		super();
 		this.value = new BigDecimal(jsonNumber);
 	}
 	
@@ -72,6 +74,7 @@ public final class JsonNumber extends JsonValue implements Comparable<JsonNumber
 	 * @throws JsonStandardException if the passed number is infinity or NaN
 	 */
 	public JsonNumber(float jsonNumber) throws JsonStandardException {
+		super();
 		if (Float.isFinite(jsonNumber)) {
 			this.value = new BigDecimal(jsonNumber);
 		} else {
@@ -87,6 +90,7 @@ public final class JsonNumber extends JsonValue implements Comparable<JsonNumber
 	 * @throws JsonStandardException if the passed number is infinity or NaN
 	 */
 	public JsonNumber(double jsonNumber) throws JsonStandardException {
+		super();
 		if (Double.isFinite(jsonNumber)) {
 			this.value = new BigDecimal(jsonNumber);
 		} else {
@@ -102,7 +106,8 @@ public final class JsonNumber extends JsonValue implements Comparable<JsonNumber
 	 * @throws NullPointerException if the specified value is null
 	 */
 	public JsonNumber(BigDecimal jsonNumber) {
-			this.value = Objects.requireNonNull(jsonNumber, "A JSON number cannot be created from null.");
+		super();
+		this.value = Objects.requireNonNull(jsonNumber, "A JSON number cannot be created from null.");
 	}
 	
 	

@@ -41,7 +41,8 @@ public final class JsonArray extends JsonValue implements List<JsonValue> {
 	/**
 	 * Create a new, empty JSON array.
 	 */
-	public JsonArray() {		
+	public JsonArray() {
+		super();
 	}
 	
 	/**

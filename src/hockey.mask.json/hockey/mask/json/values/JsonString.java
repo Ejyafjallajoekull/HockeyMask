@@ -58,6 +58,7 @@ public final class JsonString extends JsonValue implements Comparable<JsonString
 	 * @throws NullPointerException if null is passed string value
 	 */
 	public JsonString(String value) {
+		super();
 		this.value = Objects.requireNonNull(value, "A JSON formatted string cannot be null.");
 	}
 	
