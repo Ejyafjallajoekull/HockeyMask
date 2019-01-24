@@ -36,7 +36,7 @@ public final class JsonArray extends JsonValue implements List<JsonValue> {
 	 */
 	public static final char JSON_ARRAY_VALUE_SEPARATOR = ',';
 	
-	private final ArrayList<JsonValue> array = new ArrayList<JsonValue>();
+	private final List<JsonValue> array = new ArrayList<JsonValue>();
 		
 	/**
 	 * Create a new, empty JSON array.

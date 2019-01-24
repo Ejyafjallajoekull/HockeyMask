@@ -2,6 +2,7 @@ package hockey.mask.json.values;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 
 import hockey.mask.json.JsonStandardException;
@@ -17,7 +18,7 @@ import hockey.mask.json.parser.JsonStringParser;
  * @author Planters
  *
  */
-public final class JsonObject extends JsonValue {
+public final class JsonObject extends JsonValue {//implements Map<JsonString, List<JsonValue>> {
 
 	/**
 	 *  The identifier used to identify the start of a JSON formatted object.
@@ -40,7 +41,7 @@ public final class JsonObject extends JsonValue {
 	 */
 	public static final char JSON_OBJECT_PAIR_SEPARATOR = ',';
 	
-	private final ArrayList<JsonPair> members = new ArrayList<JsonPair>();
+	private final List<JsonPair> members = new ArrayList<JsonPair>();
 	
 	/**
 	 * Create a new JSON object without any members.
