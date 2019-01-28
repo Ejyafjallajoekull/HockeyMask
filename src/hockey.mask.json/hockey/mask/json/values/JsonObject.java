@@ -1,9 +1,13 @@
 package hockey.mask.json.values;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import hockey.mask.json.JsonStandardException;
 import hockey.mask.json.parser.JsonParser;
@@ -18,17 +22,17 @@ import hockey.mask.json.parser.JsonStringParser;
  * @author Planters
  *
  */
-public final class JsonObject extends JsonValue {//implements Map<JsonString, List<JsonValue>> {
+public final class JsonObject extends JsonValue {
 
 	/**
 	 *  The identifier used to identify the start of a JSON formatted object.
 	 */
-	public static final char JSON_OBJECT_START_IDENTIFIER = '{';
+	public static final String JSON_OBJECT_START_IDENTIFIER = "{";
 	
 	/**
 	 *  The identifier used to identify the end of a JSON formatted object.
 	 */
-	public static final char JSON_OBJECT_END_IDENTIFIER = '}';
+	public static final String JSON_OBJECT_END_IDENTIFIER = "}";
 
 	/**
 	 * The separator used to separate a name and value pair in a JSON object.
@@ -39,9 +43,9 @@ public final class JsonObject extends JsonValue {//implements Map<JsonString, Li
 	 *  The separator used to separate JSON formatted pairs or members contained in 
 	 *  a JSON formatted object.
 	 */
-	public static final char JSON_OBJECT_PAIR_SEPARATOR = ',';
-	
-	private final List<JsonPair> members = new ArrayList<JsonPair>();
+	public static final String JSON_OBJECT_PAIR_SEPARATOR = ",";
+		
+	private final Map<JsonString, List<JsonValue>> jsonPairs = new HashMap<JsonString, List<JsonValue>>();
 	
 	/**
 	 * Create a new JSON object without any members.
@@ -56,48 +60,46 @@ public final class JsonObject extends JsonValue {//implements Map<JsonString, Li
 	 * @return the names of all members
 	 */
 	public JsonString[] getNames() {
-		JsonString[] names = new JsonString[this.members.size()];
-		for (int i = 0; i < this.members.size(); i++) {
-			names[i] = this.members.get(i).getName();
-		}
-		return names;
+		return this.jsonPairs.keySet().toArray(JsonString[]::new);
 	}
 	
 	/**
 	 * Get the member values assigned to the specified member name.
-	 * This may be multiple values, however, the JSON standard discourages 
+	 * 
+	 * <p>This may be multiple values, however, the JSON standard discourages 
 	 * the use of duplicate member names, so following those recommendations most 
-	 * of the time a array holding a single value will be returned.
+	 * of the time a array holding a single value will be returned.</p>
 	 * 
 	 * @param name - the member name to get the values from
 	 * @return the values assigned to the specified member name
 	 */
 	public JsonValue[] getValues(JsonString name) {
-		ArrayList<JsonValue> values = new ArrayList<JsonValue>();
-		for (JsonPair pair : this.members) {
-			if (pair.getName().equals(name)) {
-				values.add(pair.getValue());
-			}
+		List<JsonValue> values = this.jsonPairs.get(name);
+		if (values != null) {
+			return values.toArray(JsonValue[]::new);
+		} else {
+			return new JsonValue[0];
 		}
-		return values.toArray(new JsonValue[values.size()]);
 	}
 	
 	/**
-	 * Get the value of the first occurrence of a member with the specified name.<br>
-	 * This function should always be used if it is known that the JSON standard 
-	 * recommendation of unique member names was satisfied.<br>
-	 * Null will be returned if no member with the specified name does exist.
+	 * Get the value of the value of the first occurrence of a member with the specified name.
+	 * 
+	 * <p>This function should always be used if it is known that the JSON standard 
+	 * recommendation of unique member names was satisfied.</p>
+	 * 
+	 * <p>{@code Null} will be returned if no member with the specified name exists.</p>
 	 * 
 	 * @param name - the name of the member
 	 * @return the value of the first member with the specified name
 	 */
 	public JsonValue get(JsonString name) {
-		for (JsonPair pair : this.members) {
-			if (pair.getName().equals(name)) {
-				return pair.getValue();
-			}
+		List<JsonValue> values = this.jsonPairs.get(name);
+		if (values != null && !values.isEmpty()) {
+			return values.get(0);
+		} else {
+			return null;
 		}
-		return null;
 	}
 	
 	/**
@@ -107,12 +109,21 @@ public final class JsonObject extends JsonValue {//implements Map<JsonString, Li
 	 * @return true if a member with the specified name is present, false if not
 	 */
 	public boolean hasMember(JsonString name) {
-		for (JsonPair pair : this.members) {
-			if (pair.getName().equals(name)) {
-				return true;
-			}
-		}
-		return false;
+		return this.jsonPairs.containsKey(name);
+	}
+	
+	/**
+	 * Convert the specified map entry into a stream of JSON member pairs.
+	 * 
+	 * @param keyMemberPair - the entry containing the member name as key and all values 
+	 * associated with at as list
+	 * @return a stream of JSON object member pairs
+	 * @throws NullPointerException if the supplied entry is null or either key or value 
+	 * of the entry is null
+	 */
+	private static Stream<JsonPair> entryToPairStream(Entry<JsonString, List<JsonValue>> keyMemberPair) {
+		return keyMemberPair.getValue().stream()
+		.map(value -> new JsonPair(keyMemberPair.getKey(), value));
 	}
 	
 	/**
@@ -122,16 +133,10 @@ public final class JsonObject extends JsonValue {//implements Map<JsonString, Li
 	 */
 	@Override
 	public String toJson() {
-		StringBuilder jsonString = new StringBuilder(Character.toString(JsonObject.JSON_OBJECT_START_IDENTIFIER));
-		for (int i = 0; i < this.members.size(); i++) {
-			JsonPair val = this.members.get(i);
-			jsonString.append(val.toJson());
-			if (i != this.size() - 1) {
-				jsonString.append(JsonObject.JSON_OBJECT_PAIR_SEPARATOR);
-			}
-		}
-		jsonString.append(JsonObject.JSON_OBJECT_END_IDENTIFIER);
-		return jsonString.toString();
+		return this.jsonPairs.entrySet().stream()
+		.flatMap(JsonObject::entryToPairStream) // transform to JSON member pairs
+		.map(JsonPair::toJson) // transform to JSON standard string
+		.collect(Collectors.joining(JsonObject.JSON_OBJECT_PAIR_SEPARATOR, JsonObject.JSON_OBJECT_START_IDENTIFIER, JsonObject.JSON_OBJECT_END_IDENTIFIER));
 	}
 	
 	/**
@@ -210,7 +215,7 @@ public final class JsonObject extends JsonValue {//implements Map<JsonString, Li
 	 */
 	private void add(JsonPair pair) {
 		Objects.requireNonNull(pair, "Null is no valid member for a JSON object.");
-		this.members.add(pair);
+		this.add(pair.getName(), pair.getValue());
 	}
 
 	/**
@@ -225,14 +230,14 @@ public final class JsonObject extends JsonValue {//implements Map<JsonString, Li
 	public void add(JsonString name, JsonValue value) {
 		Objects.requireNonNull(name, "Null is no valid member name for a JSON object.");
 		Objects.requireNonNull(value, "Null is no valid member value for a JSON object.");
-		this.members.add(new JsonPair(name, value));
+		this.jsonPairs.computeIfAbsent(name, k -> new ArrayList<JsonValue>()).add(value);
 	}
 
 	/**
 	 * Removes all members from the JSON object.
 	 */
 	public void clear() {
-		this.members.clear();
+		this.jsonPairs.clear();
 	}
 
 	/**
@@ -241,7 +246,7 @@ public final class JsonObject extends JsonValue {//implements Map<JsonString, Li
 	 * @return true if this JSON array does have at least one member
 	 */
 	public boolean hasMembers() {
-		return !this.members.isEmpty();
+		return !this.jsonPairs.isEmpty();
 	}
 
 	/**
@@ -250,28 +255,24 @@ public final class JsonObject extends JsonValue {//implements Map<JsonString, Li
 	 * @param name - the name of the member to remove
 	 */
 	public void remove(JsonString name) {
-		for (Iterator<JsonPair> i = this.members.iterator(); i.hasNext();) {
-			JsonPair pair = i.next();
-			if (pair.getName().equals(name)) {
-				i.remove();
-			}
-		}
+		this.jsonPairs.remove(name);
 	}
 
 	/**
-	 * Get the number of members of this JSON object.
+	 * Get the number of unique members of this JSON object.
 	 * 
 	 * @return the number of members
 	 */
 	public int size() {
-		return this.members.size();
+		return this.jsonPairs.size();
 	}
 
 	/**
 	 * Set the first member with the specified name to the specified value.
-	 * If no member with this name does exist a new one is created and added.
+	 * 
+	 * <p>If no member with this name does exist a new one is created and added.
 	 * The value previously held by the member is returned. If the member has been 
-	 * newly created null is returned.
+	 * newly created null is returned.</p>
 	 * 
 	 * @param name - the name of the member to set
 	 * @param value - the value to set for the specified member
@@ -282,20 +283,18 @@ public final class JsonObject extends JsonValue {//implements Map<JsonString, Li
 	public JsonValue set(JsonString name, JsonValue value) {
 		Objects.requireNonNull(name, "Null is no valid member name for a JSON object.");
 		Objects.requireNonNull(value, "Null is no valid member value for a JSON object.");
-		for (JsonPair pair : this.members) {
-			if (pair.getName().equals(name)) {
-				JsonValue oldValue = pair.getValue();
-				pair.setValue(value);
-				return oldValue;
-			}
+		List<JsonValue> allValues = this.jsonPairs.computeIfAbsent(name, k -> new ArrayList<JsonValue>());
+		if (allValues.isEmpty()) {
+			allValues.add(value);
+			return null;
+		} else {
+			return allValues.set(0, value);
 		}
-		this.add(name, value);
-		return null;
 	}
 
 	@Override
 	public int hashCode() {
-		return this.members.hashCode();
+		return this.jsonPairs.hashCode();
 	}
 
 	@Override
@@ -303,14 +302,14 @@ public final class JsonObject extends JsonValue {//implements Map<JsonString, Li
 		if (obj == this) {
 			return true;
 		} else if (obj instanceof JsonObject) {
-			return this.members.equals(((JsonObject) obj).members);
+			return this.jsonPairs.equals(((JsonObject) obj).jsonPairs);
 		}
 		return false;
 	}
 	
 	@Override
 	public String toString() {
-		return this.members.toString();
+		return this.toJson();
 	}
 		
 }
