@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import hockey.mask.json.JsonStandardException;
 import hockey.mask.json.parser.JsonParser;
@@ -23,18 +24,18 @@ public final class JsonArray extends JsonValue implements List<JsonValue> {
 	/**
 	 *  The identifier used to identify the start of a JSON formatted array.
 	 */
-	public static final char JSON_ARRAY_START_IDENTIFIER = '[';
+	public static final String JSON_ARRAY_START_IDENTIFIER = "[";
 	
 	/**
 	 *  The identifier used to identify the end of a JSON formatted array.
 	 */
-	public static final char JSON_ARRAY_END_IDENTIFIER = ']';
+	public static final String JSON_ARRAY_END_IDENTIFIER = "]";
 
 	/**
 	 *  The separator used to separate JSON formatted values contained in 
 	 *  a JSON formatted array.
 	 */
-	public static final char JSON_ARRAY_VALUE_SEPARATOR = ',';
+	public static final String JSON_ARRAY_VALUE_SEPARATOR = ",";
 	
 	private final List<JsonValue> array = new ArrayList<JsonValue>();
 		
@@ -62,20 +63,8 @@ public final class JsonArray extends JsonValue implements List<JsonValue> {
 	 */
 	@Override
 	public String toJson() {
-		StringBuilder jsonString = new StringBuilder(Character.toString(JsonArray.JSON_ARRAY_START_IDENTIFIER));
-		for (int i = 0; i < this.size(); i++) {
-			JsonValue val = this.get(i);
-			if (val != null) {
-				jsonString.append(val.toJson());
-			} else {
-				jsonString.append(JsonNull.JSON_NULL.toJson());
-			}
-			if (i != this.size() - 1) {
-				jsonString.append(JsonArray.JSON_ARRAY_VALUE_SEPARATOR);
-			}
-		}
-		jsonString.append(JsonArray.JSON_ARRAY_END_IDENTIFIER);
-		return jsonString.toString();
+		return this.array.stream().map(JsonValue::toJson)
+		.collect(Collectors.joining(JsonArray.JSON_ARRAY_VALUE_SEPARATOR, JsonArray.JSON_ARRAY_START_IDENTIFIER, JsonArray.JSON_ARRAY_END_IDENTIFIER));
 	}
 	
 	/**
@@ -324,12 +313,22 @@ public final class JsonArray extends JsonValue implements List<JsonValue> {
 
 	@Override
 	public ListIterator<JsonValue> listIterator() {
-		return this.array.listIterator();
+		/*
+		 * Create a wrapper for the list iterator to prevent
+		 * addition of null values.
+		 */
+		ListIterator<JsonValue> iterator = this.array.listIterator();
+		return iterator != null ? new NonNullListIterator(iterator): null;
 	}
 
 	@Override
 	public ListIterator<JsonValue> listIterator(int index) {
-		return this.array.listIterator(index);
+		/*
+		 * Create a wrapper for the list iterator to prevent
+		 * addition of null values.
+		 */
+		ListIterator<JsonValue> iterator = this.array.listIterator(index);
+		return iterator != null ? new NonNullListIterator(iterator): null;
 	}
 
 	/**
@@ -383,6 +382,82 @@ public final class JsonArray extends JsonValue implements List<JsonValue> {
 	@Override
 	public String toString() {
 		return this.array.toString();
+	}
+	
+	/**
+	 * The {@code NonNullListIterator} class represents wrapper for a 
+	 * {@link ListIterator} to prevent addition of null values to the {@link JsonArray}.
+	 * 
+	 * @author Planters
+	 *
+	 */
+	private static class NonNullListIterator implements ListIterator<JsonValue> {
+		
+		private final ListIterator<JsonValue> iterator;
+
+		/**
+		 * Create a new wrapper for a {@link ListIterator} to prevent addition of null
+		 * values to the {@link JsonArray}.
+		 * 
+		 * @param iterator - the iterator to wrap
+		 */
+		private NonNullListIterator(ListIterator<JsonValue> iterator) {
+			this.iterator = iterator;
+		}
+		
+		@Override
+		public void add(JsonValue arg0) {
+			if (arg0 != null) {
+				this.iterator.add(arg0);
+			} else {
+				throw new NullPointerException("Null cannot be added to a JSON array.");
+			}
+		}
+
+		@Override
+		public boolean hasNext() {
+			return this.iterator.hasNext();
+		}
+
+		@Override
+		public boolean hasPrevious() {
+			return this.iterator.hasPrevious();
+		}
+
+		@Override
+		public JsonValue next() {
+			return this.iterator.next();
+		}
+
+		@Override
+		public int nextIndex() {
+			return this.iterator.nextIndex();
+		}
+
+		@Override
+		public JsonValue previous() {
+			return this.iterator.previous();
+		}
+
+		@Override
+		public int previousIndex() {
+			return this.iterator.previousIndex();
+		}
+
+		@Override
+		public void remove() {
+			this.iterator.remove();
+		}
+
+		@Override
+		public void set(JsonValue arg0) {
+			if (arg0 != null) {
+				this.iterator.set(arg0);
+			} else {
+				throw new NullPointerException("Null cannot be added to a JSON array.");
+			}
+		}
+		
 	}
 	
 }

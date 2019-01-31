@@ -280,7 +280,7 @@ public class JsonArrayTesting implements TestSubject {
 		for (int i = 0; i < 10000; i++) {
 			JsonArray testArray = new JsonArray();
 			ArrayList<JsonValue> testList = JsonArrayTesting.generateRandomList();
-			String perfectString = Character.toString(JsonArray.JSON_ARRAY_START_IDENTIFIER);
+			String perfectString = JsonArray.JSON_ARRAY_START_IDENTIFIER;
 			for (int j = 0; j < testList.size(); j++) {
 				testArray.add(testList.get(j));
 				perfectString += testList.get(j).toJson();

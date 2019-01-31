@@ -30,32 +30,18 @@ public class JsonObjectTesting implements TestSubject {
 	
 	@Override
 	public void runAllTests() throws TestFailureException {
-		int i = 0;
-		System.out.println(i++);
 		JsonObjectTesting.testConstructors();
-		System.out.println(i++);
 		JsonObjectTesting.testAdding();
-		System.out.println(i++);
 		JsonObjectTesting.testClear();
-		System.out.println(i++);
 		JsonObjectTesting.testHasMembers();
-		System.out.println(i++);
 		JsonObjectTesting.testHasMember();
-		System.out.println(i++);
 		JsonObjectTesting.testRemove();
-		System.out.println(i++);
 		JsonObjectTesting.testSetting();
-		System.out.println(i++);
 		JsonObjectTesting.testGetNames();
-		System.out.println(i++);
 		JsonObjectTesting.testGetting();
-		System.out.println(i++);
 		JsonObjectTesting.testToJson();
-		System.out.println(i++);
 		JsonObjectTesting.testParsing();
-		System.out.println(i++);
 		JsonObjectTesting.testParsingNext();
-		System.out.println(i++);
 	}
 	
 	/**
